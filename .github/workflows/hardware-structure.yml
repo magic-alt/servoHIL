@@ -23,6 +23,9 @@ jobs:
       - name: Check Rev.A power schematic contract
         run: python tools/check_power_schematic_contract.py
 
+      - name: Check Rev.A HIL-Link contract
+        run: python tools/check_hil_link_contract.py
+
       - name: Install current KiCad CLI
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
