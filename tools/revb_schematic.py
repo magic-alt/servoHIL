@@ -71,8 +71,9 @@ class Project:
 
 class Sheet:
     def __init__(self,project,name,title):
-        self.p=project;self.name=name;self.title=title;self.sheet_id=uid(name);self.items=[];self.used=set();self.seq=0
+        self.p=project;self.name=name;self.title=name.replace('_',' ');self.sheet_id=uid(name);self.items=[];self.used=set();self.seq=0
         project.pages.append(self)
+        self.text(title,25.4,25.4)
     def newid(self):
         self.seq+=1;return uid(self.name+str(self.seq))
     def text(self,text,x,y):
@@ -148,7 +149,7 @@ def build(d,profile,physical,assignments,out: Path):
     rails=['+5V0_DAC','+5V2_PVDD','-5V2_PVSS','1V8_D','3V3_D','VREF_2V5','GND']
     name=p.connector_def('SUPPLY_INTERFACE',[(str(i+1),v,'power_out') for i,v in enumerate(rails)])
     power.instance(name,'J1','EXTERNAL BENCH RAILS ONLY',88.9,76.2,{str(i+1):v for i,v in enumerate(rails)})
-    safe=[('1','ARM_IN','input'),('2','WDI_IN','input'),('3','FAULT_OUT_N','output'),('4','DAC_RESET_OUT_N','output'),('5','V3V3','power_in'),('6','V1V8','power_in'),('7','GND','power_in')]
+    safe=[('1','ARM_IN','input'),('2','WDI_IN','input'),('3','FAULT_N','output'),('4','DAC_RESET_N','output'),('5','V3V3','power_in'),('6','V1V8','power_in'),('7','GND','power_in')]
     name=p.connector_def('SAFETY_INTERFACE',safe)
     power.instance(name,'J2','EXTERNAL INDEPENDENT SAFETY - NOT IMPLEMENTED HERE',292.1,76.2,dict(zip([str(i+1) for i in range(7)],['HIL_ARM','HIL_WDI','HIL_FAULT_N','DAC_RESET_N','3V3_D','1V8_D','GND'])))
     power.passive('R','R1','10k default RESET asserted',292.1,127,'DAC_RESET_N','GND')
