@@ -4,6 +4,7 @@ Supply and safety connectors are EXTERNAL boundary contracts, not pretend PMICs
 or safety-certified logic. This project is not authorized for fabrication.
 """
 from pathlib import Path
+import csv
 import json
 import uuid
 
@@ -13,9 +14,17 @@ def q(value): return json.dumps(str(value),ensure_ascii=True)
 def n(value): return f'{value:.2f}'.rstrip('0').rstrip('.')
 def fx(size=1.27): return f'(effects (font (size {n(size)} {n(size)})))'
 
+
+def paper_for_height(height):
+    for paper, available in [('A3', 272), ('A2', 395), ('A1', 569)]:
+        if height <= available:
+            return paper
+    raise ValueError('connector/page exceeds supported review-sheet size')
+
+
 class Project:
     def __init__(self):
-        self.defs={};self.pages=[];self.root=uid('root');self.expected={}
+        self.defs={};self.pages=[];self.root=uid('root');self.expected={};self.references=set();self.bom=[]
     def definition(self,name,pins,half=25.4,width=15.24,passive=False):
         """pins: (number, displayed name, electrical type, x, y, orientation)."""
         pintext=[]
@@ -47,6 +56,9 @@ class Project:
             pins.append((str(number),label,typ,20.32 if right else -20.32,y,180 if right else 0))
         return self.definition(name,pins,half)
     def save(self,out):
+        with (out/'generated_bom.csv').open('w',newline='',encoding='utf-8') as handle:
+            writer=csv.DictWriter(handle,fieldnames=['reference','value','symbol','dnp','footprint','status'])
+            writer.writeheader();writer.writerows(self.bom)
         libs='\n'.join(v[0] for v in self.defs.values())
         (out/'revb.kicad_sym').write_text(f'(kicad_symbol_lib (version 20231120) (generator kicad_symbol_editor)\n{libs}\n)\n')
         (out/'sym-lib-table').write_text('(sym_lib_table (version 7) (lib (name "RevB") (type "KiCad") (uri "${KIPRJMOD}/revb.kicad_sym") (options "") (descr "Generated single-SoC interface review")))\n')
@@ -61,7 +73,8 @@ class Project:
 (property "Sheetfile" "{page.name}.kicad_sch" (at {n(x)} {n(y+38.1)} 0) {fx()})
 (instances (project "servohil_io_revB" (path "/{self.root}" (page "{i+2}")))))''')
         note='REVIEW ONLY: direct single-SoC host + 8 AO. Supply, safety and ADC/PHY interfaces are NOT completed onboard circuits. NO PCB LAYOUT.'
-        top=f'''(kicad_sch (version 20231120) (generator eeschema) (uuid "{self.root}") (paper "A3")
+        top_paper=paper_for_height(88.9+((len(self.pages)-1)//2)*60.96)
+        top=f'''(kicad_sch (version 20231120) (generator eeschema) (uuid "{self.root}") (paper "{top_paper}")
 (title_block (title "ServoHIL Rev.B - single SoC / direct carrier") (rev "B-review") (company "magic-alt/servoHIL"))
 (lib_symbols)
 (text {q(note)} (at 25.4 25.4 0) (effects (font (size 1.524 1.524)) (justify left bottom)) (uuid "{uid('top-note')}"))
@@ -70,8 +83,8 @@ class Project:
         (out/'expected_connections.json').write_text(json.dumps(self.expected,sort_keys=True,indent=2)+'\n')
 
 class Sheet:
-    def __init__(self,project,name,title):
-        self.p=project;self.name=name;self.title=name.replace('_',' ');self.sheet_id=uid(name);self.items=[];self.used=set();self.seq=0
+    def __init__(self,project,name,title,paper='A3'):
+        self.p=project;self.name=name;self.title=name.replace('_',' ');self.sheet_id=uid(name);self.items=[];self.used=set();self.seq=0;self.paper=paper
         project.pages.append(self)
         self.text(title,25.4,25.4)
     def newid(self):
@@ -84,6 +97,11 @@ class Sheet:
 (effects (font (size 1.27 1.27)) (justify {justify})) (uuid "{self.newid()}")
 (property "Intersheetrefs" "${{INTERSHEET_REFS}}" (at {n(x)} {n(y)} 0) (effects (font (size 1.27 1.27)) hide)))''')
     def instance(self,definition,ref,value,x,y,mapping,dnp=False):
+        if ref in self.p.references:
+            raise ValueError('duplicate schematic reference: '+ref)
+        self.p.references.add(ref)
+        self.p.bom.append(dict(reference=ref,value=value,symbol=definition,dnp=str(dnp).lower(),
+                               footprint='',status='REVIEW_ONLY_NOT_FOR_PURCHASE'))
         self.used.add(definition)
         _,pins,half=self.p.defs[definition]
         ref_y=y-half-5.08;val_y=y+half+5.08
@@ -113,7 +131,7 @@ class Sheet:
         for name in sorted(self.used):
             text=self.p.defs[name][0].replace(f'(symbol {q(name)}',f'(symbol "RevB:{name}"',1)
             defs.append(text)
-        s=f'''(kicad_sch (version 20231120) (generator eeschema) (uuid "{uid(self.name+'-file')}") (paper "A3")
+        s=f'''(kicad_sch (version 20231120) (generator eeschema) (uuid "{uid(self.name+'-file')}") (paper "{self.paper}")
 (title_block (title {q(self.title)}) (rev "B-review") (company "magic-alt/servoHIL")
 (comment 1 "NON-RELEASE: physical power, safety, timing and package reviews remain open"))
 (lib_symbols {' '.join(defs)})
@@ -121,29 +139,48 @@ class Sheet:
 )\n'''
         (out/(self.name+'.kicad_sch')).write_text(s)
 
-def build(d,profile,physical,assignments,out: Path):
+def build(d,profile,physical,assignments,out: Path,*,host_refs):
     p=Project()
     for kind in ['R','C']:
         p.definition(kind,[('1','1','passive',-5.08,0,0),('2','2','passive',5.08,0,180)],half=0,passive=True)
     sig={s['net']:s for s in d['signals']}
     pinmap={(r['connector'],int(r['pin'])):r['net'] for r in assignments}
-    # Carrier interface. Source/sink pin types model the purchased HOST at its connector.
-    host=Sheet(p,'01_carrier_interface','01 - Purchased carrier connectors: direct peripheral I/O')
-    for i,conn in enumerate(sorted({r['connector'] for r in physical})):
-        rows=[r for r in physical if r['connector']==conn]
+    # Model the purchased host boundary, NOT a second on-board compute chip.
+    connectors=sorted({r['connector'] for r in physical})
+    if len(connectors)>8:
+        raise ValueError('more than eight host connectors need a reviewed drawing template')
+    axu=profile['id']=='axu2cgb'
+    if axu:
+        host=Sheet(p,'01_carrier_interface','01 - Original AXU2CGB: direct J12/J15 peripheral I/O')
+    for i,conn in enumerate(connectors):
+        rows=sorted((r for r in physical if r['connector']==conn),key=lambda r:int(r['pin']))
         entries=[];mapping={}
         for row in rows:
             number=str(row['pin']);net=pinmap.get((conn,int(number)))
             typ='passive'
             if net: typ={'input':'input','output':'output','inout':'bidirectional'}[sig[net]['direction']]
-            display_name='AXU_3V3' if row['board_signal']=='VCC_3V3_BUCK4' else row['board_signal']
+            display_name='AXU_3V3' if axu and row['board_signal']=='VCC_3V3_BUCK4' else row['board_signal']
             entries.append((number,display_name,typ))
             mapping[number]=net if net else 'GND' if row['kind']=='ground' else None
         name=p.connector_def('HOST_'+conn,entries)
-        host.instance(name,conn,conn+' / PURCHASED HOST boundary',88.9+i*215.9,111.76,mapping)
-    host.text('Connector power contacts remain NC. 64 assigned GPIO; unused GPIO also NC. No secondary compute chip.',25.4,190.5)
-    host.text('J12 and J15 are ORIGINAL AXU2CGB interfaces, not AXU2CGB-I or -E. No board-power backfeed through contacts.',25.4,200.66)
-    host.text('Signal-pin backfeed, output enable and bank power sequencing STILL REQUIRE electrical review.',25.4,210.82)
+        if axu:
+            x,y=88.9+i*215.9,111.76
+        else:
+            half=p.defs[name][2]
+            y=50.8+half
+            paper=paper_for_height(y+half+45.72)
+            host=Sheet(p,f'01_carrier_interface_{i+1:02d}',
+                       f'01 - SoM host connector {conn}; I/O REVIEW ONLY',paper=paper)
+            host.text(str(profile['vendor'])+' / '+str(profile['module'])+' / rev '+str(profile['module_revision']),25.4,35.56)
+            x=127
+        host.instance(name,host_refs[conn],conn+' / PURCHASED HOST boundary',x,y,mapping)
+        if not axu:
+            host.text('Physical connector '+conn+' = schematic '+host_refs[conn]+'. Connector power contacts are NC in this I/O-only review.',25.4,y+half+15.24)
+            host.text('Vendor supply/boot circuitry, Ioff and bank sequencing are NOT implemented or qualified by this drawing.',25.4,y+half+25.4)
+    if axu:
+        host.text('Connector power contacts remain NC. 64 assigned GPIO; unused GPIO also NC. No secondary compute chip.',25.4,190.5)
+        host.text('J12 and J15 are ORIGINAL AXU2CGB interfaces, not AXU2CGB-I or -E. No board-power backfeed through contacts.',25.4,200.66)
+        host.text('Signal-pin backfeed, output enable and bank power sequencing STILL REQUIRE electrical review.',25.4,210.82)
     # External bench rails and independent safety integration boundary; no fake PMIC.
     power=Sheet(p,'02_power_safety_boundary','02 - External regulated I/O rails and independent safety boundary')
     rails=['+5V0_DAC','+5V2_PVDD','-5V2_PVSS','1V8_D','3V3_D','VREF_2V5','GND']

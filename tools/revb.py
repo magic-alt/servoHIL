@@ -36,9 +36,49 @@ def load(root: Path, carrier: str):
     d = read_json(root/'hardware/revB/io_contract.json')
     base = root/'hardware/carriers'/carrier
     p = read_json(base/'profile.json')
+    if p.get('id') != carrier:
+        raise ValueError('carrier identity does not match selected directory')
     phy = read_csv(base/p['physical_pinout']) if p['physical_pinout'] else []
     a = read_csv(base/p['assignments']) if p['assignments'] else []
     return d, p, phy, a
+
+def carrier_references(profile, physical):
+    """Map vendor connector names to collision-free schematic references.
+
+    AXU2CGB keeps its documented J12/J15 names. SoM physical names remain in
+    the pinout/derived map; J100+ avoids collisions with common J1..J5 circuits.
+    """
+    connectors = sorted({row['connector'] for row in physical})
+    if profile['id'] == 'axu2cgb':
+        return {name: name for name in connectors}
+    return {name: f'J{100 + i}' for i, name in enumerate(connectors)}
+
+
+def validate_physical_contacts(physical):
+    """Validate every contact, including unused SoM pins, before generation."""
+    bank_voltages = {}
+    for row in physical:
+        if not SAFE_ID.fullmatch(row['connector']):
+            raise ValueError('invalid connector identifier')
+        pin = str(row['pin'])
+        if not re.fullmatch(r'[1-9][0-9]*', pin):
+            raise ValueError('physical pin must be a positive canonical number')
+        kind = row['kind']
+        if kind not in {'gpio', 'ground', 'power'}:
+            raise ValueError('unknown physical contact kind: ' + kind)
+        voltage = float(row['voltage'])
+        if not (0 <= voltage < 1000):
+            raise ValueError('invalid physical contact voltage')
+        if kind == 'ground' and voltage != 0:
+            raise ValueError('ground contact must have zero voltage')
+        if kind == 'gpio':
+            bank = row['bank_group']
+            if not bank or voltage <= 0:
+                raise ValueError('GPIO bank/voltage is missing')
+            previous = bank_voltages.setdefault(bank, voltage)
+            if previous != voltage:
+                raise ValueError('bank voltage conflict: ' + bank)
+
 
 def expected_signals():
     result = {}
@@ -89,6 +129,7 @@ def validate(d, p, physical, assignments):
     if p['id'] == 'zu2cg_som' and not all(p.get(k) for k in ['vendor','module','module_revision','device']):
         raise ValueError('SoM vendor binding incomplete')
     if not physical: raise ValueError('missing physical pinout')
+    validate_physical_contacts(physical)
     if hashlib.sha256(csv_bytes(physical)).hexdigest() != p['physical_sha256']:
         raise ValueError('physical pinout digest differs from reviewed transcription')
     positions = [(r['connector'],int(r['pin'])) for r in physical]
@@ -178,17 +219,20 @@ def generate(root: Path, carrier: str, output: Path):
     phy={(r['connector'],int(r['pin'])):r for r in physical}
     sig={s['net']:s for s in d['signals']}
     rows=[]
+    host_refs=carrier_references(p,physical)
     xdc=['# REVIEW PREVIEW ONLY - no bitstream or board timing approval.',
          '# Import into the EXISTING HOST project for I/O planning; not a standalone design.',
          '# Host clock architecture, I/O delays and bank DRC remain unverified.']
     for assignment in a:
         q=phy[(assignment['connector'],int(assignment['pin']))];s=sig[assignment['net']]
         standard='LVCMOS18' if float(q['voltage'])==1.8 else 'LVCMOS33'
-        rows.append({**assignment, 'soc_ball':q['soc_ball'], 'port':s['port'],
+        rows.append({**assignment, 'schematic_ref':host_refs[assignment['connector']],
+                     'soc_ball':q['soc_ball'], 'port':s['port'],
                      'direction':s['direction'], 'iostandard':standard, 'bank_group':q['bank_group']})
         xdc += [f"set_property PACKAGE_PIN {q['soc_ball']} [get_ports {{{s['port']}}}]",
                 f"set_property IOSTANDARD {standard} [get_ports {{{s['port']}}}]"]
     (output/'derived_pin_map.csv').write_bytes(csv_bytes(rows))
+    (output/'carrier_references.json').write_text(json.dumps(host_refs,sort_keys=True,indent=2)+'\n')
     (output/'carrier.xdc.preview').write_text('\n'.join(xdc)+'\n')
     summary.update(carrier=carrier, source_digest=source_digest(root), layout_allowed=False,
                    scope='interface-plus-DAC review; power/ADC/PHY/safety boundaries are not completed circuits')
@@ -197,7 +241,7 @@ def generate(root: Path, carrier: str, output: Path):
     import importlib.util
     spec=importlib.util.spec_from_file_location('revb_schematic',root/'tools/revb_schematic.py')
     builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
-    builder.build(d,p,physical,a,output)
+    builder.build(d,p,physical,a,output,host_refs=host_refs)
     return summary
 
 def main(argv=None):

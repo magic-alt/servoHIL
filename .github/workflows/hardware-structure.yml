@@ -59,6 +59,28 @@ jobs:
           python tools/check_revb_erc.py build/revB/erc.json
       - name: Export native review PDF
         run: kicad-cli sch export pdf -o build/revB/schematic-review.pdf build/revB/servohil_io_revB.kicad_sch
+      - name: Native SoM compatibility regression - synthetic fixtures only
+        shell: bash
+        run: |
+          for case in multi large; do
+            binding="build/synthetic-$case-source"
+            output="build/synthetic-$case-review"
+            python tests/generate_som_fixture.py --case "$case" --binding-root "$binding" --output "$output"
+            kicad-cli sch export netlist --format kicadxml -o "$output/netlist.xml" "$output/servohil_io_revB.kicad_sch"
+            python tools/check_revb_netlist.py "$output/netlist.xml" "$output/expected_connections.json" --carrier zu2cg_som --root "$binding"
+            kicad-cli sch erc --format json --exit-code-violations -o "$output/erc.json" "$output/servohil_io_revB.kicad_sch"
+            python tools/check_revb_erc.py "$output/erc.json"
+            kicad-cli sch export pdf -o "$output/synthetic-review.pdf" "$output/servohil_io_revB.kicad_sch"
+          done
+      - name: Upload synthetic compatibility evidence - not a SoM product
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: servohil-revb-SYNTHETIC-som-regression
+          path: |
+            build/synthetic-multi-review/
+            build/synthetic-large-review/
+          if-no-files-found: warn
       - name: Upload non-release review evidence
         if: always()
         uses: actions/upload-artifact@v4
