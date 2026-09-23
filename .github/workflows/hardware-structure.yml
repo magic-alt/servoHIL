@@ -27,6 +27,9 @@ jobs:
         run: |
           python tools/revb.py generate --carrier axu2cgb --output build/revB
           git rev-parse HEAD > build/revB/source_commit.txt
+          # Reproduce this exact review offline; include tracked files only, never credentials.
+          git archive --format=zip --output=build/revB/source.zip HEAD
+          (cd build/revB && sha256sum source.zip > source.zip.sha256)
       - name: Prove unbound SoM and fabrication gates fail closed
         shell: bash
         run: |
