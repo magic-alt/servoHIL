@@ -5,8 +5,8 @@ This directory is the native KiCad hierarchy for the first ServoHIL-I/O board.
 ## Current state
 
 - all seven child schematic sheets are populated;
-- KiCad 10.0.6 parses the full hierarchy;
-- ERC: **0 errors / 0 warnings**;
+- historical pre-repair baseline: KiCad 10.0.6 parsed the full hierarchy;
+- historical pre-repair ERC baseline: **0 errors / 0 warnings**; rerun ERC after the archive readability repair before relying on that result;
 - CI exports the complete schematic PDF review artifact;
 - POWER topology is implemented but switching-stage values are still PRELIM;
 - AXU2CGB J12 HIL-Link mapping is implemented from the ICD;
@@ -23,6 +23,25 @@ This directory is the native KiCad hierarchy for the first ServoHIL-I/O board.
 - `j12_xdc_crosscheck: false`
 - `dac_network_review: false`
 - `layout_allowed: false`
+
+## 2026-09-23 archive readability repair
+
+The Rev.A circuit/net intent is unchanged, but the native schematic presentation
+has been repaired so the pages are usable in the editor:
+
+- every former pin-mounted global label now terminates a 2.54 mm explicit wire
+  stub, making connectivity visible without renaming or merging nets;
+- visible Reference/Value fields are restored to the placement defined by each
+  embedded symbol instead of the scattered generated coordinates;
+- the two analog-power flags and the crowded/off-page digital-power passives are
+  repositioned inside the A3 sheet; the four digital-power output rows are
+  separated from the ADP5054 body;
+- all global-label names/multiplicities, reference designators, component values
+  and explicit no-connect markers are preserved.
+
+This is an archive-only editability/readability repair, not a Rev.A redesign.
+A fresh KiCad ERC should be run on a workstation before merging or using the
+archived schematic for any engineering decision.
 
 ## Hierarchy
 
