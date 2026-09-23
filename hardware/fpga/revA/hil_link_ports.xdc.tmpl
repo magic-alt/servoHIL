@@ -1,12 +1,20 @@
-# ServoHIL-I/O Rev.A XDC TEMPLATE -- DO NOT USE FOR BITSTREAM
-# Exact PACKAGE_PIN values must be filled from Vivado I/O Planner.
+# ServoHIL-I/O Rev.A HIL-Link XDC TEMPLATE -- DO NOT USE FOR BITSTREAM
+# Exact PACKAGE_PIN values must come from Vivado I/O Planner after FGG484 bank review.
+# Local-FPGA naming: hl_tx = ZU2CG -> Local FPGA, hl_rx = Local FPGA -> ZU2CG.
 
-set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx_clk hl_rx_clk}]
-set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx_data[*] hl_rx_data[*]}]
-set_property IOSTANDARD LVCMOS18 [get_ports {hl_sync hl_irq hl_safe_n hl_reset_n hl_heartbeat}]
+set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx_clk hl_rx_clk hl_sync hl_irq hl_safe_n hl_reset_n hl_heartbeat trig0 trig1}]
+set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx[*] hl_rx[*]}]
 
-create_clock -name hil_link_tx_clk -period 10.000 [get_ports hl_tx_clk]
+# Board source damping is present on Local-FPGA-driven hl_rx/irq paths.
+set_property DRIVE 4 [get_ports {hl_rx_clk hl_rx[*] hl_irq}]
+set_property SLEW SLOW [get_ports {hl_rx_clk hl_rx[*] hl_irq}]
 
-# PLACEHOLDER ONLY:
-# set_property PACKAGE_PIN <BALL> [get_ports hl_tx_clk]
-# set_property PACKAGE_PIN <BALL> [get_ports hl_rx_clk]
+create_clock -name HIL_TX_CLK -period 10.000 [get_ports hl_tx_clk]
+
+# Timing values below remain placeholders until PCB flight time and FPGA I/O placement are known.
+# set_input_delay  -clock HIL_TX_CLK -max <ns> [get_ports {hl_tx[*] hl_sync hl_safe_n hl_reset_n hl_heartbeat trig0 trig1}]
+# set_input_delay  -clock HIL_TX_CLK -min <ns> [get_ports {hl_tx[*] hl_sync hl_safe_n hl_reset_n hl_heartbeat trig0 trig1}]
+# set_output_delay -clock <HIL_RX_CLK_OBJ> -max <ns> [get_ports {hl_rx[*] hl_irq}]
+# set_output_delay -clock <HIL_RX_CLK_OBJ> -min <ns> [get_ports {hl_rx[*] hl_irq}]
+
+# PACKAGE_PIN placeholders are deliberately absent.
