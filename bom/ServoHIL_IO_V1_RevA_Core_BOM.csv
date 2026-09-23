@@ -1,0 +1,13 @@
+Ref,Qty,Part,Function,Status
+U1,1,TPS259470L,12V eFuse / reverse current blocking / 5A current limit,freeze candidate
+U2,1,ADP5054,quad buck: 1.0V/1.8V/3.3V/6.0V_PRE,freeze candidate
+U3,1,ADM1186-1,4-channel sequencer/monitor,freeze candidate
+"U4,U5",2,LT3045,low-noise +5.0V / +5.2V LDO,freeze candidate
+U6,1,LTC7149,negative preregulator -6V_PRE,freeze candidate
+U7,1,LT3094,low-noise -5.2V LDO,freeze candidate
+U8,1,ADR4525,shared 2.5V reference,freeze
+U9,1,3.3V AON LDO,sequencer always-on supply,candidate
+U10,1,XC7A35T-1FGG484I,"Local I/O FPGA, 250 user I/O",freeze candidate
+U11,1,128Mbit QSPI Flash 3.3V,FPGA configuration,candidate
+U20-U23,4,AD3542RBCPZ16,8ch 16-bit 16MUPS DAC,freeze
+J10,1,2x20 2.54mm stack header,AXU2CGB J12 / HIL-Link,freeze
