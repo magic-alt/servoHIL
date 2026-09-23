@@ -24,6 +24,15 @@ HL_RESET_N,input,LVCMOS18,1.8V,control,,UNASSIGNED
 HL_HEARTBEAT,input,LVCMOS18,1.8V,control,,UNASSIGNED
 TRIG0,input,LVCMOS18,1.8V,control,,UNASSIGNED
 TRIG1,input,LVCMOS18,1.8V,control,,UNASSIGNED
+SPARE_GC0,bidirectional,LVCMOS18,1.8V,GC-capable reserve,,UNASSIGNED
+SPARE_GC1,bidirectional,LVCMOS18,1.8V,GC-capable reserve,,UNASSIGNED
+SPARE_GC2,bidirectional,LVCMOS18,1.8V,GC-capable reserve,,UNASSIGNED
+DBG0,bidirectional,LVCMOS18,1.8V,debug reserve,,UNASSIGNED
+DBG1,bidirectional,LVCMOS18,1.8V,debug reserve,,UNASSIGNED
+SPARE0,bidirectional,LVCMOS18,1.8V,reserve,,UNASSIGNED
+SPARE1,bidirectional,LVCMOS18,1.8V,reserve,,UNASSIGNED
+SPARE2,bidirectional,LVCMOS18,1.8V,reserve,,UNASSIGNED
+SPARE3,bidirectional,LVCMOS18,1.8V,reserve,,UNASSIGNED
 DAC_SCLK,output,LVCMOS18,1.8V,66MHz max DAC clock,,UNASSIGNED
 DAC_CS0_N,output,LVCMOS18,1.8V,control,,UNASSIGNED
 DAC_CS1_N,output,LVCMOS18,1.8V,control,,UNASSIGNED
