@@ -66,11 +66,27 @@ for sheet in ("06_dac_0_3.kicad_sch", "07_dac_4_7.kicad_sch"):
         if pins != set(range(1, 29)):
             errors.append(f"{sheet}:{ref} does not expose exact AD3542R pins 1..28")
 
-# ±5 V hardware feedback contract: RFB2 is connected to VOUT; RFB1/RFB4 are NC.
-for sheet in ("06_dac_0_3.kicad_sch", "07_dac_4_7.kicad_sch"):
+# ±5 V hardware feedback contract:
+# RFB2 is not represented by a repeated pin-name string per instance; KiCad embeds
+# the symbol definition once and connects each instance with net labels. Verify the
+# actual per-device VOUT/RFB2 network labels instead. Each DACx_VOUTy label occurs
+# at VOUT, RFB2, CFB and the output-series resistor node (>=4 occurrences).
+dac_pages = {
+    "06_dac_0_3.kicad_sch": (0, 1),
+    "07_dac_4_7.kicad_sch": (2, 3),
+}
+for sheet, devices in dac_pages.items():
     text = texts.get(sheet, "")
-    if text.count("RFB2_0") < 2 or text.count("RFB2_1") < 2:
-        errors.append(f"{sheet}: RFB2 ±5V feedback mapping incomplete")
+    for idx in devices:
+        for ch in (0, 1):
+            net = f"DAC{idx}_VOUT{ch}"
+            if text.count(net) < 4:
+                errors.append(f"{sheet}: {net} does not cover VOUT + RFB2 + CFB/output nodes")
+    # Per device: DNC + RFB1/RFB4 for both channels = five explicit NC pins.
+    expected_nc = 5 * len(devices)
+    actual_nc = text.count("(no_connect")
+    if actual_nc != expected_nc:
+        errors.append(f"{sheet}: expected {expected_nc} explicit DAC NC pins, found {actual_nc}")
 
 # FPGA pin-plan must include every core digital interface and remain unassigned.
 plan = ROOT / "hardware" / "fpga" / "revA" / "pin_plan.csv"
