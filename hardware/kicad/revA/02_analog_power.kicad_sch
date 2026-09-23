@@ -149,6 +149,10 @@
           (name "PGFB" (effects (font (size 1.27 1.27))))
           (number "6" (effects (font (size 1.27 1.27))))
         )
+        (pin power_in line (at -12.7 -15.24 0) (length 2.54)
+          (name "EPAD" (effects (font (size 1.27 1.27))))
+          (number "11" (effects (font (size 1.27 1.27))))
+        )
       )
     )
     (symbol "ServoHIL:LTC7149"
@@ -289,6 +293,10 @@
           (name "PG" (effects (font (size 1.27 1.27))))
           (number "4" (effects (font (size 1.27 1.27))))
         )
+        (pin power_in line (at -12.7 -17.78 0) (length 2.54)
+          (name "EPAD" (effects (font (size 1.27 1.27))))
+          (number "13" (effects (font (size 1.27 1.27))))
+        )
       )
     )
     (symbol "ServoHIL:ADR4525"
@@ -345,7 +353,8 @@
     (pin "7" (uuid "a5a5a5a5-0000-4000-8007-0000000007d7"))
     (pin "4" (uuid "a5a5a5a5-0000-4000-8007-0000000007d8"))
     (pin "6" (uuid "a5a5a5a5-0000-4000-8007-0000000007d9"))
-    (instances
+        (pin "11" (uuid "b6b6b6b6-0000-4000-8013-000000001388"))
+(instances
       (project "servohil_io_revA"
         (path "/0867e84b-0fe1-44a2-b571-13108fbbb995" (reference "U4") (unit 1))
       )
@@ -432,7 +441,6 @@
     )
   )
   (no_connect (at 87.7 65.08) (uuid "a5a5a5a5-0000-4000-8007-0000000007e3"))
-  (no_connect (at 87.7 70.16) (uuid "a5a5a5a5-0000-4000-8007-0000000007e4"))
   (symbol
     (lib_id "ServoHIL:R")
     (at 115 55 0)
@@ -620,7 +628,8 @@
     (pin "7" (uuid "a5a5a5a5-0000-4000-8008-000000000800"))
     (pin "4" (uuid "a5a5a5a5-0000-4000-8008-000000000801"))
     (pin "6" (uuid "a5a5a5a5-0000-4000-8008-000000000802"))
-    (instances
+        (pin "11" (uuid "b6b6b6b6-0000-4000-8013-000000001389"))
+(instances
       (project "servohil_io_revA"
         (path "/0867e84b-0fe1-44a2-b571-13108fbbb995" (reference "U5") (unit 1))
       )
@@ -707,7 +716,6 @@
     )
   )
   (no_connect (at 87.7 125.08) (uuid "a5a5a5a5-0000-4000-8008-00000000080c"))
-  (no_connect (at 87.7 130.16) (uuid "a5a5a5a5-0000-4000-8008-00000000080d"))
   (symbol
     (lib_id "ServoHIL:R")
     (at 115 115 0)
@@ -1439,7 +1447,8 @@
     (pin "8" (uuid "a5a5a5a5-0000-4000-8008-000000000875"))
     (pin "7" (uuid "a5a5a5a5-0000-4000-8008-000000000876"))
     (pin "4" (uuid "a5a5a5a5-0000-4000-8008-000000000877"))
-    (instances
+        (pin "13" (uuid "b6b6b6b6-0000-4000-8013-00000000138e"))
+(instances
       (project "servohil_io_revA"
         (path "/0867e84b-0fe1-44a2-b571-13108fbbb995" (reference "U7") (unit 1))
       )
@@ -1852,6 +1861,56 @@
   (text "LT3094 EN/UV and PGFB are tied to -6V0_PRE per unused-control guidance; negative preregulator RUN provides analog-rail sequencing." (exclude_from_sim no) (at 25 178 0)
     (effects (font (size 1.25 1.25)) (justify left bottom))
     (uuid "a5a5a5a5-0000-4000-8008-0000000008ab")
+  )
+  (global_label "6V0_PRE"
+    (shape bidirectional)
+    (at 87.7 70.16 0)
+    (fields_autoplaced yes)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid "b6b6b6b6-0000-4000-8013-00000000138a")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 87.7 70.16 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+  )
+  (global_label "GND"
+    (shape bidirectional)
+    (at 62.3 75.24 0)
+    (fields_autoplaced yes)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid "b6b6b6b6-0000-4000-8013-00000000138b")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 62.3 75.24 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+  )
+  (global_label "6V0_PRE"
+    (shape bidirectional)
+    (at 87.7 130.16 0)
+    (fields_autoplaced yes)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid "b6b6b6b6-0000-4000-8013-00000000138c")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 87.7 130.16 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+  )
+  (global_label "GND"
+    (shape bidirectional)
+    (at 62.3 135.24 0)
+    (fields_autoplaced yes)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid "b6b6b6b6-0000-4000-8013-00000000138d")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 62.3 135.24 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+  )
+  (global_label "-6V0_PRE"
+    (shape bidirectional)
+    (at 327.3 95.78 0)
+    (fields_autoplaced yes)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid "b6b6b6b6-0000-4000-8013-00000000138f")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 327.3 95.78 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
   )
   (sheet_instances (path "/" (page "3")))
 )
