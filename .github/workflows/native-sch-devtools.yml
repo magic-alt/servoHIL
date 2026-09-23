@@ -15,8 +15,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Package KiCad native runtime and library assets
         run: |
-          mkdir -p .devtools
-          docker run --rm -v "$PWD/.devtools:/out" debian:trixie-slim bash -euxc '
+          mkdir -p devtools
+          docker run --rm -v "$PWD/devtools:/out" debian:trixie-slim bash -euxc '
             apt-get update
             apt-get install -y --no-install-recommends kicad kicad-footprints kicad-symbols
             tar -C / -czf /out/kicad-runtime.tar.gz usr/bin/kicad-cli usr/lib/x86_64-linux-gnu usr/share/kicad usr/share/fonts/truetype/dejavu
@@ -25,5 +25,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: kicad-offline-runtime
-          path: .devtools/
+          path: devtools/
+          if-no-files-found: error
           retention-days: 2
