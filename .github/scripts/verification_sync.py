@@ -22,9 +22,10 @@ def clean(v):
     return "" if v.lower() in EMPTY else v
 
 def parse(body):
-    text=body or ""; rx=re.compile(r"^###\s+(.+?)\s*$",re.M); ms=list(rx.finditer(text)); out={}
+    text=body or ""; rx=re.compile(r"^(#{1,6})\s+(.+?)\s*$",re.M); ms=list(rx.finditer(text)); out={}
     for i,m in enumerate(ms):
-        key=FIELDS.get(m.group(1).strip())
+        if len(m.group(1))!=3:continue
+        key=FIELDS.get(m.group(2).strip())
         if key:
             end=ms[i+1].start() if i+1<len(ms) else len(text)
             out[key]=clean(text[m.end():end])
