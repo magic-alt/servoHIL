@@ -1,0 +1,7 @@
+part,role,disposition
+TPS259474L,12V input protection,reference candidate from Rev.A; not silently carried into new released power tree
+LT3045,positive converter rails,retained reference candidate; new load/startup/noise review required
+LTC7149,negative preregulator,retained reference candidate; compensation/magnetics/thermal review required
+LT3094,negative converter rail,retained reference candidate; sequencing and load review required
+ADR4525,precision reference,retained reference candidate; external reference configuration review required
+AD7606C-16,8-AI converter,interface reserved; 1.8V timing and AFE implementation required

@@ -1,0 +1,72 @@
+name: Verification / evidence task
+description: Define one traceable Requirement -> Test Case -> Evidence gate.
+title: "[V&V] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: "One issue = one verification closure. Closing or merging never implies PASS."
+  - type: input
+    id: req
+    attributes: {label: REQ-ID, placeholder: REQ-ENC-001}
+    validations: {required: true}
+  - type: input
+    id: tc
+    attributes: {label: TC-ID, placeholder: TC-ENC-PHY-001}
+    validations: {required: true}
+  - type: input
+    id: node
+    attributes: {label: Knowledge Node URL, description: "Required only if the Matrix row does not exist."}
+  - type: textarea
+    id: requirement
+    attributes: {label: Requirement}
+    validations: {required: true}
+  - type: textarea
+    id: testcase
+    attributes: {label: Test Case}
+    validations: {required: true}
+  - type: dropdown
+    id: level
+    attributes:
+      label: Verification Level
+      options: ["软件/单元", "仿真/RTL", "HIL/台架", "实机", "DV", "PV", "EOL"]
+    validations: {required: true}
+  - type: textarea
+    id: acceptance
+    attributes: {label: Acceptance Criteria, description: "Use measurable pass/fail thresholds."}
+    validations: {required: true}
+  - type: input
+    id: evidence_path
+    attributes: {label: Evidence Path, placeholder: "evidence/run-20260923-..."}
+  - type: input
+    id: evidence_url
+    attributes: {label: Evidence URL}
+  - type: input
+    id: evidence_date
+    attributes: {label: Evidence Date, description: "YYYY-MM-DD; use the actual test/evidence date when known.", placeholder: "2026-09-23"}
+  - type: input
+    id: bench
+    attributes: {label: Bench / DUT}
+  - type: input
+    id: hw
+    attributes: {label: HW Revision}
+  - type: input
+    id: fw
+    attributes: {label: FW SHA}
+  - type: input
+    id: bitstream
+    attributes: {label: Bitstream}
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options: ["NOT RUN", "PARTIAL", "PASS", "FAIL", "BLOCKED"]
+      default: 0
+    validations: {required: true}
+  - type: dropdown
+    id: status
+    attributes:
+      label: Verification Status
+      options: ["Planned", "Ready", "Running", "Verified", "Blocked"]
+      default: 0
+    validations: {required: true}

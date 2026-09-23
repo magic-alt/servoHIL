@@ -1,0 +1,60 @@
+name: hardware-structure
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  rev-a-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check KiCad source structure
+        run: python tools/check_kicad_scaffold.py
+
+      - name: Check PCB layout gate
+        run: python tools/check_layout_gate.py
+
+      - name: Check Rev.A power schematic contract
+        run: python tools/check_power_schematic_contract.py
+
+      - name: Check Rev.A HIL / FPGA / DAC schematic contract
+        run: python tools/check_core_schematic_contract.py
+
+      - name: Install current KiCad CLI
+        run: |
+          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
+
+      - name: Parse Rev.A hierarchy and generate ERC report
+        run: |
+          mkdir -p build
+          kicad-cli version
+          kicad-cli sch erc \
+            -o build/servohil_io_revA_erc.rpt \
+            hardware/kicad/revA/servohil_io_revA.kicad_sch
+          cat build/servohil_io_revA_erc.rpt
+          python tools/check_erc_report.py build/servohil_io_revA_erc.rpt
+
+      - name: Export Rev.A schematic review PDF
+        run: |
+          kicad-cli sch export pdf \
+            -o build/servohil_io_revA_schematic.pdf \
+            hardware/kicad/revA/servohil_io_revA.kicad_sch
+          test -s build/servohil_io_revA_schematic.pdf
+
+      - name: Upload schematic and ERC artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: servohil-reva-hardware-review
+          path: |
+            build/servohil_io_revA_erc.rpt
+            build/servohil_io_revA_schematic.pdf
+          if-no-files-found: warn

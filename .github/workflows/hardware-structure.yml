@@ -1,60 +1,90 @@
 name: hardware-structure
-
 on:
   push:
   pull_request:
-
+permissions:
+  contents: read
 jobs:
-  rev-a-guards:
+  rev-b-review:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-
-      - name: Check KiCad source structure
-        run: python tools/check_kicad_scaffold.py
-
-      - name: Check PCB layout gate
-        run: python tools/check_layout_gate.py
-
-      - name: Check Rev.A power schematic contract
-        run: python tools/check_power_schematic_contract.py
-
-      - name: Check Rev.A HIL / FPGA / DAC schematic contract
-        run: python tools/check_core_schematic_contract.py
-
-      - name: Install current KiCad CLI
+          python-version: '3.12'
+      - name: Unit and mutation regressions
+        run: python -m unittest discover -s tests -v
+      - name: Archived baseline and active architecture
+        run: python tools/check_revb_repository.py
+      - name: Validate both carrier contracts
+        run: |
+          python tools/revb.py validate --carrier axu2cgb
+          python tools/revb.py validate --carrier zu2cg_som
+      - name: Preserve existing verification-sync tests
+        run: python .github/scripts/test_verification_sync.py
+      - name: Generate non-release native review kit
+        run: |
+          python tools/revb.py generate --carrier axu2cgb --output build/revB
+          git rev-parse HEAD > build/revB/source_commit.txt
+          # Reproduce this exact review offline; include tracked files only, never credentials.
+          git archive --format=zip --output=build/revB/source.zip HEAD
+          (cd build/revB && sha256sum source.zip > source.zip.sha256)
+      - name: Prove unbound SoM and fabrication gates fail closed
+        shell: bash
+        run: |
+          set +e
+          python tools/revb.py generate --carrier zu2cg_som --output build/unbound-som > build/revB/som-blocked.txt 2>&1
+          som_rc=$?
+          python tools/revb.py release --carrier axu2cgb > build/revB/release-blocked.txt 2>&1
+          release_rc=$?
+          set -e
+          test "$som_rc" -eq 2
+          test "$release_rc" -eq 2
+          test ! -d build/unbound-som
+          cat build/revB/som-blocked.txt build/revB/release-blocked.txt
+      - name: Install KiCad CLI
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
-
-      - name: Parse Rev.A hierarchy and generate ERC report
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols
+          kicad-cli version | tee build/revB/kicad-version.txt
+      - name: Native netlist electrical cross-check
         run: |
-          mkdir -p build
-          kicad-cli version
-          kicad-cli sch erc \
-            -o build/servohil_io_revA_erc.rpt \
-            hardware/kicad/revA/servohil_io_revA.kicad_sch
-          cat build/servohil_io_revA_erc.rpt
-          python tools/check_erc_report.py build/servohil_io_revA_erc.rpt
-
-      - name: Export Rev.A schematic review PDF
+          kicad-cli sch export netlist --format kicadxml -o build/revB/netlist.xml build/revB/servohil_io_revB.kicad_sch
+          python tools/check_revb_netlist.py build/revB/netlist.xml build/revB/expected_connections.json
+      - name: Native ERC without suppressed warnings
         run: |
-          kicad-cli sch export pdf \
-            -o build/servohil_io_revA_schematic.pdf \
-            hardware/kicad/revA/servohil_io_revA.kicad_sch
-          test -s build/servohil_io_revA_schematic.pdf
-
-      - name: Upload schematic and ERC artifacts
+          kicad-cli sch erc --format json --exit-code-violations -o build/revB/erc.json build/revB/servohil_io_revB.kicad_sch
+          python tools/check_revb_erc.py build/revB/erc.json
+      - name: Export native review PDF
+        run: kicad-cli sch export pdf -o build/revB/schematic-review.pdf build/revB/servohil_io_revB.kicad_sch
+      - name: Native SoM compatibility regression - synthetic fixtures only
+        shell: bash
+        run: |
+          for case in multi large; do
+            binding="build/synthetic-$case-source"
+            output="build/synthetic-$case-review"
+            python tests/generate_som_fixture.py --case "$case" --binding-root "$binding" --output "$output"
+            kicad-cli sch export netlist --format kicadxml -o "$output/netlist.xml" "$output/servohil_io_revB.kicad_sch"
+            python tools/check_revb_netlist.py "$output/netlist.xml" "$output/expected_connections.json" --carrier zu2cg_som --root "$binding"
+            kicad-cli sch erc --format json --exit-code-violations -o "$output/erc.json" "$output/servohil_io_revB.kicad_sch"
+            python tools/check_revb_erc.py "$output/erc.json"
+            kicad-cli sch export pdf -o "$output/synthetic-review.pdf" "$output/servohil_io_revB.kicad_sch"
+          done
+      - name: Upload synthetic compatibility evidence - not a SoM product
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: servohil-reva-hardware-review
+          name: servohil-revb-SYNTHETIC-som-regression
           path: |
-            build/servohil_io_revA_erc.rpt
-            build/servohil_io_revA_schematic.pdf
+            build/synthetic-multi-review/
+            build/synthetic-large-review/
           if-no-files-found: warn
+      - name: Upload non-release review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: servohil-revb-single-soc-review
+          path: build/revB/
+          if-no-files-found: error
