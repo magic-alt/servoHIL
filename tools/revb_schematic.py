@@ -77,9 +77,10 @@ class Sheet:
         self.seq+=1;return uid(self.name+str(self.seq))
     def text(self,text,x,y):
         self.items.append(f'(text {q(text)} (at {n(x)} {n(y)} 0) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "{self.newid()}"))')
-    def label(self,net,x,y):
-        self.items.append(f'''(global_label {q(net)} (shape bidirectional) (at {n(x)} {n(y)} 0)
-(effects (font (size 1.27 1.27)) (justify left)) (uuid "{self.newid()}")
+    def label(self,net,x,y,angle=0):
+        justify='right' if angle==180 else 'left'
+        self.items.append(f'''(global_label {q(net)} (shape bidirectional) (at {n(x)} {n(y)} {angle})
+(effects (font (size 1.27 1.27)) (justify {justify})) (uuid "{self.newid()}")
 (property "Intersheetrefs" "${{INTERSHEET_REFS}}" (at {n(x)} {n(y)} 0) (effects (font (size 1.27 1.27)) hide)))''')
     def instance(self,definition,ref,value,x,y,mapping,dnp=False):
         self.used.add(definition)
@@ -99,7 +100,10 @@ class Sheet:
             if net is None:
                 self.items.append(f'(no_connect (at {n(ax)} {n(ay)}) (uuid "{self.newid()}"))')
             else:
-                self.label(net,ax,ay)
+                # Move the label outward instead of drawing its text over the pin/body.
+                lx=ax+(-5.08 if px<0 else 5.08)
+                self.items.append(f'(wire (pts (xy {n(ax)} {n(ay)}) (xy {n(lx)} {n(ay)})) (stroke (width 0) (type default)) (uuid "{self.newid()}"))')
+                self.label(net,lx,ay,180 if px<0 else 0)
                 self.p.expected[f'{ref}.{number}']=net
     def passive(self,kind,ref,value,x,y,a,b,dnp=False):
         self.instance(kind,ref,value,x,y,{'1':a,'2':b},dnp)
@@ -131,7 +135,8 @@ def build(d,profile,physical,assignments,out: Path):
             number=str(row['pin']);net=pinmap.get((conn,int(number)))
             typ='passive'
             if net: typ={'input':'input','output':'output','inout':'bidirectional'}[sig[net]['direction']]
-            entries.append((number,row['board_signal'],typ))
+            display_name='AXU_3V3' if row['board_signal']=='VCC_3V3_BUCK4' else row['board_signal']
+            entries.append((number,display_name,typ))
             mapping[number]=net if net else 'GND' if row['kind']=='ground' else None
         name=p.connector_def('HOST_'+conn,entries)
         host.instance(name,conn,conn+' / PURCHASED HOST boundary',88.9+i*215.9,111.76,mapping)
