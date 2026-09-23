@@ -1,0 +1,16 @@
+name: hardware-structure
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  rev-a-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python tools/check_kicad_scaffold.py
+      - run: python tools/check_layout_gate.py

@@ -1,0 +1,10 @@
+revision: Rev.A
+layout_allowed: false
+gates:
+  power_tree_frozen: false
+  fpga_pinplan_frozen: false
+  j12_xdc_crosscheck: false
+  dac_network_review: false
+  schematic_erc: false
+notes: >-
+  PCB layout is prohibited until every gate is true and layout_allowed is set true in a reviewed commit.

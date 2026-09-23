@@ -1,69 +1,31 @@
 # ServoHIL-I/O V1 Rev.A — schematic freeze notes
 
-Scope: **POWER → HIL-Link → Local FPGA → 8ch DAC**. No PCB layout in this revision.
+Scope: **POWER → HIL-Link → Local FPGA → 8ch DAC**. PCB layout is explicitly out of scope until the layout gate passes.
 
-## Fixed architecture
+## Frozen architecture
 
-- AXU2CGB J12 / Bank66 / 1.8 V is the deterministic HIL-Link.
-- Local I/O FPGA: XC7A35T-1FGG484I.
-- 4× AD3542R-16 = 8 fast AO.
-- Shared LDAC, RESET and 2.5 V reference; independent CS per DAC.
-- Rev.A analog output capability: ±5 V, +5.2/-5.2 V output-stage rails.
-- Hardware default state is SAFE: DAC_RESET_N is pulled low until config + PGOOD + HIL watchdog all pass.
+- AXU2CGB J12 / Bank66 / 1.8 V is the deterministic HIL-Link boundary.
+- ZU2CG remains the Plant solver.
+- XC7A35T-1FGG484I is the Local I/O FPGA candidate.
+- 4× AD3542R-16 provide 8 fast analog outputs.
+- LDAC, RESET and precision reference are shared; CS remains per DAC.
+- Rev.A targets a ±5 V-class output path using +5.2 V / -5.2 V output-stage rails.
+- The hardware default state is SAFE.
 
-## Power topology
+## Intentionally not frozen yet
 
-```text
-9–15 V IN
-  -> TVS
-  -> TPS259470L eFuse
-  -> 12V_PROT
-       -> ADP5054: 1V0 / 1V8 / 3V3 / 6V0_PRE
-       -> LT3045: +5V0_DAC
-       -> LT3045: +5V2_PVDD
-       -> LTC7149: -6V0_PRE
-            -> LT3094: -5V2_PVSS
-```
+- ADP5054 inductors, switching frequencies and compensation.
+- exact XC7A35T FGG484 PACKAGE_PIN assignments.
+- DAC CAPx compensation value.
+- final AO source-series resistance.
+- PCB placement/routing.
 
-ADR4525 provides the shared 2.5 V DAC reference.
+## Schematic freeze prerequisites
 
-## HIL-Link
-
-- 1.8 V LVCMOS
-- 100 MHz source-synchronous DDR
-- 8-bit each direction
-- 1.6 Gbit/s theoretical per direction
-- CRC protected fast frames
-- dedicated heartbeat / safe / reset control signals
-
-## DAC architecture
-
-- U20: AO0 Ia, AO1 Ib
-- U21: AO2 Ic, AO3 Vbus
-- U22: AO4 Torque, AO5 Temperature
-- U23: AO6 AUX0, AO7 AUX1
-- shared SCLK / LDAC_N / RESET_N / VREF
-- one CS_N per AD3542R
-- two SDIO data lanes per DAC for dual-SPI operation
-
-For the fixed -5 V to +5 V range, use the AD3542R RFB2_x feedback selection and program CHx_OUTPUT_RANGE_SEL=011. CAPx-to-VOUTx uses an NP0/C0G tuning footprint.
-
-The AO source resistor is not frozen. The design keeps a replaceable footprint for 33 / 49.9 / 52.3 ohm validation; 52.3 ohm is the initial reference for high-Z/coax validation.
-
-## Safety
-
-DAC_RESET_N must remain asserted unless all are true:
-
-1. FPGA configuration completed,
-2. critical rails are power-good,
-3. HIL-Link watchdog is healthy.
-
-A link timeout, clock loss, CRC fault storm, FPGA reset or power fault must return the DAC path to a safe state without software intervention.
-
-## Do not start layout until
-
-1. J12 mapping and ZU2CG XDC are reviewed.
-2. ADP5054 load estimates and compensation/inductor values are validated.
-3. Artix-7 package-bank pin assignment passes Vivado I/O planning.
-4. AD3542R RFB/CAP network is reviewed against the current datasheet/evaluation schematic.
-5. ERC and rail/current/thermal review pass.
+1. Vivado/XPE rail estimates are available.
+2. J12 pinout is cross-checked against the ALINX manual.
+3. Local-FPGA bank plan passes Vivado I/O DRC.
+4. AD3542R network is reviewed against current vendor primary documentation.
+5. KiCad ERC passes.
+6. power/current/thermal budget is reviewed.
+7. fail-safe logic is proven independent of application firmware.

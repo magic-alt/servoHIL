@@ -1,143 +1,110 @@
-# ServoHIL-I/O V1 Rev.A — block and schematic review
+# ServoHIL-I/O V1 Rev.A — detailed block and schematic review
 
-This file is the diff-friendly source-of-truth companion to the rendered review PDF.
+This document complements the native KiCad hierarchy under `hardware/kicad/revA/`.
 
-Scope: **POWER → HIL-Link → Local FPGA → 8ch DAC**.
-
-## 01 System block
+Scope remains frozen to:
 
 ```text
-AXU2CGB / ZU2CG
-  Inverter + PMSM + Mechanics Plant
-            |
-            | J12 / Bank66 / 1.8 V
-            | 100 MHz source-synchronous DDR
-            v
-      Local I/O FPGA
-      XC7A35T-1FGG484I
-            |
-            | DAC serializer + shared LDAC
-            v
-      4 × AD3542R-16
-            |
-          AO0..7
-            v
-        DUT Adapter
-            |
-            v
-        Joint DUT
+POWER -> HIL-Link -> Local FPGA -> 8ch fast DAC -> DUT Adapter
 ```
 
-The local FPGA is an I/O engine only. The plant solver stays in ZU2CG.
+## 1. System partition
 
-## 02 POWER
+- AXU2CGB / ZU2CG owns inverter, PMSM, mechanics, gearbox and sensor plant models.
+- Local I/O FPGA owns deterministic transport, edge timestamping, DAC serialization, trace FIFO and autonomous safe-state behavior.
+- DUT Adapter owns controller-specific range scaling, clamp/protection and later physical fault insertion.
+- Rev.A does not implement ADC, general DIO, encoder PHY, CAN/RS485 or FIU hardware.
 
-Input chain:
+## 2. POWER
+
+Selected topology:
 
 ```text
 9–15 V IN
   -> TVS
-  -> TPS259470L eFuse
+  -> TPS25947-class eFuse
   -> 12V_PROT
-```
+       -> ADP5054
+            -> 1V0_FPGA
+            -> 1V8_D
+            -> 3V3_D
+            -> 6V0_PRE
+                 -> LT3045 -> +5V0_DAC
+                 -> LT3045 -> +5V2_PVDD
+       -> LTC7149 -> -6V0_PRE -> LT3094 -> -5V2_PVSS
 
-Digital/FPGA rails:
-
-```text
-12V_PROT -> ADP5054
-              CH1 -> 1V0_FPGA
-              CH2 -> 6V0_PRE
-              CH3 -> 1V8_D
-              CH4 -> 3V3_D
-```
-
-Analog rails:
-
-```text
-6V0_PRE  -> LT3045 -> +5V0_DAC
-6V0_PRE  -> LT3045 -> +5V2_PVDD
-12V_PROT -> LTC7149 -> -6V0_PRE -> LT3094 -> -5V2_PVSS
 +5V0_DAC -> ADR4525 -> VREF_2V5
 ```
 
-Sequencing target:
+A small 3V3_AON rail supplies the sequencer/supervisor path before the main FPGA rails are released.
+
+Target power order:
 
 1. 1V0
 2. 1V8
 3. 3V3
-4. 6V0_PRE and analog rails
+4. analog preregulator
+5. positive/negative DAC rails
 
-A separate 3V3_AON rail powers the sequencer/supervisor path.
+Final ADP5054 inductors, switching frequencies, compensation and capacitance are not frozen until Vivado/XPE current estimates and transient/thermal calculations are available.
 
-## 03 HIL-Link
+## 3. HIL-Link
 
-Electrical:
+Boundary: AXU2CGB J12 / ZU2CG Bank66 / 1.8 V.
 
-- 1.8 V LVCMOS
-- 100 MHz source clock
-- DDR
-- 8-bit per direction
-- 1.6 Gbit/s theoretical per direction
-- source damping footprint at each Local-FPGA-driven group
+Electrical contract:
 
-Fast ZU2CG → I/O frame:
+- LVCMOS18
+- 100 MHz source-synchronous clock
+- DDR data
+- 8 bits each direction
+- per-frame sequence and CRC
+- dedicated safe/reset/heartbeat sideband
+- source damping footprint on FPGA-driven groups
+
+The raw link rate is 1.6 Gbit/s per direction.
+
+Fast Plant-to-I/O frame:
 
 ```text
-SEQ       16
-AO0..7   128
-FAST_DO   32
-CONTROL   16
-CRC16     16
--------------
-TOTAL    208 bits
+SEQ       16 bit
+AO0..7   128 bit
+FAST_DO   32 bit
+CONTROL   16 bit
+CRC16     16 bit
+----------------
+TOTAL    208 bit
 ```
 
-208-bit serialization at 1.6 Gbit/s is about 130 ns.
+At 1.6 Gbit/s this is about 130 ns serialization time.
 
-Dedicated sideband nets:
+The authoritative J12 pin assignment is `docs/icd/j12-hil-link.csv`. The schematic and Local-FPGA XDC must be cross-checked against that file.
 
-- HL_SYNC
-- HL_IRQ
-- HL_SAFE_N
-- HL_RESET_N
-- HL_HEARTBEAT
-- TRIG0/1
-- DBG/SPARE
+## 4. Local I/O FPGA
 
-See `docs/icd/ServoHIL_IO_V1_RevA_J12_HIL_Link_ICD.csv`.
+Candidate device: `XC7A35T-1FGG484I`.
 
-## 04 Local FPGA
-
-Candidate: `XC7A35T-1FGG484I`.
+The device does **not** run the PMSM plant.
 
 Initial bank intent:
 
-- Bank0 / 3.3 V: configuration, QSPI, JTAG
-- Bank14 / 1.8 V: HIL-Link
-- Bank15 / 1.8 V: AD3542R digital interface
-- additional banks reserved for Rev.B I/O
+- configuration/QSPI/debug: 3.3 V
+- HIL-Link: 1.8 V
+- AD3542R digital interface: 1.8 V
+- future I/O banks remain reserved
 
-No PACKAGE_PIN is frozen until Vivado I/O Planner review.
+Concrete FGG484 PACKAGE_PIN values remain unassigned until Vivado I/O Planner and DRC pass.
 
-Required hardware safety:
+## 5. 8-channel fast DAC
 
-```text
-DAC_RESET_N =
-    FPGA_CONFIG_OK
-  AND POWER_GOOD
-  AND HIL_LINK_WATCHDOG_OK
-```
+Four identical AD3542R-16 devices:
 
-DAC_RESET_N has a hardware pull-down so the unpowered/unconfigured state is SAFE.
-
-## 05–06 8-channel DAC
-
-Four identical dual-channel devices:
-
-- U20: AO0 Ia / AO1 Ib
-- U21: AO2 Ic / AO3 Vbus
-- U22: AO4 Torque / AO5 Temperature
-- U23: AO6 AUX0 / AO7 AUX1
+| Device | Channel A | Channel B |
+| --- | --- | --- |
+| U20 | AO0 / Ia | AO1 / Ib |
+| U21 | AO2 / Ic | AO3 / Vbus |
+| U22 | AO4 / Torque | AO5 / Temperature |
+| U23 | AO6 / AUX0 | AO7 / AUX1 |
 
 Shared:
 
@@ -148,10 +115,10 @@ Shared:
 
 Per device:
 
-- independent CS_N
+- one CS_N
 - two SDIO lanes for dual-SPI operation
 
-Power:
+Power intent:
 
 - DVDD = 1.8 V
 - VLOGIC = 1.8 V
@@ -159,33 +126,64 @@ Power:
 - PVDD = +5.2 V
 - PVSS/AVSS = -5.2 V
 
-Rev.A output target: fixed ±5 V capability.
+Rev.A output target is fixed ±5 V capability.
 
-For the fixed -5 V to +5 V range, use RFB2_x and program `CHx_OUTPUT_RANGE_SEL=011`. CAPx-to-VOUTx keeps an NP0/C0G tuning footprint.
+For the fixed -5 V to +5 V output range, use the device feedback selection required by the current AD3542R datasheet and keep the CAPx-to-VOUTx NP0/C0G compensation footprint tunable.
 
-Each AO keeps a replaceable source-series resistor footprint. 33 / 49.9 / 52.3 ohm are validation candidates; the final value is selected from the real DUT-adapter cable/input-capacitance step response.
+The AO series resistor is also tunable. 33 / 49.9 / 52.3 ohm are bring-up candidates; the final value is selected from measured step response with the real DUT-adapter cable and ADC input network.
 
-## 07 Schematic freeze gate
+## 6. Hardware safety
 
-Do not start KiCad PCB layout until all are complete:
+The analog-output path must default SAFE without FPGA firmware.
 
-1. power-tree component values and thermal/current budget frozen,
-2. Artix-7 bank/ball assignment passes Vivado I/O review,
-3. AXU2CGB J12 mapping matches XDC and schematic,
-4. AD3542R RFB/CAP/output network reviewed,
-5. ERC passes,
-6. power-good and fail-safe paths reviewed,
-7. HIL-Link timing constraints drafted,
-8. bring-up plan accepted.
+Conceptually:
 
-Bring-up order:
+```text
+DAC_RESET_N =
+    FPGA_CONFIG_OK
+  AND MANDATORY_POWER_GOOD
+  AND HIL_LINK_WATCHDOG_OK
+```
+
+DAC_RESET_N is physically biased to the asserted state.
+
+Any of the following must force the safe state:
+
+- FPGA unconfigured/reset,
+- mandatory rail fault,
+- HIL-Link clock loss,
+- HIL-Link heartbeat timeout,
+- repeated frame/CRC fault condition.
+
+## 7. Layout gate
+
+Do not begin Rev.A PCB layout until:
+
+1. power-tree values and thermal/current budget are frozen;
+2. XC7A35T bank/ball planning passes Vivado I/O review;
+3. J12 ICD, schematic and XDC cross-check passes;
+4. AD3542R output/reference/compensation network is reviewed;
+5. KiCad ERC passes;
+6. hardware fail-safe path is reviewed;
+7. HIL-Link timing constraints are drafted;
+8. bring-up plan is accepted.
+
+`hardware/kicad/revA/layout_gate.yaml` is the machine-readable authority.
+
+## 8. Bring-up order
 
 ```text
 rails
  -> FPGA configuration
  -> HIL-Link PRBS
- -> DAC static output
+ -> static DAC output
  -> 8-channel LDAC synchronization
  -> PWM -> Plant -> DAC latency
- -> 20 kHz controller-HIL closed loop
+ -> 20 kHz Controller-HIL closed loop
 ```
+
+Primary Rev.A targets:
+
+- event timestamp granularity <= 5 ns
+- deterministic PWM-to-DAC latency < 1 us
+- 20 kHz physical Controller-HIL FOC closed-loop PASS

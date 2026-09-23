@@ -1,35 +1,30 @@
-# KiCad hardware source
+# KiCad hardware development rules
 
-Target tool: KiCad 8.x or newer.
+The native Rev.A project lives in `hardware/kicad/revA/`.
 
-## Rev.A source tree
+Rev.A is currently in the **schematic phase**. The machine-readable layout authority is `hardware/kicad/revA/layout_gate.yaml`.
 
-The first board is developed under `hardware/kicad/servohil_io_v1_rev_a/`.
+## Sheet ownership
 
-Schematic hierarchy:
+- 01_POWER_ENTRY
+- 02_ANALOG_POWER
+- 03_DIGITAL_POWER
+- 04_AXU_HIL_LINK
+- 05_IO_FPGA
+- 06_DAC_0_3
+- 07_DAC_4_7
 
-```text
-00_TOP
-01_POWER_ENTRY
-02_ANALOG_POWER
-03_DIGITAL_POWER
-04_AXU_HIL_LINK
-05_IO_FPGA
-06_DAC_0_3
-07_DAC_4_7
-```
+Future ADC/DIO/Encoder/CAN/RS485/FIU sheets remain deferred.
 
-Future sheets for ADC/DIO/Encoder/CAN/RS485/FIU are intentionally excluded until the core path is electrically frozen.
+## Rules
 
-## Layout gate
+- Do not guess regulator magnetics/compensation.
+- Do not guess XC7A35T BGA balls directly in KiCad.
+- Treat `docs/icd/j12-hil-link.csv` as the J12 mapping authority.
+- Treat Vivado I/O Planner/XDC as the FPGA pin-placement authority.
+- Treat KiCad ERC plus schematic review as mandatory before layout.
+- Generated fabrication output is not source-of-truth.
 
-Do not create or route `.kicad_pcb` as the implementation baseline until:
+## Before layout
 
-- schematic ERC passes,
-- FPGA bank/ball planning passes,
-- J12 schematic and XDC match,
-- power budget and compensation values are frozen,
-- AD3542R feedback/output network is reviewed,
-- Rev.A schematic review is accepted.
-
-Generated Gerbers, plots, caches and temporary files are not source-of-truth.
+All entries in `layout_gate.yaml` must pass in a reviewed commit. CI intentionally blocks premature PCB layout.
