@@ -1,0 +1,16 @@
+(kicad_sch
+  (version 20231120)
+  (generator "eeschema")
+  (generator_version "8.0")
+  (uuid "81ee3c62-caf6-424d-9468-a01d18b0858d")
+  (paper "A3")
+  (title_block
+    (title "ServoHIL-I/O V1 Rev.A — 06_DAC_0_3")
+    (date "2026-09-23")
+    (rev "Rev.A PRELIMINARY")
+    (company "magic-alt / servoHIL")
+    (comment 1 "Hierarchy scaffold; component placement pending freeze inputs")
+  )
+  (lib_symbols)
+  (sheet_instances (path "/" (page "7")))
+)
