@@ -1,0 +1,52 @@
+"""Actual inverting preregulator, negative LDO and external precision reference."""
+from pr17_native import Drawing
+
+
+def negative_sheet():
+    d=Drawing('30_negative_reference','NEGATIVE POWER / VREF: LT8330 Cuk -> LT3094 -> DAC; ADR4525 external reference')
+    d.s.paper='A2'
+    d.ic('LT8330_S6',[(6,'VIN','power_in'),(4,'EN_UVLO','input'),(2,'GND','power_in')],[(1,'SW','passive'),(3,'FBX','input'),(5,'INTVCC','power_out')])
+    d.add('LT8330_S6','U301','LT8330ES6#TRMPBF / 2MHz',127,99.06,{6:'VIN_PROT',4:'INPUT_OK',2:'GND',1:'SW_NEG',3:'FB_NEG',5:'INTVCC_NEG'},'Package_TO_SOT_SMD:TSOT-23-6','https://www.analog.com/media/en/technical-documentation/data-sheets/lt8330.pdf')
+    d.add('L','L301','10uH independent / Isat >=1.5A',50.8,45.72,{1:'VIN_PROT',2:'SW_NEG'})
+    d.c('C410','1uF / 50V X7R energy transfer',152.4,45.72,'SW_NEG','NEG_X')
+    d.add('L','L302','10uH independent / Isat >=1.5A',254,45.72,{1:'NEG_X',2:'-6V2_PRE'})
+    d.add('D','D301','SS16 / 60V 1A Schottky',254,76.2,{1:'GND',2:'NEG_X'},'Diode_SMD:D_SMA','https://www.diodes.com/assets/Datasheets/ds13002.pdf')
+    d.c('C411','10uF / 50V X7R, 1210',40.64,111.76,'VIN_PROT','GND')
+    d.c('C412','100nF / 50V',40.64,137.16,'VIN_PROT','GND')
+    d.c('C413','1uF / 16V INTVCC ONLY',152.4,157.48,'INTVCC_NEG','GND')
+    d.c('C414','10uF / 16V X7R, 1210',254,111.76,'-6V2_PRE','GND')
+    d.c('C415','10uF / 16V X7R, 1210',254,137.16,'-6V2_PRE','GND')
+    d.r('R410','1M 0.1%',50.8,180.34,'-6V2_PRE','FB_NEG')
+    d.r('R411','147k 0.1%',152.4,180.34,'FB_NEG','GND')
+    d.c('C416','4.7pF / 50V C0G feedforward',254,180.34,'-6V2_PRE','FB_NEG')
+    d.r('R412','2.2k bleeder',50.8,205.74,'-6V2_PRE','GND')
+    d.flag('PF301',152.4,205.74,'-6V2_PRE')
+    d.tp('TP301',254,205.74,'-6V2_PRE')
+    d.ic('LT3094_MSE',[(1,'IN1','power_in'),(2,'IN2','power_in'),(3,'EN_UV','input'),(5,'PGFB','input'),(6,'ILIM','passive'),(9,'GND','power_in'),(13,'EP_IN','power_in')],[(11,'OUT1','power_out'),(12,'OUT2','power_out'),(10,'OUTS','input'),(8,'SET','passive'),(4,'PG','open_collector'),(7,'VIOC','passive')])
+    d.add('LT3094_MSE','U302','LT3094EMSE#PBF / EP13=negative IN',429.26,99.06,{1:'-6V2_PRE',2:'-6V2_PRE',3:'-6V2_PRE',5:'PGFB_PVSS',6:'ILIM_PVSS',9:'GND',13:'-6V2_PRE',11:'-5V2_PVSS',12:'-5V2_PVSS',10:'-5V2_PVSS',8:'SET_PVSS',4:'PG_PVSS',7:None},source='https://www.analog.com/media/en/technical-documentation/data-sheets/lt3094.pdf')
+    d.r('R420','52.0k 0.1%',353.06,45.72,'SET_PVSS','GND')
+    d.c('C420','470nF / 16V SET',530.86,45.72,'SET_PVSS','GND')
+    d.r('R421','15k / 250mA nominal limit',353.06,157.48,'ILIM_PVSS','GND')
+    d.r('R422','158k 0.1%',530.86,157.48,'-5V2_PVSS','PGFB_PVSS')
+    d.r('R423','10k 0.1%',530.86,182.88,'PGFB_PVSS','GND')
+    d.r('R424','10k',353.06,182.88,'3V3_AON','PG_PVSS')
+    d.c('C421','10uF / 16V X7R, 1210',353.06,208.28,'-6V2_PRE','GND')
+    d.c('C422','100nF / 16V',530.86,208.28,'-6V2_PRE','GND')
+    d.c('C423','22uF / 16V X7R, 1210',353.06,233.68,'-5V2_PVSS','GND')
+    d.c('C424','22uF / 16V X7R, 1210',530.86,233.68,'-5V2_PVSS','GND')
+    d.tp('TP302',429.26,233.68,'-5V2_PVSS')
+    d.ic('ADR4525_SO8',[(1,'NIC1','no_connect'),(2,'VIN','power_in'),(3,'NIC3','no_connect'),(4,'GND','power_in')],[(8,'DNC8','no_connect'),(7,'NIC7','no_connect'),(6,'VOUT','power_out'),(5,'NIC5','no_connect')])
+    d.add('ADR4525_SO8','U303','ADR4525BRZ / 2.5V reference',152.4,297.18,{1:None,2:'+5V0_DAC',3:None,4:'GND',8:None,7:None,6:'VREF_2V5',5:None},'Package_SO:SOIC-8_3.9x4.9mm_P1.27mm','https://www.analog.com/media/en/technical-documentation/data-sheets/ADR4520_4525_4530_4533_4540_4550.pdf')
+    d.c('C430','1uF / 16V',50.8,274.32,'+5V0_DAC','GND')
+    d.c('C431','100nF / 16V',50.8,307.34,'+5V0_DAC','GND')
+    d.c('C432','1uF / 16V',254,274.32,'VREF_2V5','GND')
+    d.c('C433','100nF / 16V',254,307.34,'VREF_2V5','GND')
+    d.tp('TP303',152.4,337.82,'VREF_2V5')
+    d.s.text('Inverting stage topology: VIN -> L301 -> SW -> C410 -> NEG_X -> L302 -> negative OUT; D301 ANODE=NEG_X, CATHODE=GND.',25.4,365.76)
+    d.s.text('Independent 10uH inductors, not shorted/parallel windings. C410 sees VIN + |VOUT|. Target -6.24V; negative continuous budget 0.12A.',25.4,373.38)
+    d.s.text('LT3094 MSE EP13 and EN3 go to negative IN, NOT GND. SET sinks 100uA. PG trip ~-5.04V. Kelvin OUTS/SET and >=10uF effective Cout required.',25.4,381)
+    d.s.text('ADR4525 pin8 DNC; configure DAC external-reference mode before use. Negative-loop ripple/thermal/startup and reference fanout remain bench gates.',25.4,388.62)
+    for i,item in enumerate(d.s.items):
+        if '(symbol (lib_id ' in item and ('22uF' in item or '10uF' in item or '1uF / 50V' in item):
+            d.s.items[i]=item.replace('Capacitor_SMD:C_0805_2012Metric','Capacitor_SMD:C_1210_3225Metric')
+    return d
