@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760">
+<style>
+text{font-family:"Noto Sans CJK SC","Microsoft YaHei","Arial",sans-serif;fill:#111}
+.h{font-size:28px;font-weight:700}.b{font-size:19px;font-weight:700}.s{font-size:14px}.box{fill:#f7f8fa;stroke:#222;stroke-width:2;rx:16}.a{stroke:#222;stroke-width:3;fill:none;marker-end:url(#m)}
+</style>
+<defs><marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#222"/></marker></defs>
+<text class="h" x="55" y="55">ServoHIL-I/O V1 Rev.A — System Block</text>
+<rect class="box" x="55" y="160" width="220" height="120"/><text class="b" x="82" y="205">AXU2CGB / ZU2CG</text><text class="s" x="82" y="235">Inverter + PMSM + Mechanics</text><text class="s" x="82" y="260">J12 Bank66 / 1.8 V</text>
+<rect class="box" x="335" y="160" width="220" height="120"/><text class="b" x="385" y="205">HIL-Link</text><text class="s" x="365" y="235">100 MHz DDR / 8-bit each way</text><text class="s" x="365" y="260">deterministic + CRC</text>
+<rect class="box" x="615" y="140" width="250" height="160"/><text class="b" x="665" y="190">Local I/O FPGA</text><text class="s" x="645" y="220">XC7A35T / edge timestamp</text><text class="s" x="645" y="245">DAC serializer / watchdog</text><text class="s" x="645" y="270">future ADC/DIO/Encoder PHY</text>
+<rect class="box" x="930" y="95" width="235" height="120"/><text class="b" x="980" y="140">8ch Fast DAC</text><text class="s" x="965" y="170">4 × AD3542R-16</text><text class="s" x="965" y="195">shared LDAC / VREF</text>
+<rect class="box" x="930" y="260" width="235" height="105"/><text class="b" x="985" y="305">Future I/O</text><text class="s" x="962" y="335">ADC / DIO / Encoder / Bus / FIU</text>
+<rect class="box" x="1230" y="120" width="190" height="145"/><text class="b" x="1264" y="165">DUT Adapter</text><text class="s" x="1254" y="195">scaling / clamp</text><text class="s" x="1254" y="220">HIL_PRESENT / KILL</text>
+<rect class="box" x="1460" y="120" width="115" height="145"/><text class="b" x="1477" y="165">DUT</text><text class="s" x="1477" y="195">20 kHz FOC</text><text class="s" x="1477" y="220">joint drive</text>
+<path class="a" d="M275 220 H335"/><path class="a" d="M555 220 H615"/><path class="a" d="M865 190 H930"/><path class="a" d="M1165 155 H1230"/><path class="a" d="M1420 190 H1460"/>
+<path class="a" stroke-dasharray="9,7" d="M1460 245 C1300 480,800 480,720 300"/>
+<rect class="box" x="55" y="500" width="430" height="145"/><text class="b" x="85" y="545">Power</text><text class="s" x="85" y="575">12V → eFuse → multi-rail FPGA supply</text><text class="s" x="85" y="600">+5.0V / +5.2V / -5.2V low-noise analog</text><text class="s" x="85" y="625">sequenced / monitored / fail-safe</text>
+<rect class="box" x="585" y="500" width="390" height="145"/><text class="b" x="615" y="545">Safety</text><text class="s" x="615" y="575">FPGA config + rail PGOOD + HIL heartbeat</text><text class="s" x="615" y="600">any fault → DAC_RESET_N low</text><text class="s" x="615" y="625">PWR_STAGE_KILL defaults active</text>
+<rect class="box" x="1075" y="500" width="435" height="145"/><text class="b" x="1105" y="545">Rev.A Target</text><text class="s" x="1105" y="575">timestamp ≤ 5 ns</text><text class="s" x="1105" y="600">PWM → DAC deterministic latency &lt; 1 µs</text><text class="s" x="1105" y="625">20 kHz Controller-HIL FOC closed-loop PASS</text>
+</svg>
