@@ -246,183 +246,183 @@
     (pin "40" (uuid "d8d8d8d8-0000-4000-8027-000000002737"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "J10") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 85.09 62.23) (xy 82.55 62.23)
     )
     (stroke (width 0) (type default))
-    (uuid "9ac80d40-5854-4b88-812e-92baa96a10e0")
+    (uuid "ff55b055-eb0a-4349-bd44-f433c199e6bd")
   )
-(global_label "GND" (shape bidirectional) (at 82.55 62.23 0)
+  (global_label "GND" (shape bidirectional) (at 82.55 62.23 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002739") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 62.23 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
   (no_connect (at 85.09 67.31 0) (uuid "d8d8d8d8-0000-4000-8027-00000000273a"))
-    (wire
+  (wire
     (pts
       (xy 85.09 72.39) (xy 82.55 72.39)
     )
     (stroke (width 0) (type default))
-    (uuid "75c7d301-03b5-41b7-bd24-8631443b092d")
+    (uuid "b4553a44-46c1-431e-a7f5-61f8e4423d50")
   )
-(global_label "HL_TX0" (shape bidirectional) (at 82.55 72.39 0)
+  (global_label "HL_TX0" (shape bidirectional) (at 82.55 72.39 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000273b") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 72.39 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 77.47) (xy 82.55 77.47)
     )
     (stroke (width 0) (type default))
-    (uuid "74c7d16e-dbe0-468a-a6ce-1e80be4f3eb6")
+    (uuid "b5553bd7-6e96-4e4b-be4b-c9a96a2e07c7")
   )
-(global_label "HL_TX1" (shape bidirectional) (at 82.55 77.47 0)
+  (global_label "HL_TX1" (shape bidirectional) (at 82.55 77.47 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000273c") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 77.47 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 82.55) (xy 82.55 82.55)
     )
     (stroke (width 0) (type default))
-    (uuid "77c7d627-535f-4811-832a-f45750129e1b")
+    (uuid "b255371e-57c4-4010-adfb-d01e07c8fc1a")
   )
-(global_label "HL_TX2" (shape bidirectional) (at 82.55 82.55 0)
+  (global_label "HL_TX2" (shape bidirectional) (at 82.55 82.55 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000273d") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 82.55 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 87.63) (xy 82.55 87.63)
     )
     (stroke (width 0) (type default))
-    (uuid "76c7d494-2b8a-4ce4-acd4-8ca6ca26d3a4")
+    (uuid "b35538b1-7f99-4b3d-8452-37cf8db4c691")
   )
-(global_label "HL_TX3" (shape bidirectional) (at 82.55 87.63 0)
+  (global_label "HL_TX3" (shape bidirectional) (at 82.55 87.63 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000273e") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 87.63 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 92.71) (xy 82.55 92.71)
     )
     (stroke (width 0) (type default))
-    (uuid "79c7d94d-a309-4e6b-967e-24f55bea3309")
+    (uuid "b05533f8-a76e-466a-814f-00bcfbf1672c")
   )
-(global_label "HL_TX4" (shape bidirectional) (at 82.55 92.71 0)
+  (global_label "HL_TX4" (shape bidirectional) (at 82.55 92.71 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000273f") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 92.71 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 97.79) (xy 82.55 97.79)
     )
     (stroke (width 0) (type default))
-    (uuid "29cb2cf4-0a65-4132-b08a-9b64767e17d8")
+    (uuid "785d2a95-63d2-49ab-9198-8d0da25b1a39")
   )
-(global_label "HL_TX5" (shape bidirectional) (at 82.55 97.79 0)
+  (global_label "HL_TX5" (shape bidirectional) (at 82.55 97.79 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002740") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 97.79 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 102.87) (xy 82.55 102.87)
     )
     (stroke (width 0) (type default))
-    (uuid "2acb2e87-3239-4c5f-86e1-0315fc69e24f")
+    (uuid "775d2902-3bfd-4e7e-bb42-255c1c6f4fc2")
   )
-(global_label "HL_TX6" (shape bidirectional) (at 82.55 102.87 0)
+  (global_label "HL_TX6" (shape bidirectional) (at 82.55 102.87 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002741") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 102.87 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 107.95) (xy 82.55 107.95)
     )
     (stroke (width 0) (type default))
-    (uuid "2bcb301a-babb-4ad8-9d37-6ac68255acc6")
+    (uuid "765d276f-1429-4351-be45-5c6f9683854b")
   )
-(global_label "HL_TX7" (shape bidirectional) (at 82.55 107.95 0)
+  (global_label "HL_TX7" (shape bidirectional) (at 82.55 107.95 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002742") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 107.95 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 113.03) (xy 82.55 113.03)
     )
     (stroke (width 0) (type default))
-    (uuid "2ccb31ad-e290-4605-b38d-d2770841773d")
+    (uuid "755d25dc-ec54-4824-a7ee-f4be1097bad4")
   )
-(global_label "HL_TX_CLK" (shape bidirectional) (at 82.55 113.03 0)
+  (global_label "HL_TX_CLK" (shape bidirectional) (at 82.55 113.03 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002743") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 113.03 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 118.11) (xy 82.55 118.11)
     )
     (stroke (width 0) (type default))
-    (uuid "25cb26a8-a9b8-4de6-9730-fca08e2d41b4")
+    (uuid "745d2449-c47f-4cf7-b83e-ee498aabf05d")
   )
-(global_label "HL_SYNC" (shape bidirectional) (at 82.55 118.11 0)
+  (global_label "HL_SYNC" (shape bidirectional) (at 82.55 118.11 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002744") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 118.11 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
   
   
   
-    (wire
+  (wire
     (pts
       (xy 115.57 87.63) (xy 118.11 87.63)
     )
     (stroke (width 0) (type default))
-    (uuid "21cb205c-cbbd-47ca-a33d-d8ec471fc420")
+    (uuid "805d372d-a27a-4313-9ee5-4f8572fcc681")
   )
-(global_label "HL_SAFE_N" (shape bidirectional) (at 118.11 87.63 0)
+  (global_label "HL_SAFE_N" (shape bidirectional) (at 118.11 87.63 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002748") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 87.63 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 92.71) (xy 118.11 92.71)
     )
     (stroke (width 0) (type default))
-    (uuid "22cb21ef-f392-42f7-b994-409dcd0b8e97")
+    (uuid "7f5d359a-7aa5-47e6-888e-e7d4ed10fc0a")
   )
-(global_label "HL_RESET_N" (shape bidirectional) (at 118.11 92.71 0)
+  (global_label "HL_RESET_N" (shape bidirectional) (at 118.11 92.71 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002749") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 92.71 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 97.79) (xy 118.11 97.79)
     )
     (stroke (width 0) (type default))
-    (uuid "5acb7a17-aa26-44cf-81e1-6a65e033ebff")
+    (uuid "a75d7492-b3ea-46ee-ab75-968c00395972")
   )
-(global_label "HL_HEARTBEAT" (shape bidirectional) (at 118.11 97.79 0)
+  (global_label "HL_HEARTBEAT" (shape bidirectional) (at 118.11 97.79 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000274a") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 97.79 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 102.87) (xy 118.11 102.87)
     )
     (stroke (width 0) (type default))
-    (uuid "5bcb7baa-32a7-4348-9837-d216661fb676")
+    (uuid "a65d72ff-8c15-4bc1-ae78-cd9f7a4d8efb")
   )
-(global_label "TRIG0" (shape bidirectional) (at 118.11 102.87 0)
+  (global_label "TRIG0" (shape bidirectional) (at 118.11 102.87 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000274b") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 102.87 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 107.95) (xy 118.11 107.95)
     )
     (stroke (width 0) (type default))
-    (uuid "5ccb7d3d-5a7c-4e75-ae8e-39c7ec0b80ed")
+    (uuid "a55d716c-6440-4094-9822-65eef461c484")
   )
-(global_label "TRIG1" (shape bidirectional) (at 118.11 107.95 0)
+  (global_label "TRIG1" (shape bidirectional) (at 118.11 107.95 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000274c") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 107.95 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -432,38 +432,38 @@
   
   
   
-    (wire
+  (wire
     (pts
       (xy 115.57 143.51) (xy 118.11 143.51)
     )
     (stroke (width 0) (type default))
-    (uuid "2ccd7044-b3a1-44b4-9299-e1969ece0aa4")
+    (uuid "f55a1dc5-30cc-42f5-88e2-e59f6ff062ed")
   )
-(global_label "GND" (shape bidirectional) (at 118.11 143.51 0)
+  (global_label "GND" (shape bidirectional) (at 118.11 143.51 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002753") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 143.51 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 148.59) (xy 118.11 148.59)
     )
     (stroke (width 0) (type default))
-    (uuid "2bcd6eb1-8bcc-4987-a2e9-db2118e2402d")
+    (uuid "ee5a12c0-f7f5-4ad6-ac86-0fc8f5dc2d64")
   )
-(global_label "GND" (shape bidirectional) (at 118.11 148.59 0)
+  (global_label "GND" (shape bidirectional) (at 118.11 148.59 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002754") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 148.59 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
   (no_connect (at 115.57 153.67 0) (uuid "d8d8d8d8-0000-4000-8027-000000002755"))
   (no_connect (at 115.57 158.75 0) (uuid "d8d8d8d8-0000-4000-8027-000000002756"))
-    (wire
+  (wire
     (pts
       (xy 85.09 133.35) (xy 82.55 133.35)
     )
     (stroke (width 0) (type default))
-    (uuid "28cd69f8-144e-4800-b940-42d2871ee0c8")
+    (uuid "f15a1779-d020-4fa9-af89-46db879f8cc9")
   )
-(global_label "J12_HL_RX_CLK" (shape bidirectional) (at 82.55 133.35 0)
+  (global_label "J12_HL_RX_CLK" (shape bidirectional) (at 82.55 133.35 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002757") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 133.35 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -479,36 +479,36 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-000000002759"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R200") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 44.45) (xy 196.85 44.45)
     )
     (stroke (width 0) (type default))
-    (uuid "7dcdefc7-4e00-4df1-adef-e1f74b0a8feb")
+    (uuid "c459d0a2-910b-4f58-8259-0cbe063a8ec6")
   )
-(global_label "J12_HL_RX_CLK" (shape bidirectional) (at 196.85 44.45 0)
+  (global_label "J12_HL_RX_CLK" (shape bidirectional) (at 196.85 44.45 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000275b") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 44.45 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 44.45) (xy 212.09 44.45)
     )
     (stroke (width 0) (type default))
-    (uuid "7ccdee34-262b-42c4-9799-7a46c51ec574")
+    (uuid "c559d235-b8e0-4a85-98af-746f8c26593d")
   )
-(global_label "HL_RX_CLK" (shape bidirectional) (at 212.09 44.45 0)
+  (global_label "HL_RX_CLK" (shape bidirectional) (at 212.09 44.45 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000275c") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 44.45 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 143.51) (xy 82.55 143.51)
     )
     (stroke (width 0) (type default))
-    (uuid "7bcdeca1-fe56-4797-a7e9-73d13f32fafd")
+    (uuid "be59c730-8009-4266-bc52-9e98121223b4")
   )
-(global_label "J12_HL_RX0" (shape bidirectional) (at 82.55 143.51 0)
+  (global_label "J12_HL_RX0" (shape bidirectional) (at 82.55 143.51 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000275d") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 143.51 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -524,36 +524,36 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-00000000275f"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R201") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 58.42) (xy 196.85 58.42)
     )
     (stroke (width 0) (type default))
-    (uuid "16cf8c39-213a-4fad-b31e-e797b31737d1")
+    (uuid "8361b914-259b-476c-92b3-e25ed31ca544")
   )
-(global_label "J12_HL_RX0" (shape bidirectional) (at 196.85 58.42 0)
+  (global_label "J12_HL_RX0" (shape bidirectional) (at 196.85 58.42 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002761") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 58.42 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 58.42) (xy 212.09 58.42)
     )
     (stroke (width 0) (type default))
-    (uuid "13cf8780-490f-4ada-b01b-b0842153d86c")
+    (uuid "8661bdcd-9d1a-48f3-bc5d-7aad64e004a9")
   )
-(global_label "HL_RX0" (shape bidirectional) (at 212.09 58.42 0)
+  (global_label "HL_RX0" (shape bidirectional) (at 212.09 58.42 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002762") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 58.42 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 148.59) (xy 82.55 148.59)
     )
     (stroke (width 0) (type default))
-    (uuid "14cf8913-70e4-4607-8672-1835a73fa2e3")
+    (uuid "8561bc3a-7545-4dc6-a607-12fcdef43a32")
   )
-(global_label "J12_HL_RX1" (shape bidirectional) (at 82.55 148.59 0)
+  (global_label "J12_HL_RX1" (shape bidirectional) (at 82.55 148.59 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002763") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 148.59 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -569,36 +569,36 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-000000002765"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R202") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 71.12) (xy 196.85 71.12)
     )
     (stroke (width 0) (type default))
-    (uuid "18cf8f5f-1037-42bb-ad18-79718f907907")
+    (uuid "8161b5ee-d5f2-4112-8cad-7438c7451056")
   )
-(global_label "J12_HL_RX1" (shape bidirectional) (at 196.85 71.12 0)
+  (global_label "J12_HL_RX1" (shape bidirectional) (at 196.85 71.12 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002767") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 71.12 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 71.12) (xy 212.09 71.12)
     )
     (stroke (width 0) (type default))
-    (uuid "1dcf973e-380c-4de8-8f7b-bd6e5c89c112")
+    (uuid "7c61ae0f-0ec9-4931-b657-0c8729aa1c03")
   )
-(global_label "HL_RX1" (shape bidirectional) (at 212.09 71.12 0)
+  (global_label "HL_RX1" (shape bidirectional) (at 212.09 71.12 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002768") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 71.12 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 153.67) (xy 82.55 153.67)
     )
     (stroke (width 0) (type default))
-    (uuid "1ecf98d1-5fe1-4915-a5d2-251fe2758b89")
+    (uuid "7b61ac7c-e6f4-4e04-a000-a4d6a3be518c")
   )
-(global_label "J12_HL_RX2" (shape bidirectional) (at 82.55 153.67 0)
+  (global_label "J12_HL_RX2" (shape bidirectional) (at 82.55 153.67 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002769") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 153.67 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -614,36 +614,36 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-00000000276b"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R203") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 83.82) (xy 196.85 83.82)
     )
     (stroke (width 0) (type default))
-    (uuid "69d00ee2-0b42-4f44-933b-6ff23bccfe4e")
+    (uuid "b061ffeb-2609-4e55-bfe4-1c7b67aa00af")
   )
-(global_label "J12_HL_RX2" (shape bidirectional) (at 196.85 83.82 0)
+  (global_label "J12_HL_RX2" (shape bidirectional) (at 196.85 83.82 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000276d") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 83.82 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 83.82) (xy 212.09 83.82)
     )
     (stroke (width 0) (type default))
-    (uuid "6ad01075-3317-4a71-a991-d7a3c1b8c8c5")
+    (uuid "af61fe58-fe34-4328-a98d-b4cae1be3638")
   )
-(global_label "HL_RX2" (shape bidirectional) (at 212.09 83.82 0)
+  (global_label "HL_RX2" (shape bidirectional) (at 212.09 83.82 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000276e") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 83.82 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 85.09 158.75) (xy 82.55 158.75)
     )
     (stroke (width 0) (type default))
-    (uuid "67d00bbc-5aec-459e-a68e-a0902ff56960")
+    (uuid "b2620311-75b3-44af-9337-4d197381959d")
   )
-(global_label "J12_HL_RX3" (shape bidirectional) (at 82.55 158.75 0)
+  (global_label "J12_HL_RX3" (shape bidirectional) (at 82.55 158.75 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000276f") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 158.75 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -659,36 +659,36 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-000000002771"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R204") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 96.52) (xy 196.85 96.52)
     )
     (stroke (width 0) (type default))
-    (uuid "9cd29dc2-2708-40d6-a57e-275477454e82")
+    (uuid "7d5f710b-a996-4977-86fb-03dd19095313")
   )
-(global_label "J12_HL_RX3" (shape bidirectional) (at 196.85 96.52 0)
+  (global_label "J12_HL_RX3" (shape bidirectional) (at 196.85 96.52 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002773") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 96.52 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 96.52) (xy 212.09 96.52)
     )
     (stroke (width 0) (type default))
-    (uuid "97d295e3-5fe0-48f5-8f27-bfa3d9aa5a2f")
+    (uuid "825f78ea-d16b-44a4-83f7-ccca8745f3ae")
   )
-(global_label "HL_RX3" (shape bidirectional) (at 212.09 96.52 0)
+  (global_label "HL_RX3" (shape bidirectional) (at 212.09 96.52 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002774") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 96.52 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 62.23) (xy 118.11 62.23)
     )
     (stroke (width 0) (type default))
-    (uuid "96d29450-380b-4dc8-b8d1-57f253be8fb8")
+    (uuid "835f7a7d-f940-4fd1-9a4e-347b0d31be25")
   )
-(global_label "J12_HL_RX4" (shape bidirectional) (at 118.11 62.23 0)
+  (global_label "J12_HL_RX4" (shape bidirectional) (at 118.11 62.23 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002775") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 62.23 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -704,36 +704,36 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-000000002777"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R205") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 110.49) (xy 196.85 110.49)
     )
     (stroke (width 0) (type default))
-    (uuid "a2d2a734-98b7-4114-84de-343e3c0f65dc")
+    (uuid "775f6799-9894-4c85-80f4-95b7543f3bb9")
   )
-(global_label "J12_HL_RX4" (shape bidirectional) (at 196.85 110.49 0)
+  (global_label "J12_HL_RX4" (shape bidirectional) (at 196.85 110.49 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002779") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 110.49 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 110.49) (xy 212.09 110.49)
     )
     (stroke (width 0) (type default))
-    (uuid "4ad21cac-5f72-420c-825e-67e6451cfec4")
+    (uuid "cf5ff221-d1d8-4b8d-8374-620f08aaf1b1")
   )
-(global_label "HL_RX4" (shape bidirectional) (at 212.09 110.49 0)
+  (global_label "HL_RX4" (shape bidirectional) (at 212.09 110.49 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000277a") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 110.49 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 67.31) (xy 118.11 67.31)
     )
     (stroke (width 0) (type default))
-    (uuid "4dd22165-d6f1-4393-ac08-0035d6e05e29")
+    (uuid "cc5fed68-f9ad-46ba-8071-2afc76e7924c")
   )
-(global_label "J12_HL_RX5" (shape bidirectional) (at 118.11 67.31 0)
+  (global_label "J12_HL_RX5" (shape bidirectional) (at 118.11 67.31 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000277b") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 67.31 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -749,36 +749,36 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-00000000277d"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R206") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 123.19) (xy 196.85 123.19)
     )
     (stroke (width 0) (type default))
-    (uuid "49d21b19-379e-46df-92ae-6171bf31344d")
+    (uuid "d05ff3b4-9901-436e-a717-8c385f386870")
   )
-(global_label "J12_HL_RX5" (shape bidirectional) (at 196.85 123.19 0)
+  (global_label "J12_HL_RX5" (shape bidirectional) (at 196.85 123.19 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000277f") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 123.19 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 123.19) (xy 212.09 123.19)
     )
     (stroke (width 0) (type default))
-    (uuid "a1d4e438-dc15-4cde-b43a-3ce809236cd4")
+    (uuid "703f08e9-3583-4557-8689-a8816d6c5bd5")
   )
-(global_label "HL_RX5" (shape bidirectional) (at 212.09 123.19 0)
+  (global_label "HL_RX5" (shape bidirectional) (at 212.09 123.19 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002780") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 123.19 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 72.39) (xy 118.11 72.39)
     )
     (stroke (width 0) (type default))
-    (uuid "a2d4e5cb-03ea-480b-8a90-a4998f0f374b")
+    (uuid "6f3f0756-0dae-4a2a-b033-40d0e780915e")
   )
-(global_label "J12_HL_RX6" (shape bidirectional) (at 118.11 72.39 0)
+  (global_label "J12_HL_RX6" (shape bidirectional) (at 118.11 72.39 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002781") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 72.39 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -794,36 +794,36 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-000000002783"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R207") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 135.89) (xy 196.85 135.89)
     )
     (stroke (width 0) (type default))
-    (uuid "a6d4ec17-6497-4b57-a3ea-435d77600d6f")
+    (uuid "733f0da2-ad02-46de-898c-df94ff2fbb3a")
   )
-(global_label "J12_HL_RX6" (shape bidirectional) (at 196.85 135.89 0)
+  (global_label "J12_HL_RX6" (shape bidirectional) (at 196.85 135.89 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002785") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 135.89 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 135.89) (xy 212.09 135.89)
     )
     (stroke (width 0) (type default))
-    (uuid "a7d4edaa-ed18-49d0-ba40-ab0efd4bd7e6")
+    (uuid "723f0c0f-852d-4bb1-8c90-16a77943f0c3")
   )
-(global_label "HL_RX6" (shape bidirectional) (at 212.09 135.89 0)
+  (global_label "HL_RX6" (shape bidirectional) (at 212.09 135.89 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002786") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 135.89 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 77.47) (xy 118.11 77.47)
     )
     (stroke (width 0) (type default))
-    (uuid "a8d4ef3d-14ed-44fd-9097-12bf8337a25d")
+    (uuid "713f0a7c-5d58-4084-b639-aef6f358264c")
   )
-(global_label "J12_HL_RX7" (shape bidirectional) (at 118.11 77.47 0)
+  (global_label "J12_HL_RX7" (shape bidirectional) (at 118.11 77.47 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002787") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 77.47 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -839,36 +839,36 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-000000002789"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R208") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 148.59) (xy 196.85 148.59)
     )
     (stroke (width 0) (type default))
-    (uuid "73d49bce-0458-4ef4-b0b3-9b1af8c50b72")
+    (uuid "9e3f5153-5dc6-476d-b836-10937dcabd37")
   )
-(global_label "J12_HL_RX7" (shape bidirectional) (at 196.85 148.59 0)
+  (global_label "J12_HL_RX7" (shape bidirectional) (at 196.85 148.59 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000278b") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 148.59 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 148.59) (xy 212.09 148.59)
     )
     (stroke (width 0) (type default))
-    (uuid "74d49d61-2c2d-4a21-870a-02cb7eb0d5e9")
+    (uuid "9d3f4fc0-35f1-4c40-a1df-a8e2f7def2c0")
   )
-(global_label "HL_RX7" (shape bidirectional) (at 212.09 148.59 0)
+  (global_label "HL_RX7" (shape bidirectional) (at 212.09 148.59 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000278c") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 148.59 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 115.57 82.55) (xy 118.11 82.55)
     )
     (stroke (width 0) (type default))
-    (uuid "75d49ef4-b4ae-489a-9d60-6a7cd53e4ca8")
+    (uuid "a43f5ac5-4cc3-4a7b-a4e2-dff5a1517c01")
   )
-(global_label "J12_HL_IRQ" (shape bidirectional) (at 118.11 82.55 0)
+  (global_label "J12_HL_IRQ" (shape bidirectional) (at 118.11 82.55 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-00000000278d") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 118.11 82.55 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
@@ -884,25 +884,25 @@
     (pin "2" (uuid "d8d8d8d8-0000-4000-8027-00000000278f"))
     (instances (project "servohil_io_revA" (path "/0067332d-92ee-43d7-b3f1-f942e9227e55" (reference "R209") (unit 1))))
   )
-    (wire
+  (wire
     (pts
       (xy 199.39 162.56) (xy 196.85 162.56)
     )
     (stroke (width 0) (type default))
-    (uuid "a6d72aae-bf72-4d3a-a99c-b3b87fd1a5ae")
+    (uuid "6b3cc273-5227-44fb-9127-31b1f6be22fb")
   )
-(global_label "J12_HL_IRQ" (shape bidirectional) (at 196.85 162.56 0)
+  (global_label "J12_HL_IRQ" (shape bidirectional) (at 196.85 162.56 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002791") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 196.85 162.56 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-    (wire
+  (wire
     (pts
       (xy 209.55 162.56) (xy 212.09 162.56)
     )
     (stroke (width 0) (type default))
-    (uuid "a5d7291b-979d-420d-ac9f-eacbf9e5db37")
+    (uuid "6c3cc406-daa9-4374-a77d-99627ca9ed72")
   )
-(global_label "HL_IRQ" (shape bidirectional) (at 212.09 162.56 0)
+  (global_label "HL_IRQ" (shape bidirectional) (at 212.09 162.56 0)
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8027-000000002792") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 212.09 162.56 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
