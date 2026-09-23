@@ -23,6 +23,19 @@ Rev.A targets:
 
 ADC, general DIO, encoder PHY, CAN/RS485 and fault-insertion hardware are deferred until the core path is electrically frozen.
 
+## Rev.A design baseline
+
+- [System block diagram](docs/architecture/ServoHIL_IO_V1_RevA_System_Block.svg)
+- [Schematic review](docs/design/ServoHIL_IO_V1_RevA_Block_and_Schematic.md)
+- [Schematic freeze notes](docs/design/ServoHIL_IO_V1_RevA_Schematic_Notes.md)
+- [AXU2CGB J12 HIL-Link ICD](docs/icd/ServoHIL_IO_V1_RevA_J12_HIL_Link_ICD.csv)
+- [Core BOM](bom/ServoHIL_IO_V1_RevA_Core_BOM.csv)
+- [KiCad development rules](hardware/kicad/README.md)
+- [Rev.A KiCad project scaffold](hardware/kicad/servohil_io_v1_rev_a/README.md)
+- [Local FPGA hardware contract](hardware/fpga/README.md)
+- [HIL-Link XDC template](hardware/fpga/constraints/servohil_io_v1_reva_hil_link.xdc.in)
+- [Authoritative hardware references](references/README.md)
+
 ## Repository structure
 
 - `hardware/kicad/` — KiCad schematic / PCB sources
@@ -43,4 +56,4 @@ PCB layout does **not** begin until:
 4. AD3542R output/reference network is reviewed against the latest datasheet/evaluation design,
 5. schematic ERC and rail/current/thermal reviews pass.
 
-See the Rev.A design documents on the active hardware-development branch.
+Active Rev.A development branch: `feat/servohil-io-v1-reva-core-schematic`.
