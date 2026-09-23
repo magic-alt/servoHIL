@@ -1,0 +1,1 @@
+- input: added 10_input_protection.kicad_sch; existing child sheets preserved.
