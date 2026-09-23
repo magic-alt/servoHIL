@@ -16,7 +16,7 @@ If either setting is missing, the workflow runs contract validation and reports 
 
 ## Security
 
-The workflow uses pull_request_target so public-fork PR metadata can sync. It always checks out the trusted default branch and never checks out or executes PR code.
+The workflow uses pull_request_target so metadata can be validated for public-fork PRs. It always checks out the trusted default branch and never checks out or executes PR code. Notion credentials are passed only for same-repository PRs or OWNER/MEMBER/COLLABORATOR-authored items; untrusted external Issues/PRs are validation-only.
 
 ## Upsert
 
