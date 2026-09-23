@@ -1,0 +1,53 @@
+name: native-power-stage
+on:
+  push:
+    branches: [feat/revb-native-power-safety-dac]
+    paths:
+      - tools/migrations/pr17_stage.txt
+      - tools/migrations/pr17_native.py
+      - tools/check_native_power.py
+      - .github/workflows/native-power-stage.yml
+permissions:
+  contents: write
+concurrency:
+  group: native-power-stage
+  cancel-in-progress: false
+jobs:
+  materialize-reviewed-stage:
+    if: github.repository == 'magic-alt/servoHIL' && github.ref_name == 'feat/revb-native-power-safety-dac'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Install native KiCad parser
+        run: |
+          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols
+      - name: Materialize one new editable sheet, never overwrite previous sheets
+        run: |
+          stage=$(cat tools/migrations/pr17_stage.txt)
+          python tools/migrations/pr17_native.py --stage "$stage"
+          mkdir -p build/native-power
+          kicad-cli version > build/native-power/kicad-version.txt
+          kicad-cli sch export netlist --format kicadxml -o build/native-power/netlist.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+          python tools/check_native_power.py build/native-power/netlist.xml --stage "$stage"
+          kicad-cli sch export pdf -o build/native-power/schematic-review.pdf hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+      - name: Commit this completed source section immediately
+        run: |
+          git config user.name 'servoHIL hardware integration'
+          git config user.email '59996146+magic-alt@users.noreply.github.com'
+          git add hardware/kicad/revB/axu2cgb_expansion
+          git commit -m "hardware(power): commit native $(cat tools/migrations/pr17_stage.txt) circuit and editable project"
+          # No force push; concurrent branch work must be reconciled explicitly.
+          git push origin HEAD:feat/revb-native-power-safety-dac
+          git rev-parse HEAD > build/native-power/source_commit.txt
+          git archive --format=zip --output=build/native-power/native-source.zip HEAD hardware/kicad/revB/axu2cgb_expansion
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: servohil-native-power-stage
+          path: build/native-power/
+          if-no-files-found: warn
