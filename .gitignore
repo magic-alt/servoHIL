@@ -1,0 +1,24 @@
+# KiCad
+*.bak
+*-backups/
+*.kicad_prl
+*.kicad_sch-bak
+*.kicad_pcb-bak
+fp-info-cache
+~*.lck
+
+# Generated fabrication / plots
+hardware/**/gerbers/
+hardware/**/plots/
+hardware/**/fabrication/
+hardware/**/bom/generated/
+
+# Vivado
+.Xil/
+*.jou
+*.log
+*.str
+*.runs/
+*.cache/
+*.hw/
+*.sim/
