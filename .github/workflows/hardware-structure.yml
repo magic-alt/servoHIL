@@ -39,10 +39,19 @@ jobs:
           cat build/servohil_io_revA_erc.rpt
           python tools/check_erc_report.py build/servohil_io_revA_erc.rpt
 
-      - name: Upload ERC report
+      - name: Export Rev.A schematic review PDF
+        run: |
+          kicad-cli sch export pdf \
+            -o build/servohil_io_revA_schematic.pdf \
+            hardware/kicad/revA/servohil_io_revA.kicad_sch
+          test -s build/servohil_io_revA_schematic.pdf
+
+      - name: Upload schematic and ERC artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: servohil-reva-erc
-          path: build/servohil_io_revA_erc.rpt
+          name: servohil-reva-hardware-review
+          path: |
+            build/servohil_io_revA_erc.rpt
+            build/servohil_io_revA_schematic.pdf
           if-no-files-found: warn
