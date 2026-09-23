@@ -9,8 +9,8 @@ on:
 
 permissions:
   contents: read
-  issues: read
-  pull-requests: read
+  issues: write
+  pull-requests: write
 
 jobs:
   sync:
@@ -20,11 +20,15 @@ jobs:
         with:
           ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
+
       - name: Contract tests
         run: python3 .github/scripts/test_verification_sync.py
+
       - name: Validate metadata
         run: python3 .github/scripts/verification_sync.py --event "$GITHUB_EVENT_PATH"
+
       - name: Sync trusted metadata to Notion
+        id: notion_sync
         if: >-
           (github.event_name == 'issues' && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)) ||
           (github.event_name == 'pull_request_target' && (github.event.pull_request.head.repo.full_name == github.repository || contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)))
@@ -33,3 +37,43 @@ jobs:
           NOTION_VERIFICATION_DATA_SOURCE_ID: ${{ vars.NOTION_VERIFICATION_DATA_SOURCE_ID }}
           NOTION_API_VERSION: 2026-03-11
         run: python3 .github/scripts/verification_sync.py --event "$GITHUB_EVENT_PATH"
+
+      - name: Backlink Matrix record to GitHub
+        if: steps.notion_sync.outputs.matrix_page_url != ''
+        uses: actions/github-script@v7
+        env:
+          MATRIX_PAGE_URL: ${{ steps.notion_sync.outputs.matrix_page_url }}
+          SYNC_KEY: ${{ steps.notion_sync.outputs.sync_key }}
+        with:
+          script: |
+            const marker = '<!-- verification-matrix-link -->';
+            const issue_number =
+              context.payload.issue?.number ?? context.payload.pull_request?.number;
+            if (!issue_number) return;
+
+            const body =
+              `${marker}\n` +
+              `Verification Matrix: ${process.env.MATRIX_PAGE_URL}\n\n` +
+              `Sync key: \`${process.env.SYNC_KEY}\``;
+
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              { ...context.repo, issue_number, per_page: 100 }
+            );
+            const existing = comments.find(
+              c => c.user?.type === 'Bot' && c.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number,
+                body
+              });
+            }

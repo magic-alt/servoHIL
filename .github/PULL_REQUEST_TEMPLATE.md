@@ -12,7 +12,7 @@ List ERC/DRC/static checks, simulation, bench and physical evidence separately.
 
 ## Verification Matrix metadata
 
-Fill only when this PR maps to a Matrix gate. Leave both IDs as n/a for untracked work. Merge state never implies PASS.
+Fill only when this PR maps to a Matrix gate. Leave both IDs as n/a for untracked work. Merge state never implies PASS. A new commit makes PR-bound evidence stale until it is refreshed.
 
 ### REQ-ID
 n/a
@@ -31,6 +31,8 @@ n/a
 ### Evidence Path
 n/a
 ### Evidence URL
+n/a
+### Evidence Date
 n/a
 ### Bench / DUT
 n/a
