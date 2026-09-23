@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "ServoHIL")(type "KiCad")(uri "${KIPRJMOD}/servohil_power.kicad_sym")(options "")(descr "ServoHIL Rev.A project-local symbols"))
+)
