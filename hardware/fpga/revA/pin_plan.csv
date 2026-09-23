@@ -1,6 +1,6 @@
 logical_net,direction_at_local_fpga,iostandard,required_bank_vcco,clock_requirement,package_pin,status
-HL_TX_CLK,input,LVCMOS18,1.8V,data clock input,,UNASSIGNED
-HL_RX_CLK,output,LVCMOS18,1.8V,source clock output,,UNASSIGNED
+HL_TX_CLK,input,LVCMOS18,1.8V,source clock input / clock-capable pin required,,UNASSIGNED
+HL_RX_CLK,output,LVCMOS18,1.8V,forwarded source clock output,,UNASSIGNED
 HL_TX0,input,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_TX1,input,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_TX2,input,LVCMOS18,1.8V,data,,UNASSIGNED
@@ -9,6 +9,10 @@ HL_TX4,input,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_TX5,input,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_TX6,input,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_TX7,input,LVCMOS18,1.8V,data,,UNASSIGNED
+HL_SYNC,input,LVCMOS18,1.8V,control,,UNASSIGNED
+SPARE_GC0,bidirectional,LVCMOS18,1.8V,GC-capable reserve,,UNASSIGNED
+SPARE_GC1,bidirectional,LVCMOS18,1.8V,GC-capable reserve,,UNASSIGNED
+SPARE_GC2,bidirectional,LVCMOS18,1.8V,GC-capable reserve,,UNASSIGNED
 HL_RX0,output,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_RX1,output,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_RX2,output,LVCMOS18,1.8V,data,,UNASSIGNED
@@ -17,10 +21,15 @@ HL_RX4,output,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_RX5,output,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_RX6,output,LVCMOS18,1.8V,data,,UNASSIGNED
 HL_RX7,output,LVCMOS18,1.8V,data,,UNASSIGNED
-HL_SYNC,input,LVCMOS18,1.8V,control,,UNASSIGNED
 HL_IRQ,output,LVCMOS18,1.8V,control,,UNASSIGNED
 HL_SAFE_N,input,LVCMOS18,1.8V,control,,UNASSIGNED
 HL_RESET_N,input,LVCMOS18,1.8V,control,,UNASSIGNED
 HL_HEARTBEAT,input,LVCMOS18,1.8V,control,,UNASSIGNED
 TRIG0,input,LVCMOS18,1.8V,control,,UNASSIGNED
 TRIG1,input,LVCMOS18,1.8V,control,,UNASSIGNED
+DBG0,bidirectional,LVCMOS18,1.8V,debug reserve,,UNASSIGNED
+DBG1,bidirectional,LVCMOS18,1.8V,debug reserve,,UNASSIGNED
+SPARE0,bidirectional,LVCMOS18,1.8V,reserve,,UNASSIGNED
+SPARE1,bidirectional,LVCMOS18,1.8V,reserve,,UNASSIGNED
+SPARE2,bidirectional,LVCMOS18,1.8V,reserve,,UNASSIGNED
+SPARE3,bidirectional,LVCMOS18,1.8V,reserve,,UNASSIGNED
