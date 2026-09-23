@@ -9,8 +9,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python tools/check_kicad_scaffold.py
-      - run: python tools/check_layout_gate.py
+
+      - name: Check KiCad source structure
+        run: python tools/check_kicad_scaffold.py
+
+      - name: Check PCB layout gate
+        run: python tools/check_layout_gate.py
+
+      - name: Check Rev.A power schematic contract
+        run: python tools/check_power_schematic_contract.py
+
+      - name: Install KiCad CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends kicad
+
+      - name: Parse Rev.A hierarchy and generate ERC report
+        run: |
+          mkdir -p build
+          kicad-cli version
+          kicad-cli sch erc \
+            -o build/servohil_io_revA_erc.rpt \
+            hardware/kicad/revA/servohil_io_revA.kicad_sch
+          cat build/servohil_io_revA_erc.rpt
+
+      - name: Upload ERC report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: servohil-reva-erc
+          path: build/servohil_io_revA_erc.rpt
+          if-no-files-found: warn
