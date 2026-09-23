@@ -1,0 +1,30 @@
+name: Verification Matrix Sync
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened]
+  pull_request_target:
+    types: [opened, edited, synchronize, closed, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - name: Contract tests
+        run: python3 .github/scripts/test_verification_sync.py
+      - name: Validate and sync
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_VERIFICATION_DATA_SOURCE_ID: ${{ vars.NOTION_VERIFICATION_DATA_SOURCE_ID }}
+          NOTION_API_VERSION: 2026-03-11
+        run: python3 .github/scripts/verification_sync.py --event "$GITHUB_EVENT_PATH"
