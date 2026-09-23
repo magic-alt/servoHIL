@@ -1,0 +1,28 @@
+{
+  "sources": [
+    {
+      "id": "ALINX_AXU2CG_UG_REV1_20210408_PP20_22",
+      "title": "AXU2CGA/B User Manual Rev1.0 2021-04-08 pp20-22",
+      "origin": "https://www.alinx.com/public/upload/file/AXU2CG_UG.pdf",
+      "mirror": "https://manuals.plus/m/6f6bb42c15a0c7b88d40e2dcf2088f595cf96dc177d10188f3353adddb4461d9",
+      "note": "Manufacturer-authored manual; original link returned an empty page during this review. Pin table cross-checked against the manual mirror; physical board revision still requires review."
+    },
+    {
+      "id": "ALINX_OFFICIAL_BLOG",
+      "url": "https://www.cnblogs.com/alinx/p/14296296.html",
+      "section": "40针扩展口",
+      "claim": "J12 Bank66 1.8V; J15 Bank25/26 3.3V; 34 GPIO each"
+    },
+    {
+      "id": "AD3542R_REV_C",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/ad3542r.pdf",
+      "pages": [6,7,11,12,27,38,65],
+      "claim": "DAC pin/voltage/timing references; 16MUPS is single-channel in stated fast mode, 100ns is not 16-bit settling"
+    },
+    {
+      "id": "AD7606C16_REV_A",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/ad7606c-16.pdf",
+      "claim": "8-DOUT serial option; 1.8V clock/timing must be checked before rate claims"
+    }
+  ]
+}

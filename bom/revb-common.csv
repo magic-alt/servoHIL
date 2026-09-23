@@ -1,0 +1,10 @@
+ref,qty,part,role,status
+U20-U23,4,AD3542RBCPZ16,8-channel DAC,schematic candidate; footprint and analog review OPEN
+R300/R301/R320/R321/R340/R341/R360/R361,8,52.3ohm,AO source isolation,starting value; cable and ADC load review OPEN
+R1,1,10kohm,DAC RESET default pull-down,not a standalone safety solution
+J12/J15,2,40-pin board connector,original AXU2CGB carrier interface,mechanical mating and orientation review OPEN
+J1,1,regulated bench rail interface,I/O power boundary,onboard regulator design NOT COMPLETE
+J2,1,independent safety interface,external hardware safety boundary,implementation and validation NOT COMPLETE
+J3,1,ADC integration interface,8-AI digital reservation,ADC AFE/physical implementation NOT COMPLETE
+J4,1,digital PHY integration interface,PWM dual encoder RS485 management,PHY/protection NOT COMPLETE
+J5,1,8-AO DUT interface,scaled and clamped by DUT adapter,mechanical/adapter review OPEN
