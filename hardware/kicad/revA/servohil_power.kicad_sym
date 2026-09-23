@@ -787,7 +787,7 @@
           )
         )
       )
-      (symbol "ServoHIL:J12_STACK"
+      (symbol "J12_STACK"
         (pin_names (offset 1.016))
         (exclude_from_sim no)
         (in_bom yes)
