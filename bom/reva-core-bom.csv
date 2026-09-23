@@ -1,6 +1,6 @@
 Ref,Qty,Part,Function,Status
 U1,1,TPS259474LRPWR,9-15V input eFuse / UVOV / ~4A current limit / PG,Rev.A candidate
-U2,1,ADP5054ACPZ-R7,quad buck 1.0V/1.8V/3.3V/6.0V_PRE,topology selected; power-stage passives PRELIM
+U2,1,ADP5054ACPZ-R7,quad buck 1.0V/1.8V/3.3V/6.0V_PRE,topology selected; full 48-pin symbol and passives PRELIM
 U3,1,ADM1186-1,4-channel power sequencer/monitor,Rev.A candidate
 U4/U5,2,LT3045,low-noise +5.0V / +5.2V post regulators,topology selected
 U6,1,LTC7149,negative preregulator -6V0_PRE,topology selected; magnetics/comp PRELIM
@@ -9,7 +9,13 @@ U8,1,ADR4525,shared 2.5V DAC reference,freeze candidate
 U9,1,TPS70933DBVR,3.3V always-on supervisor/sequencer rail,Rev.A candidate
 U12,1,74LVC1G17,delayed Schmitt start pulse for ADM1186 UP,Rev.A candidate
 Q1/Q2,2,SI4204DY-class N-MOSFET,ADP5054 CH1/CH2 external low-side switch,candidate; exact MOSFET not frozen
-U10,1,XC7A35T-1FGG484I,Local I/O FPGA,package candidate; balls TBD
-U11,1,128Mbit QSPI Flash 3.3V,FPGA configuration,candidate
-U20-U23,4,AD3542RBCPZ16,8ch 16-bit fast DAC,freeze
-J10,1,2x20 stack header,AXU2CGB J12 / HIL-Link,freeze
+U10,1,XC7A35T-1FGG484I,Local I/O FPGA,functional schematic complete; FGG484 balls/footprint intentionally not frozen
+U11,1,W25Q128JV-class QSPI Flash,FPGA configuration,candidate
+Y1,1,100MHz 1.8V oscillator,Local FPGA timestamp/reference clock,candidate
+J11,1,2x5 JTAG header,Local FPGA configuration/debug,candidate
+U13,1,TPS3431-class watchdog,independent HIL-link safety watchdog,pre-layout candidate
+U14/U15,2,74LVC1G08-class gate,hardware safe-release qualification,pre-layout candidate
+U16,1,SN74AXC1T45-class translator,3.3V-to-1.8V DAC_RESET_N safe release,pre-layout candidate
+U20-U23,4,AD3542RBCPZ16,8ch 16-bit fast DAC,electrical pin/range contract frozen; footprint/layout review pending
+J10,1,2x20 stack header,AXU2CGB J12 / HIL-Link,ICD frozen
+J20,1,10-pin AO interface,AO0-AO7 + 2xGND DUT boundary,connector family/footprint TBD
