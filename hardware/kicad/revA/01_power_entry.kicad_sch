@@ -253,7 +253,7 @@
     (uuid "a5a5a5a5-0000-4000-8003-0000000003ef")
     (property "Reference" "D1" (at 64.77 38.1 0) (effects (font (size 1.27 1.27))))
     (property "Value" "SMBJ16A" (at 64.77 82.55 0) (effects (font (size 1.27 1.27))))
-    (property "Footprint" "Diode_SMD:D_SMB" (at 64.77 59.69 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Footprint" "" (at 64.77 59.69 0) (effects (font (size 1.27 1.27)) hide))
     (property "Datasheet" "~" (at 64.77 59.69 0) (effects (font (size 1.27 1.27)) hide))
     (pin "1" (uuid "a5a5a5a5-0000-4000-8003-0000000003ed"))
     (pin "2" (uuid "a5a5a5a5-0000-4000-8003-0000000003ee"))
