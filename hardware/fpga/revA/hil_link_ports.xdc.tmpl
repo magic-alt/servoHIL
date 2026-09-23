@@ -1,20 +1,38 @@
 # ServoHIL-I/O Rev.A HIL-Link XDC TEMPLATE -- DO NOT USE FOR BITSTREAM
-# Exact PACKAGE_PIN values must come from Vivado I/O Planner after FGG484 bank review.
-# Local-FPGA naming: hl_tx = ZU2CG -> Local FPGA, hl_rx = Local FPGA -> ZU2CG.
+# Exact XC7A35T FGG484 PACKAGE_PIN values remain UNASSIGNED until Vivado I/O Planner review.
+#
+# Direction is from the Local I/O FPGA point of view:
+#   hl_tx* : ZU2CG -> Local FPGA
+#   hl_rx* : Local FPGA -> ZU2CG
+#
+# Logical KiCad/ICD names map to HDL arrays as:
+#   HL_TX0..7    -> hl_tx[0..7]
+#   HL_RX0..7    -> hl_rx[0..7]
+#   TRIG0..1     -> trig[0..1]
+#   DBG0..1      -> dbg[0..1]
+#   SPARE0..3    -> spare[0..3]
+#   SPARE_GC0..2 -> spare_gc[0..2]
 
-set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx_clk hl_rx_clk hl_sync hl_irq hl_safe_n hl_reset_n hl_heartbeat trig0 trig1}]
-set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx[*] hl_rx[*]}]
+set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx_clk hl_rx_clk hl_sync hl_irq hl_safe_n hl_reset_n hl_heartbeat}]
+set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx[*] hl_rx[*] trig[*] dbg[*] spare[*] spare_gc[*]}]
 
-# Board source damping is present on Local-FPGA-driven hl_rx/irq paths.
+# Local-FPGA-driven deterministic outputs. 33-ohm starting series footprints are
+# present in the schematic; PCB placement must put them physically near the FPGA source.
 set_property DRIVE 4 [get_ports {hl_rx_clk hl_rx[*] hl_irq}]
 set_property SLEW SLOW [get_ports {hl_rx_clk hl_rx[*] hl_irq}]
 
+# Incoming ZU2CG source-synchronous clock.
 create_clock -name HIL_TX_CLK -period 10.000 [get_ports hl_tx_clk]
 
-# Timing values below remain placeholders until PCB flight time and FPGA I/O placement are known.
-# set_input_delay  -clock HIL_TX_CLK -max <ns> [get_ports {hl_tx[*] hl_sync hl_safe_n hl_reset_n hl_heartbeat trig0 trig1}]
-# set_input_delay  -clock HIL_TX_CLK -min <ns> [get_ports {hl_tx[*] hl_sync hl_safe_n hl_reset_n hl_heartbeat trig0 trig1}]
-# set_output_delay -clock <HIL_RX_CLK_OBJ> -max <ns> [get_ports {hl_rx[*] hl_irq}]
-# set_output_delay -clock <HIL_RX_CLK_OBJ> -min <ns> [get_ports {hl_rx[*] hl_irq}]
-
-# PACKAGE_PIN placeholders are deliberately absent.
+# PLACEHOLDER TIMING ONLY.
+# Populate after FGG484 pin placement and board flight-time estimation:
+#
+# set_input_delay  -clock HIL_TX_CLK -max <ns> [get_ports {hl_tx[*] hl_sync hl_safe_n hl_reset_n hl_heartbeat trig[*]}]
+# set_input_delay  -clock HIL_TX_CLK -min <ns> [get_ports {hl_tx[*] hl_sync hl_safe_n hl_reset_n hl_heartbeat trig[*]}]
+#
+# The receive direction forwards hl_rx_clk with the Local-FPGA data.
+# create_generated_clock / set_output_delay values depend on the implemented
+# forwarded-clock primitive and must not be guessed in Rev.A schematic phase.
+#
+# Reserve/debug nets are intentionally retained but do not carry timing constraints yet.
+# No active PACKAGE_PIN assignments are allowed in this template.
