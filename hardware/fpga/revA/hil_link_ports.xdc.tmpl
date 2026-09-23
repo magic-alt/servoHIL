@@ -1,0 +1,12 @@
+# ServoHIL-I/O Rev.A XDC TEMPLATE -- DO NOT USE FOR BITSTREAM
+# Exact PACKAGE_PIN values must be filled from Vivado I/O Planner.
+
+set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx_clk hl_rx_clk}]
+set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx_data[*] hl_rx_data[*]}]
+set_property IOSTANDARD LVCMOS18 [get_ports {hl_sync hl_irq hl_safe_n hl_reset_n hl_heartbeat}]
+
+create_clock -name hil_link_tx_clk -period 10.000 [get_ports hl_tx_clk]
+
+# PLACEHOLDER ONLY:
+# set_property PACKAGE_PIN <BALL> [get_ports hl_tx_clk]
+# set_property PACKAGE_PIN <BALL> [get_ports hl_rx_clk]
