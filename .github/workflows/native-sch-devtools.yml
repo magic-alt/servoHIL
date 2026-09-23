@@ -13,13 +13,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Package KiCad native runtime and library assets
+      - name: Package complete KiCad native runtime and library assets
         run: |
           mkdir -p devtools
           docker run --rm -v "$PWD/devtools:/out" debian:trixie-slim bash -euxc '
             apt-get update
             apt-get install -y --no-install-recommends kicad kicad-footprints kicad-symbols
-            tar -C / -czf /out/kicad-runtime.tar.gz usr/bin/kicad-cli usr/lib/x86_64-linux-gnu usr/share/kicad usr/share/fonts/truetype/dejavu
+            # KiCad CLI dynamically loads eeschema/pcbnew kiface modules outside
+            # x86_64-linux-gnu. Preserve bin+lib, not just the CLI executable.
+            tar -C / -czf /out/kicad-runtime.tar.gz usr/bin usr/lib usr/share/kicad usr/share/fonts/truetype/dejavu
             kicad-cli version > /out/kicad-version.txt
           '
       - uses: actions/upload-artifact@v4
