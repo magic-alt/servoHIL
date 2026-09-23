@@ -1564,8 +1564,8 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "d8d8d8d8-0000-4000-8028-00000000283e") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 82.55 160.02 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 80.01 149.86 0) (uuid "d8d8d8d8-0000-4000-8028-00000000283f"))
-  (no_connect (at 80.01 165.1 0) (uuid "d8d8d8d8-0000-4000-8028-000000002840"))
+  (no_connect (at 80.01 149.86) (uuid "d8d8d8d8-0000-4000-8028-00000000283f"))
+  (no_connect (at 80.01 165.1) (uuid "d8d8d8d8-0000-4000-8028-000000002840"))
   (symbol
     (lib_id "ServoHILCore:R") (at 115.57 144.78 0) (unit 1)
     (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no)

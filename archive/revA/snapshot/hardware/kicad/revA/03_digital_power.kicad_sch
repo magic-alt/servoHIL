@@ -563,7 +563,7 @@
       (effects (font (size 1.27 1.27)) (hide yes))
     )
   )
-  (no_connect (at 67.31 49.53 0) (uuid "a5a5a5a5-0000-4000-800b-000000000bc2"))
+  (no_connect (at 67.31 49.53) (uuid "a5a5a5a5-0000-4000-800b-000000000bc2"))
   (symbol
     (lib_id "ServoHIL:C")
     (at 25.4 41.91 0)

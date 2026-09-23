@@ -519,7 +519,7 @@
       (effects (font (size 1.27 1.27)) (hide yes))
     )
   )
-  (no_connect (at 87.63 64.77 0) (uuid "a5a5a5a5-0000-4000-8007-0000000007e3"))
+  (no_connect (at 87.63 64.77) (uuid "a5a5a5a5-0000-4000-8007-0000000007e3"))
   (symbol
     (lib_id "ServoHIL:R")
     (at 115.57 54.61 0)
@@ -906,7 +906,7 @@
       (effects (font (size 1.27 1.27)) (hide yes))
     )
   )
-  (no_connect (at 87.63 124.46 0) (uuid "a5a5a5a5-0000-4000-8008-00000000080c"))
+  (no_connect (at 87.63 124.46) (uuid "a5a5a5a5-0000-4000-8008-00000000080c"))
   (symbol
     (lib_id "ServoHIL:R")
     (at 115.57 115.57 0)
@@ -2095,8 +2095,8 @@
       (effects (font (size 1.27 1.27)) (hide yes))
     )
   )
-  (no_connect (at 353.06 85.09 0) (uuid "a5a5a5a5-0000-4000-8008-000000000883"))
-  (no_connect (at 353.06 90.17 0) (uuid "a5a5a5a5-0000-4000-8008-000000000884"))
+  (no_connect (at 353.06 85.09) (uuid "a5a5a5a5-0000-4000-8008-000000000883"))
+  (no_connect (at 353.06 90.17) (uuid "a5a5a5a5-0000-4000-8008-000000000884"))
   (symbol
     (lib_id "ServoHIL:R")
     (at 379.73 64.77 0)

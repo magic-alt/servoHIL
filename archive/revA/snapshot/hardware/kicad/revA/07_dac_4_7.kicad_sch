@@ -342,7 +342,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify right))
     (uuid "e9e9e9e9-0000-4000-802f-000000002fe8") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 97.79 109.22 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 100.33 114.3 0) (uuid "e9e9e9e9-0000-4000-802f-000000002fe9"))
+  (no_connect (at 100.33 114.3) (uuid "e9e9e9e9-0000-4000-802f-000000002fe9"))
   (wire
     (pts
       (xy 100.33 124.46) (xy 97.79 124.46)
@@ -442,7 +442,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "e9e9e9e9-0000-4000-802f-000000002ff2") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 133.35 83.82 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 130.81 93.98 0) (uuid "e9e9e9e9-0000-4000-802f-000000002ff3"))
+  (no_connect (at 130.81 93.98) (uuid "e9e9e9e9-0000-4000-802f-000000002ff3"))
   (wire
     (pts
       (xy 130.81 104.14) (xy 133.35 104.14)
@@ -454,7 +454,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "e9e9e9e9-0000-4000-802f-000000002ff4") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 133.35 104.14 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 130.81 114.3 0) (uuid "e9e9e9e9-0000-4000-802f-000000002ff5"))
+  (no_connect (at 130.81 114.3) (uuid "e9e9e9e9-0000-4000-802f-000000002ff5"))
   (wire
     (pts
       (xy 130.81 124.46) (xy 133.35 124.46)
@@ -477,7 +477,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "e9e9e9e9-0000-4000-802f-000000002ff7") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 133.35 134.62 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 130.81 144.78 0) (uuid "e9e9e9e9-0000-4000-802f-000000002ff8"))
+  (no_connect (at 130.81 144.78) (uuid "e9e9e9e9-0000-4000-802f-000000002ff8"))
   (wire
     (pts
       (xy 130.81 154.94) (xy 133.35 154.94)
@@ -489,7 +489,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "e9e9e9e9-0000-4000-802f-000000002ff9") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 133.35 154.94 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 130.81 163.83 0) (uuid "e9e9e9e9-0000-4000-802f-000000002ffa"))
+  (no_connect (at 130.81 163.83) (uuid "e9e9e9e9-0000-4000-802f-000000002ffa"))
   (symbol (lib_id "ServoHILCore:C") (at 170.18 124.46 0) (unit 1)
     (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no) (uuid "e9e9e9e9-0000-4000-802f-000000002ffd")
     (property "Reference" "C340" (at 170.18 121.92 0) (effects (font (size 1.27 1.27))))
@@ -988,7 +988,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify right))
     (uuid "e9e9e9e9-0000-4000-8030-000000003058") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 312.42 109.22 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 314.96 114.3 0) (uuid "e9e9e9e9-0000-4000-8030-000000003059"))
+  (no_connect (at 314.96 114.3) (uuid "e9e9e9e9-0000-4000-8030-000000003059"))
   (wire
     (pts
       (xy 314.96 124.46) (xy 312.42 124.46)
@@ -1088,7 +1088,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "e9e9e9e9-0000-4000-8030-000000003062") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 347.98 83.82 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 345.44 93.98 0) (uuid "e9e9e9e9-0000-4000-8030-000000003063"))
+  (no_connect (at 345.44 93.98) (uuid "e9e9e9e9-0000-4000-8030-000000003063"))
   (wire
     (pts
       (xy 345.44 104.14) (xy 347.98 104.14)
@@ -1100,7 +1100,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "e9e9e9e9-0000-4000-8030-000000003064") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 347.98 104.14 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 345.44 114.3 0) (uuid "e9e9e9e9-0000-4000-8030-000000003065"))
+  (no_connect (at 345.44 114.3) (uuid "e9e9e9e9-0000-4000-8030-000000003065"))
   (wire
     (pts
       (xy 345.44 124.46) (xy 347.98 124.46)
@@ -1123,7 +1123,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "e9e9e9e9-0000-4000-8030-000000003067") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 347.98 134.62 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 345.44 144.78 0) (uuid "e9e9e9e9-0000-4000-8030-000000003068"))
+  (no_connect (at 345.44 144.78) (uuid "e9e9e9e9-0000-4000-8030-000000003068"))
   (wire
     (pts
       (xy 345.44 154.94) (xy 347.98 154.94)
@@ -1135,7 +1135,7 @@
     (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify left))
     (uuid "e9e9e9e9-0000-4000-8030-000000003069") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 347.98 154.94 0)
       (effects (font (size 1.27 1.27)) (hide yes))))
-  (no_connect (at 345.44 163.83 0) (uuid "e9e9e9e9-0000-4000-8030-00000000306a"))
+  (no_connect (at 345.44 163.83) (uuid "e9e9e9e9-0000-4000-8030-00000000306a"))
   (symbol (lib_id "ServoHILCore:C") (at 384.81 124.46 0) (unit 1)
     (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no) (uuid "e9e9e9e9-0000-4000-8030-00000000306d")
     (property "Reference" "C360" (at 384.81 121.92 0) (effects (font (size 1.27 1.27))))
