@@ -1,12 +1,40 @@
-# ServoHIL-I/O Rev.A XDC TEMPLATE -- DO NOT USE FOR BITSTREAM
-# Exact PACKAGE_PIN values must be filled from Vivado I/O Planner.
+# ServoHIL-I/O Rev.A HIL-Link XDC TEMPLATE -- DO NOT USE FOR BITSTREAM
+# Exact XC7A35T FGG484 PACKAGE_PIN values remain UNASSIGNED until Vivado I/O Planner review.
+#
+# Direction is from the Local I/O FPGA point of view:
+#   hl_tx_* : ZU2CG -> Local FPGA
+#   hl_rx_* : Local FPGA -> ZU2CG
 
 set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx_clk hl_rx_clk}]
 set_property IOSTANDARD LVCMOS18 [get_ports {hl_tx_data[*] hl_rx_data[*]}]
 set_property IOSTANDARD LVCMOS18 [get_ports {hl_sync hl_irq hl_safe_n hl_reset_n hl_heartbeat}]
+set_property IOSTANDARD LVCMOS18 [get_ports {trig[*] dbg[*] spare[*] spare_gc[*]}]
 
-create_clock -name hil_link_tx_clk -period 10.000 [get_ports hl_tx_clk]
+# Local-FPGA-driven deterministic outputs. Keep edge rate conservative until SI measurement.
+set_property DRIVE 4 [get_ports {hl_rx_clk hl_rx_data[*] hl_irq}]
+set_property SLEW SLOW [get_ports {hl_rx_clk hl_rx_data[*] hl_irq}]
 
-# PLACEHOLDER ONLY:
-# set_property PACKAGE_PIN <BALL> [get_ports hl_tx_clk]
-# set_property PACKAGE_PIN <BALL> [get_ports hl_rx_clk]
+# The incoming ZU2CG source-synchronous clock is 100 MHz.
+create_clock -name HIL_TX_CLK -period 10.000 [get_ports hl_tx_clk]
+
+# TODO after FGG484 pin planning and board-flight-time estimate:
+# - assign PACKAGE_PIN for every port in pin_plan.csv
+# - add set_input_delay for hl_tx_data[*] relative to hl_tx_clk
+# - add set_output_delay for hl_rx_data[*] relative to forwarded hl_rx_clk
+# - implement forwarded hl_rx_clk with a deterministic clocking primitive
+# - validate whether IDELAY/ISERDES is required; do not add it speculatively
+#
+# HDL port contract:
+# input        hl_tx_clk;
+# input  [7:0] hl_tx_data;
+# input        hl_sync;
+# input        hl_safe_n;
+# input        hl_reset_n;
+# input        hl_heartbeat;
+# input  [1:0] trig;
+# output       hl_rx_clk;
+# output [7:0] hl_rx_data;
+# output       hl_irq;
+# inout  [1:0] dbg;
+# inout  [3:0] spare;
+# inout  [2:0] spare_gc;
