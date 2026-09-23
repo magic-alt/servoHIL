@@ -6,7 +6,8 @@ on:
       - tools/migrations/pr17_stage.txt
       - tools/migrations/pr17_*.py
       - tools/check_native_power.py
-      - tools/verify_native.py
+      - tools/verify_native*.py
+      - tools/native_supervision_rules.py
       - .github/workflows/native-power-stage.yml
 permissions:
   contents: write
@@ -26,7 +27,7 @@ jobs:
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends kicad kicad-symbols
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
       - name: Materialize one new editable sheet, never overwrite previous sheets
         run: |
           stage=$(cat tools/migrations/pr17_stage.txt)
@@ -34,9 +35,9 @@ jobs:
           mkdir -p build/native-power
           kicad-cli version > build/native-power/kicad-version.txt
           kicad-cli sch export netlist --format kicadxml -o build/native-power/netlist.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
-          python tools/verify_native.py build/native-power/netlist.xml --stage "$stage"
+          python tools/verify_native_all.py build/native-power/netlist.xml --stage "$stage"
           kicad-cli sch export pdf -o build/native-power/schematic-review.pdf hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
-      - name: Commit this completed source section immediately
+      - name: Commit this electrical source section immediately
         run: |
           git config user.name 'servoHIL hardware integration'
           git config user.email '59996146+magic-alt@users.noreply.github.com'
@@ -45,6 +46,21 @@ jobs:
           git push origin HEAD:feat/revb-native-power-safety-dac
           git rev-parse HEAD > build/native-power/source_commit.txt
           git archive --format=zip --output=build/native-power/native-source.zip HEAD hardware/kicad/revB/axu2cgb_expansion
+      - name: Full native ERC - no suppressions
+        run: |
+          set +e
+          kicad-cli sch erc --format json --exit-code-violations -o build/native-power/erc.json hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+          rc=$?
+          set -e
+          python - <<'PY'
+          import json
+          data=json.load(open('build/native-power/erc.json'))
+          for sheet in data.get('sheets',[]):
+              for v in sheet.get('violations',[]):
+                  print(sheet.get('path',''),v.get('type'),v.get('severity'),v.get('description'))
+                  for item in v.get('items',[]):print(' ',item.get('description',''))
+          PY
+          exit "$rc"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

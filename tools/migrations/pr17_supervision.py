@@ -1,0 +1,50 @@
+"""Power qualification and deliberate re-arm. Not a complete DUT safety system."""
+from pr17_native import Drawing
+
+
+def supervision_sheet():
+    d=Drawing('40_power_supervision','POWER QUALIFICATION: monitored rails, negative-rail loss detection and latched DAC reset release')
+    d.s.paper='A2'
+    d.ic('TPS3808G01_DBV',[(6,'VDD','power_in'),(5,'SENSE','input'),(3,'MR_N','input'),(2,'GND','power_in')],[(1,'RESET_N','open_collector'),(4,'CT','passive')])
+    for i,x,rail,rt,mr in [(401,88.9,'1V8_D','32.8k 0.1%','ANALOG_OK'),(402,266.7,'3V3_D','67.3k 0.1%','INPUT_OK'),(403,444.5,'VREF_2V5','49.9k 0.1%','INPUT_OK')]:
+        sense=f'SENSE_{i}';base=500+(i-401)*10
+        d.add('TPS3808G01_DBV',f'U{i}','TPS3808G01DBVR / CT open =20ms',x,66.04,{6:'3V3_AON',5:sense,3:mr,2:'GND',1:'RAILS_OK',4:None},'Package_TO_SOT_SMD:SOT-23-6','https://www.ti.com/lit/ds/symlink/tps3808.pdf')
+        d.r(f'R{base}',rt,x-35.56,104.14,rail,sense)
+        d.r(f'R{base+1}','10k 0.1%',x+63.5,104.14,sense,'GND')
+        d.c(f'C{base}','1nF / 16V sense filter',x-35.56,127,sense,'GND')
+        d.c(f'C{base+1}','100nF / 16V',x+63.5,127,'3V3_AON','GND')
+    d.r('R530','10k / open-drain pull-up',469.9,152.4,'3V3_AON','RAILS_OK')
+    d.ic('TLV1701_DBV',[(1,'IN_PLUS','input'),(3,'IN_MINUS','input'),(2,'V_MINUS','power_in')],[(5,'V_PLUS','power_in'),(4,'OUT','open_collector')])
+    d.add('TLV1701_DBV','U404','TLV1701AIDBVR / PVSS independent sense',88.9,228.6,{1:'NEG_REF625',3:'NEG_FOLD',2:'GND',5:'3V3_AON',4:'NEG_VALID'},'Package_TO_SOT_SMD:SOT-23-5','https://www.ti.com/lit/ds/symlink/tlv1701.pdf')
+    d.r('R540','10k 0.1%',35.56,167.64,'VREF_2V5','NEG_FOLD')
+    d.r('R541','30k 0.1%',152.4,167.64,'-5V2_PVSS','NEG_FOLD')
+    d.r('R542','30k 0.1%',35.56,190.5,'VREF_2V5','NEG_REF625')
+    d.r('R543','10k 0.1%',152.4,190.5,'NEG_REF625','GND')
+    d.r('R544','1M / comparator hysteresis',152.4,261.62,'NEG_VALID','NEG_REF625')
+    d.r('R545','10k',35.56,261.62,'3V3_AON','NEG_VALID')
+    d.c('C540','1nF / 16V',35.56,284.48,'NEG_FOLD','GND')
+    d.c('C541','100nF / 16V',152.4,284.48,'3V3_AON','GND')
+    d.add('D','D401','BAT54H / input negative clamp',35.56,307.34,{1:'NEG_FOLD',2:'GND'},'Diode_SMD:D_SOD-123')
+    d.add('D','D402','BAT54H / input upper clamp',152.4,307.34,{1:'3V3_AON',2:'NEG_FOLD'},'Diode_SMD:D_SOD-123')
+    d.add('D','D403','BAT54H / reference upper clamp',88.9,332.74,{1:'3V3_AON',2:'NEG_REF625'},'Diode_SMD:D_SOD-123')
+    d.ic('SN74LVC1G11_DBV',[(1,'A','input'),(3,'B','input'),(6,'C','input'),(2,'GND','power_in')],[(5,'VCC','power_in'),(4,'Y','output')])
+    d.add('SN74LVC1G11_DBV','U405','SN74LVC1G11DBVR / analog PG AND',279.4,187.96,{1:'PG_5V0',3:'PG_PVDD',6:'PG_PVSS',2:'GND',5:'3V3_AON',4:'ANALOG_PG'},'Package_TO_SOT_SMD:SOT-23-6','https://www.ti.com/lit/ds/symlink/sn74lvc1g11.pdf')
+    d.add('SN74LVC1G11_DBV','U406','SN74LVC1G11DBVR / supply + PVSS qualification',469.9,187.96,{1:'ANALOG_PG',3:'NEG_VALID',6:'INPUT_OK',2:'GND',5:'3V3_AON',4:'ANALOG_OK'},'Package_TO_SOT_SMD:SOT-23-6','https://www.ti.com/lit/ds/symlink/sn74lvc1g11.pdf')
+    d.c('C550','100nF',279.4,220.98,'3V3_AON','GND')
+    d.c('C551','100nF',469.9,220.98,'3V3_AON','GND')
+    d.ic('SN74LVC1G74_DCT',[(1,'CLK','input'),(2,'D','input'),(6,'CLR_N','input'),(7,'PRE_N','input'),(4,'GND','power_in')],[(8,'VCC','power_in'),(5,'Q','output'),(3,'Q_N','output')])
+    d.add('SN74LVC1G74_DCT','U407','SN74LVC1G74DCTR / explicit re-arm latch',279.4,269.24,{1:'HIL_ARM',2:'3V3_AON',6:'RAILS_OK',7:'3V3_AON',4:'GND',8:'3V3_AON',5:'ARM_LATCH',3:None},source='https://www.ti.com/lit/ds/symlink/sn74lvc1g74.pdf')
+    d.r('R550','100k / unplugged ARM low',228.6,312.42,'HIL_ARM','GND')
+    d.c('C552','100nF',330.2,312.42,'3V3_AON','GND')
+    d.add('SN74LVC1G11_DBV','U408','SN74LVC1G11DBVR / 1.8V reset driver',469.9,269.24,{1:'RAILS_OK',3:'ARM_LATCH',6:'INPUT_OK',2:'GND',5:'1V8_D',4:'DAC_RESET_N'},'Package_TO_SOT_SMD:SOT-23-6','https://www.ti.com/lit/ds/symlink/sn74lvc1g11.pdf')
+    d.r('R551','10k / default RESET asserted',419.1,312.42,'DAC_RESET_N','GND')
+    d.c('C553','100nF',520.7,312.42,'1V8_D','GND')
+    d.ic('SN74LVC1G07_DBV',[(1,'NC','no_connect'),(2,'A','input'),(3,'GND','power_in')],[(5,'VCC','power_in'),(4,'Y_OD','open_collector')])
+    d.add('SN74LVC1G07_DBV','U409','SN74LVC1G07DBVR / power fault open drain',279.4,355.6,{1:None,2:'RAILS_OK',3:'GND',5:'3V3_AON',4:'HIL_FAULT_N'},'Package_TO_SOT_SMD:SOT-23-5','https://www.ti.com/lit/ds/symlink/sn74lvc1g07.pdf')
+    d.c('C554','100nF',419.1,350.52,'3V3_AON','GND')
+    d.tp('TP401',520.7,350.52,'HIL_WDI')
+    d.s.text('Power fault clears U407. Restoring rails does NOT re-arm: HIL_ARM must toggle low->high after RAILS_OK has settled. No automatic resume.',25.4,375.92)
+    d.s.text('DAC_RESET_N is a 1.8V output, hardware-pulled LOW. HIL_FAULT_N is open-drain; require HOST-side pull-up. It reports POWER only.',25.4,383.54)
+    d.s.text('TP401 HIL_WDI is reserved, NOT an implemented watchdog. Complete heartbeat safety, physical AO disconnect and DUT gate inhibit remain OPEN.',25.4,391.16)
+    d.s.text('Negative-rail sense folds PVSS with VREF; missing PVSS forces NEG_VALID low. Reference is independently monitored. Threshold/hysteresis need bench review.',25.4,398.78)
+    return d
