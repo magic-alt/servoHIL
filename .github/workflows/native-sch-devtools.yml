@@ -1,0 +1,39 @@
+name: native-sch-devtools
+on:
+  push:
+    branches: [feat/revb-native-power-safety-dac]
+    paths: [.github/workflows/native-sch-devtools.yml]
+  pull_request:
+    paths: [.github/workflows/native-sch-devtools.yml]
+permissions:
+  contents: read
+jobs:
+  tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package KiCad CLI and its runtime for offline verification
+        run: |
+          mkdir -p .devtools
+          docker run --rm -v "$PWD/.devtools:/out" debian:trixie-slim bash -euxc '
+            apt-get update
+            apt-get install -y --no-install-recommends kicad kicad-symbols
+            mkdir -p /out/root
+            dpkg -L kicad | grep -E "(kicad-cli|\.kiface$)" > /out/binaries.txt
+            while read -r f; do
+              test -f "$f" || continue
+              cp --parents -L "$f" /out/root
+              ldd "$f" | awk "{for(i=1;i<=NF;i++) if(\$i ~ /^\//) print \$i}" >> /out/libs.txt
+            done < /out/binaries.txt
+            sort -u /out/libs.txt | while read -r f; do test ! -f "$f" || cp --parents -L "$f" /out/root; done
+            mkdir -p /out/root/usr/share/kicad
+            cp -a /usr/share/kicad/symbols /out/root/usr/share/kicad/
+            kicad-cli version > /out/version.txt
+            tar -C /out -czf /out/kicad-offline-tools.tar.gz root binaries.txt version.txt
+          '
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kicad-offline-tools
+          path: .devtools/kicad-offline-tools.tar.gz
+          retention-days: 2
