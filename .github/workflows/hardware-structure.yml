@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends kicad
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
 
       - name: Parse Rev.A hierarchy and generate ERC report
         run: |
@@ -37,6 +37,7 @@ jobs:
             -o build/servohil_io_revA_erc.rpt \
             hardware/kicad/revA/servohil_io_revA.kicad_sch
           cat build/servohil_io_revA_erc.rpt
+          python tools/check_erc_report.py build/servohil_io_revA_erc.rpt
 
       - name: Upload ERC report
         if: always()
