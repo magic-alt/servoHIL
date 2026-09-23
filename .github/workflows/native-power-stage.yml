@@ -4,8 +4,9 @@ on:
     branches: [feat/revb-native-power-safety-dac]
     paths:
       - tools/migrations/pr17_stage.txt
-      - tools/migrations/pr17_native.py
+      - tools/migrations/pr17_*.py
       - tools/check_native_power.py
+      - tools/verify_native.py
       - .github/workflows/native-power-stage.yml
 permissions:
   contents: write
@@ -29,11 +30,11 @@ jobs:
       - name: Materialize one new editable sheet, never overwrite previous sheets
         run: |
           stage=$(cat tools/migrations/pr17_stage.txt)
-          python tools/migrations/pr17_native.py --stage "$stage"
+          python tools/migrations/pr17_apply.py --stage "$stage"
           mkdir -p build/native-power
           kicad-cli version > build/native-power/kicad-version.txt
           kicad-cli sch export netlist --format kicadxml -o build/native-power/netlist.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
-          python tools/check_native_power.py build/native-power/netlist.xml --stage "$stage"
+          python tools/verify_native.py build/native-power/netlist.xml --stage "$stage"
           kicad-cli sch export pdf -o build/native-power/schematic-review.pdf hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
       - name: Commit this completed source section immediately
         run: |
@@ -41,7 +42,6 @@ jobs:
           git config user.email '59996146+magic-alt@users.noreply.github.com'
           git add hardware/kicad/revB/axu2cgb_expansion
           git commit -m "hardware(power): commit native $(cat tools/migrations/pr17_stage.txt) circuit and editable project"
-          # No force push; concurrent branch work must be reconciled explicitly.
           git push origin HEAD:feat/revb-native-power-safety-dac
           git rev-parse HEAD > build/native-power/source_commit.txt
           git archive --format=zip --output=build/native-power/native-source.zip HEAD hardware/kicad/revB/axu2cgb_expansion
