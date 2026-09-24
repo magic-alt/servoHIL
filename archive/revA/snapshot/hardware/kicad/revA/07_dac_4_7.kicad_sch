@@ -423,9 +423,7 @@
     (stroke (width 0) (type default))
     (uuid "7c2625c5-6840-4aef-ae6c-8b59fd733be1")
   )
-  (label "DAC2_CAP1" (at 133.35 74.93 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-802f-000000002ff1"))
+  
   (wire
     (pts
       (xy 130.81 83.82) (xy 133.35 83.82)
@@ -433,9 +431,7 @@
     (stroke (width 0) (type default))
     (uuid "7926210c-f0c1-4968-84c2-f30a6bafdc7c")
   )
-  (label "DAC2_VOUT1" (at 133.35 83.82 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-802f-000000002ff2"))
+  
   (no_connect (at 130.81 93.98) (uuid "e9e9e9e9-0000-4000-802f-000000002ff3"))
   (wire
     (pts
@@ -444,9 +440,7 @@
     (stroke (width 0) (type default))
     (uuid "77261de6-dfbe-4c76-b16f-c26c5fd8478e")
   )
-  (label "DAC2_VOUT1" (at 133.35 104.14 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-802f-000000002ff4"))
+  
   (no_connect (at 130.81 114.3) (uuid "e9e9e9e9-0000-4000-802f-000000002ff5"))
   (wire
     (pts
@@ -455,9 +449,7 @@
     (stroke (width 0) (type default))
     (uuid "75261ac0-9015-461c-9e1c-91ce5400b2a0")
   )
-  (label "DAC2_CAP0" (at 133.35 124.46 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-802f-000000002ff6"))
+  
   (wire
     (pts
       (xy 130.81 134.62) (xy 133.35 134.62)
@@ -465,9 +457,7 @@
     (stroke (width 0) (type default))
     (uuid "76261c53-b7ea-4149-b472-f97fd9ec7d17")
   )
-  (label "DAC2_VOUT0" (at 133.35 134.62 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-802f-000000002ff7"))
+  
   (no_connect (at 130.81 144.78) (uuid "e9e9e9e9-0000-4000-802f-000000002ff8"))
   (wire
     (pts
@@ -476,9 +466,7 @@
     (stroke (width 0) (type default))
     (uuid "8426325d-2998-4187-bbb9-4dd12cd18f99")
   )
-  (label "DAC2_VOUT0" (at 133.35 154.94 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-802f-000000002ff9"))
+  
   (no_connect (at 130.81 163.83) (uuid "e9e9e9e9-0000-4000-802f-000000002ffa"))
   (symbol (lib_id "ServoHILCore:C") (at 170.18 124.46 0) (unit 1)
     (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no) (uuid "e9e9e9e9-0000-4000-802f-000000002ffd")
@@ -497,9 +485,7 @@
     (stroke (width 0) (type default))
     (uuid "4825d3e9-7a1d-45b3-82c6-916dc98e1bb5")
   )
-  (label "DAC2_CAP0" (at 162.56 124.46 180)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "e9e9e9e9-0000-4000-802f-000000002ffe"))
+  
   (wire
     (pts
       (xy 175.26 124.46) (xy 177.8 124.46)
@@ -527,9 +513,7 @@
     (stroke (width 0) (type default))
     (uuid "9cd2006f-e719-438f-95a2-8d7d51dd7eff")
   )
-  (label "DAC2_CAP1" (at 162.56 74.93 180)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "e9e9e9e9-0000-4000-8030-000000003003"))
+  
   (wire
     (pts
       (xy 175.26 74.93) (xy 177.8 74.93)
@@ -1028,9 +1012,7 @@
     (stroke (width 0) (type default))
     (uuid "aad693a7-0048-4b0b-9261-d6d972190007")
   )
-  (label "DAC3_CAP1" (at 347.98 74.93 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-8030-000000003061"))
+  
   (wire
     (pts
       (xy 345.44 83.82) (xy 347.98 83.82)
@@ -1038,9 +1020,7 @@
     (stroke (width 0) (type default))
     (uuid "abd6953a-88c9-4984-a8b8-3e8af804ca7e")
   )
-  (label "DAC3_VOUT1" (at 347.98 83.82 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-8030-000000003062"))
+  
   (no_connect (at 345.44 93.98) (uuid "e9e9e9e9-0000-4000-8030-000000003063"))
   (wire
     (pts
@@ -1049,9 +1029,7 @@
     (stroke (width 0) (type default))
     (uuid "a5d68bc8-391f-432a-9565-0dec03dc5f6c")
   )
-  (label "DAC3_VOUT1" (at 347.98 104.14 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-8030-000000003064"))
+  
   (no_connect (at 345.44 114.3) (uuid "e9e9e9e9-0000-4000-8030-000000003065"))
   (wire
     (pts
@@ -1060,9 +1038,7 @@
     (stroke (width 0) (type default))
     (uuid "a7d68eee-e975-4cd0-8211-dd4e0fb3f45a")
   )
-  (label "DAC3_CAP0" (at 347.98 124.46 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-8030-000000003066"))
+  
   (wire
     (pts
       (xy 345.44 134.62) (xy 347.98 134.62)
@@ -1070,9 +1046,7 @@
     (stroke (width 0) (type default))
     (uuid "a8d69081-114a-47fd-9868-44ff959fbed1")
   )
-  (label "DAC3_VOUT0" (at 347.98 134.62 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-8030-000000003067"))
+  
   (no_connect (at 345.44 144.78) (uuid "e9e9e9e9-0000-4000-8030-000000003068"))
   (wire
     (pts
@@ -1081,9 +1055,7 @@
     (stroke (width 0) (type default))
     (uuid "a2d6870f-3eef-4473-9fae-9951a17753bf")
   )
-  (label "DAC3_VOUT0" (at 347.98 154.94 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "e9e9e9e9-0000-4000-8030-000000003069"))
+  
   (no_connect (at 345.44 163.83) (uuid "e9e9e9e9-0000-4000-8030-00000000306a"))
   (symbol (lib_id "ServoHILCore:C") (at 384.81 124.46 0) (unit 1)
     (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no) (uuid "e9e9e9e9-0000-4000-8030-00000000306d")
@@ -1102,9 +1074,7 @@
     (stroke (width 0) (type default))
     (uuid "d6d6d8eb-d8e0-46c7-a6bb-dcedb018e4b3")
   )
-  (label "DAC3_CAP0" (at 377.19 124.46 180)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "e9e9e9e9-0000-4000-8030-00000000306e"))
+  
   (wire
     (pts
       (xy 389.89 124.46) (xy 392.43 124.46)
@@ -1132,9 +1102,7 @@
     (stroke (width 0) (type default))
     (uuid "acd8d564-6c25-49e0-9e1a-b55a1e97ecdc")
   )
-  (label "DAC3_CAP1" (at 377.19 74.93 180)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "e9e9e9e9-0000-4000-8030-000000003073"))
+  
   (wire
     (pts
       (xy 389.89 74.93) (xy 392.43 74.93)
@@ -1549,5 +1517,117 @@
   (label "GND" (at 368.3 227.33 180)
     (effects (font (size 1.27 1.27)) (justify right bottom))
     (uuid "fafafafa-0000-4000-803e-000000003ea6"))
+  (wire
+    (pts
+      (xy 133.35 74.93) (xy 162.56 74.93)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000001")
+  )
+  (wire
+    (pts
+      (xy 133.35 124.46) (xy 162.56 124.46)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000002")
+  )
+  (wire
+    (pts
+      (xy 347.98 74.93) (xy 377.19 74.93)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000003")
+  )
+  (wire
+    (pts
+      (xy 347.98 124.46) (xy 377.19 124.46)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000004")
+  )
+  (wire
+    (pts
+      (xy 133.35 83.82) (xy 137.16 83.82)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000005")
+  )
+  (wire
+    (pts
+      (xy 137.16 83.82) (xy 137.16 104.14)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000006")
+  )
+  (wire
+    (pts
+      (xy 137.16 104.14) (xy 133.35 104.14)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000007")
+  )
+  (wire
+    (pts
+      (xy 133.35 134.62) (xy 137.16 134.62)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000008")
+  )
+  (wire
+    (pts
+      (xy 137.16 134.62) (xy 137.16 154.94)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000009")
+  )
+  (wire
+    (pts
+      (xy 137.16 154.94) (xy 133.35 154.94)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000010")
+  )
+  (wire
+    (pts
+      (xy 347.98 83.82) (xy 351.79 83.82)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000011")
+  )
+  (wire
+    (pts
+      (xy 351.79 83.82) (xy 351.79 104.14)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000012")
+  )
+  (wire
+    (pts
+      (xy 351.79 104.14) (xy 347.98 104.14)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000013")
+  )
+  (wire
+    (pts
+      (xy 347.98 134.62) (xy 351.79 134.62)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000014")
+  )
+  (wire
+    (pts
+      (xy 351.79 134.62) (xy 351.79 154.94)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000015")
+  )
+  (wire
+    (pts
+      (xy 351.79 154.94) (xy 347.98 154.94)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818d7d7-0718-4000-8000-000000000016")
+  )
   (sheet_instances (path "/" (page "8")))
 )
