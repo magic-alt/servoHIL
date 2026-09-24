@@ -1,0 +1,57 @@
+name: native-schematic-readability
+on:
+  push:
+    branches: [fix/revb-schematic-wiring-readability]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  native-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install native KiCad CLI
+        run: |
+          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
+          mkdir -p build/readability
+          kicad-cli version > build/readability/kicad-version.txt
+      - name: Local-versus-cross-sheet label policy
+        run: |
+          python tools/check_native_readability.py --audit-only > build/readability/label-audit.json
+          python tools/check_native_readability.py
+      - name: Actual native netlist and existing electrical assertions
+        run: |
+          native=hardware/kicad/revB/axu2cgb_expansion
+          kicad-cli sch export netlist --format kicadxml -o build/readability/netlist.xml "$native/servohil_io_revB.kicad_sch"
+          python tools/check_native_readability.py --normalize build/readability/netlist.xml --output build/readability/canonical.xml
+          python tools/verify_native_all.py build/readability/canonical.xml --stage supervision
+          python tools/check_revb_netlist.py build/readability/canonical.xml "$native/expected_connections.json"
+          NATIVE_NETLIST=build/readability/canonical.xml python -m unittest discover -s tests -p test_native_power_netlist.py -v
+      - name: Original-source pin graph equivalence
+        run: |
+          mkdir -p build/before
+          git archive 49cdeb395d31e2844b1f50189508aa9dbf940d40 hardware/kicad/revB/axu2cgb_expansion | tar -x -C build/before
+          before=build/before/hardware/kicad/revB/axu2cgb_expansion
+          kicad-cli sch export netlist --format kicadxml -o build/readability/before.xml "$before/servohil_io_revB.kicad_sch"
+          python tools/check_native_readability.py --before build/readability/before.xml --after build/readability/netlist.xml > build/readability/equivalence.json
+      - name: Native ERC - do not suppress warnings
+        run: |
+          kicad-cli sch erc --format json --exit-code-violations -o build/readability/erc.json hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+          python tools/check_revb_erc.py build/readability/erc.json
+      - name: Export review PDF and exact native source
+        if: always()
+        run: |
+          kicad-cli sch export pdf -o build/readability/schematic-review.pdf hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+          git rev-parse HEAD > build/readability/source_commit.txt
+          git archive --format=zip --output=build/readability/native-source.zip HEAD hardware/kicad/revB/axu2cgb_expansion
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-schematic-readability
+          path: build/readability/
+          if-no-files-found: error
