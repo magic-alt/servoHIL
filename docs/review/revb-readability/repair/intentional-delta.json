@@ -1,0 +1,20 @@
+{
+  "type": "EXPLICIT_INHERITED_SAFETY_REPAIR_NOT_STYLE_EQUIVALENCE",
+  "removed_components": [
+    "U409"
+  ],
+  "added_components": [
+    "Q401",
+    "Q402",
+    "R552",
+    "R553",
+    "R554",
+    "R555",
+    "R556",
+    "TP402"
+  ],
+  "changed_component_data": [
+    "C105"
+  ],
+  "required_correction": "U408.6 -> HIL_ARM; replace U409 floating status with host-referenced Q401/Q402 circuit"
+}

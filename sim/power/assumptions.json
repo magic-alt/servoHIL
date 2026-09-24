@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "basis": "Component nominal values are read from checked-in native KiCad, not this file.",
+  "vin_prot_v": [
+    8.0,
+    12.0,
+    15.0
+  ],
+  "vin_note": "8V is a protected-node low-line screening point after the input diode; NOT a new input connector rating (9-15V SELV).",
+  "ambient_c": [
+    -40,
+    25,
+    85
+  ],
+  "resistor_tolerance": 0.001,
+  "buck": {
+    "frequency_hz": [
+      450000,
+      500000,
+      550000
+    ],
+    "frequency_status": "SENSITIVITY_ONLY: datasheet specifies 500kHz typical and +/-6% FSS, not guaranteed 450/550kHz bounds",
+    "feedback_v": [
+      0.792,
+      0.8,
+      0.808
+    ],
+    "inductor_fraction": [
+      0.8,
+      1.0,
+      1.2
+    ],
+    "output_effective_cap_f": [
+      2e-05,
+      4.4e-05
+    ],
+    "capacitor_esr_ohm": [
+      0.005,
+      0.03
+    ],
+    "efficiency": [
+      0.75,
+      0.9
+    ],
+    "efficiency_status": "engineering sensitivity, NOT vendor-guaranteed efficiency",
+    "theta_ja_c_per_w": [
+      89,
+      120
+    ],
+    "theta_status": "89 is DS41326 p4 single-layer test-board figure; 120 is layout sensitivity, neither proves actual PCB thermal behavior",
+    "load_budget_a": {
+      "6V2_PRE": 0.5,
+      "3V3_D": 0.3,
+      "1V8_D": 0.3
+    }
+  },
+  "ldo": {
+    "set_current_a": [
+      9.8e-05,
+      0.0001,
+      0.000102
+    ],
+    "offset_bound_v": 0.002,
+    "set_current_status": "LT3045 RevD p3 / LT3094 RevB p4 full electrical-condition min/max, not initial +/-1%",
+    "load_budget_a": {
+      "+5V0_DAC": 0.2,
+      "+5V2_PVDD": 0.12,
+      "-5V2_PVSS": 0.12
+    },
+    "gnd_current_screen_a": {
+      "LT3045": 0.025,
+      "LT3094": 0.023
+    },
+    "gnd_current_status": "500mA table maxima used as conservative screening at lower budget loads; not claimed characterized bounds at every load",
+    "theta_ja_c_per_w": [
+      33,
+      80,
+      120
+    ],
+    "theta_status": "33 is vendor MSE reference figure; 80/120 are copper/layout sensitivity",
+    "junction_design_limit_c": 125,
+    "dropout_screen_v": 0.45
+  },
+  "cuk": {
+    "frequency_hz": [
+      1800000,
+      2000000,
+      2200000
+    ],
+    "frequency_status": "1.8/2.0/2.2MHz is an engineering sensitivity band; Rev D p3 gives 1.85/2.0/2.15MHz at VIN=24V, not a measured oscillator range on this board",
+    "output_load_a": 0.15,
+    "output_load_note": "0.12A negative DAC budget plus LDO ground-current/bleeder allowance; must be rechecked with exact DAC loading",
+    "diode_drop_v": 0.5,
+    "efficiency": 0.8,
+    "diode_efficiency_status": "engineering assumptions, not SS16/LT8330 macro-model",
+    "switch_rating_a": 1.0,
+    "feedback_magnitude_v": [
+      0.78,
+      0.8,
+      0.82
+    ],
+    "feedback_bias_bound_a": 1e-08,
+    "line_regulation_fraction_per_v": 0.00015,
+    "feedback_source": "LT8330 Rev D p3, FBX<0: -0.820/-0.800/-0.780V; bias +/-10nA; line regulation max 0.015%/V, reference VIN=12V. https://www.analog.com/media/en/technical-documentation/data-sheets/lt8330.pdf",
+    "ccm_validity_source": "Diode-current sum criterion for uncoupled inductors, small capacitor ripple approximation; Madrid et al., Sensors 2021,21,7434 DOI:10.3390/s21227434. Failure invalidates CCM formulas; positive margin does not qualify silicon."
+  },
+  "mlcc": {
+    "tolerance_loss": 0.1,
+    "temperature_loss": 0.15,
+    "aging_loss": 0.03,
+    "aging_status": "3% scenario only; actual part/class/time-after-deaging must be supplied",
+    "bias_retention": null,
+    "curve_status": "BLOCKED: no part-specific DC-bias curve imported; 22uF printed on BOM is not effective capacitance"
+  },
+  "dac": {
+    "maximum_supply_span_v": 10.6,
+    "minimum_pvss_v": -5.3,
+    "recommended_headroom_v": 0.2,
+    "requested_output_peak_v": 5.0,
+    "dynamic_margin_v": 0.05,
+    "source": "AD3542R RevC electrical/AC conditions pp4-6, recommended headroom/footroom p5"
+  }
+}

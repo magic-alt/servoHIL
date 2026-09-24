@@ -1,0 +1,26 @@
+{
+  "baseline": "49cdeb395d31e2844b1f50189508aa9dbf940d40",
+  "completed": [
+    "scope",
+    "positive",
+    "input",
+    "negative",
+    "dac",
+    "supervision",
+    "status",
+    "polish"
+  ],
+  "source_hashes": {
+    "01_carrier_interface.kicad_sch": "f9ba5307a2c15da9ad3626f5dd1524ddd5cdfa4f225acdbd66cd4d893072e2d8",
+    "03_peripheral_boundaries.kicad_sch": "e40cb026254fde37936888a28e8e34cb84afee95e846a27c259da37b080c40f0",
+    "04_dac_0_3.kicad_sch": "1f7b6847be98600c26f7c648ff2179b68049f257ca003c40cc00635b224be386",
+    "05_dac_4_7.kicad_sch": "84ad383ab2acfa4e5ac1efa20052c49ad3612e73cba73a49b6fd91a4f4a45599",
+    "06_analog_outputs.kicad_sch": "aa8f319a1ce6fd7d85279a5632583e5628302bf79063de5d421e46ca03adae45",
+    "10_input_protection.kicad_sch": "1088849000bcb7e8afc2d08c96685b744d40f685f25625742e9e911b32f9a863",
+    "20_positive_rails.kicad_sch": "23cd7a1189f7074dc7c243e00036e475adc97c69e43c4034c487f8c531ca0417",
+    "30_negative_reference.kicad_sch": "b943a7032676f07029c9deecbbc0efb8bf9003cf08fff1426066bd1bf8900b3f",
+    "40_power_supervision.kicad_sch": "d339b4d59cfc2af4e950dc9570c0e9effc207934e7c3f893784f3b6e78a74abd",
+    "41_power_status.kicad_sch": "2e0fcbb2fa814c0e34f72048d767a441697b66b83959f93b541054afd50346f3",
+    "servohil_io_revB.kicad_sch": "eaed36eaebd993fd9f8af13124bb9cc07fc688ceab7a7759647fd2878efbd105"
+  }
+}

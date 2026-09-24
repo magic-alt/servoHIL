@@ -1,0 +1,5 @@
+- input: added 10_input_protection.kicad_sch; existing child sheets preserved.
+- positive: added 20_positive_rails.kicad_sch; existing child sheets preserved.
+- negative: added 30_negative_reference.kicad_sch; existing child sheets preserved.
+- supervision: added 40_power_supervision.kicad_sch; existing child sheets preserved.
+- status: added 41_power_status.kicad_sch; existing child sheets preserved.
