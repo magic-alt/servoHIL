@@ -1,0 +1,21 @@
+name: revb-electrical-verification
+on:
+  push:
+    branches: [feat/revb-electrical-verification]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: edv-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  analytical-and-spice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Electrical regressions
+        run: python -m unittest discover -s tests -p 'test_edv*.py' -v
