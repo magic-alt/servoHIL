@@ -5,7 +5,8 @@
     "positive",
     "input",
     "negative",
-    "dac"
+    "dac",
+    "supervision"
   ],
   "source_hashes": {
     "01_carrier_interface.kicad_sch": "f9ba5307a2c15da9ad3626f5dd1524ddd5cdfa4f225acdbd66cd4d893072e2d8",
@@ -16,7 +17,7 @@
     "10_input_protection.kicad_sch": "79d14f1367b9ff51504412d33a5cc523ed3c9a9b3fa5f3c39bbae7c3b052204f",
     "20_positive_rails.kicad_sch": "57e4dee2e8372d49f04d536086f182e750b626ff3a70bc83436b17f09093412e",
     "30_negative_reference.kicad_sch": "bb3f27d3843f21e492be544ec4394ee22beea79916588fde86dec22f77997f95",
-    "40_power_supervision.kicad_sch": "ab91ca5b0e8b8b04445b39a7f0c89dc5eb16b37928c4239f2607549fc91ec5a9",
+    "40_power_supervision.kicad_sch": "26a39371a30bf796aca4b8221cc676cdf4339747ef733b8938f60cad279149d8",
     "41_power_status.kicad_sch": "e73205499ce1ee559d4df00cfe1b81d512b8eed097c0cffd6e0a9fa967338541",
     "servohil_io_revB.kicad_sch": "eaed36eaebd993fd9f8af13124bb9cc07fc688ceab7a7759647fd2878efbd105"
   }
