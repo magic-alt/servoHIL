@@ -4,8 +4,8 @@
   "source_note": "Manufacturer specifications at 25C. Isat is typically 30 percent L drop; Irms is reference current for temperature rise, NOT an absolute or guaranteed limit. Datasheet/curves/footprints must be reviewed before binding native MPNs.",
   "parts": {
     "XAL5050-103MEC": {
-      "inductance_h": 0.000010,
-      "tolerance_fraction": 0.20,
+      "inductance_h": 1e-05,
+      "tolerance_fraction": 0.2,
       "dcr_max_ohm_25c": 0.045,
       "srf_typ_hz": 15000000,
       "isat_typ_a_30pct_25c": 4.9,
@@ -14,8 +14,8 @@
       "source_url": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5050-103/"
     },
     "XAL5050-682MEC": {
-      "inductance_h": 0.0000068,
-      "tolerance_fraction": 0.20,
+      "inductance_h": 6.8e-06,
+      "tolerance_fraction": 0.2,
       "dcr_max_ohm_25c": 0.0295,
       "srf_typ_hz": 21000000,
       "isat_typ_a_30pct_25c": 6.0,
@@ -24,9 +24,9 @@
       "source_url": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5050-682/"
     },
     "XAL5030-472MEC": {
-      "inductance_h": 0.0000047,
-      "tolerance_fraction": 0.20,
-      "dcr_max_ohm_25c": 0.040,
+      "inductance_h": 4.7e-06,
+      "tolerance_fraction": 0.2,
+      "dcr_max_ohm_25c": 0.04,
       "srf_typ_hz": 23000000,
       "isat_typ_a_30pct_25c": 6.7,
       "irms_ref_a_20c_rise": 4.3,
@@ -49,8 +49,23 @@
     "Actual-board temperature rise; catalog Irms at 25C is not a board guarantee"
   ],
   "mlcc_selection": {
-    "status": "BLOCKED_MPN_AND_CURVE",
-    "reason": "No fabricated DC-bias retention values. Obtain exact manufacturer part-number curves before purchasing or freezing capacitors.",
-    "required_evidence": ["manufacturer", "part_number", "nominal_capacitance_f", "rated_voltage_v", "case_size", "curve_temperature_c", "dc_voltage_v", "retention_fraction", "source_url", "raw_file_sha256", "aging_time_hours", "tolerance", "temperature_characteristic"]
+    "status": "PARTIAL_CANDIDATES_CURVES_BLOCKED",
+    "reason": "Exact candidates cover eight of nine banks; C105 MPN, C410 NRND replacement and real DC-bias curves remain blocked. Use capacitors.py for candidate-specific tolerance, not the generic analytical tolerance scenario.",
+    "required_evidence": [
+      "manufacturer",
+      "part_number",
+      "nominal_capacitance_f",
+      "rated_voltage_v",
+      "case_size",
+      "curve_temperature_c",
+      "dc_voltage_v",
+      "retention_fraction",
+      "source_url",
+      "raw_file_sha256",
+      "aging_time_hours",
+      "tolerance",
+      "temperature_characteristic"
+    ],
+    "catalog": "sim/power/capacitor_candidates.json"
   }
 }
