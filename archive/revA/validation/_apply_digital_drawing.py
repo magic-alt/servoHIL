@@ -86,7 +86,7 @@ class Drawing:
                 '44':(169,182,0), '49':(169,186,0), '30':(169,190,0)}
         for y, numbers in [(32,('32','33','31','41','40')),(74,('28','25','29','19','20')),
                            (116,('1','4',None,'46','47')),(158,('12','8',None,'16','15'))]:
-            for n, dy in zip(numbers,(-8,0,8,20,30)):
+            for n, dy in zip(numbers,(-8,0,8,20,25)):
                 if n: pins[n] = (197,y+dy,180)
         self.reshape('ADP5054',183,103,(171,18,195,194),pins)
         self.reshape('ADM1186-1',104,130,(96,83,112,184),{
@@ -98,6 +98,10 @@ class Drawing:
             '2':(52,152,0),'4':(68,152,180),'5':(60,144,270),'3':(60,160,90)})
         self.reshape('NMOS_LS',220,42,(216,38,224,46),{
             '1':(214,42,0),'2':(220,48,90),'3':(220,36,270)})
+        for name in ('R','C','L','D'):
+            definition = self.defs[name]
+            put(definition,'pin_names',expr('(pin_names (offset 0) hide)'))
+            put(definition,'pin_numbers',expr('(pin_numbers hide)'))
         cap = next(s for s in items(self.defs['C'],'symbol') if s[1].endswith('_0_1'))
         cap[:] = cap[:2]
         for coords in [(-2.54,0,-0.762,0),(-0.762,-2.54,-0.762,2.54),
@@ -126,7 +130,7 @@ class Drawing:
             else: fields = [(x,y-3,None),(x,y+3,None)]
         for key,(px,py,side) in zip(('Reference','Value'),fields):
             p=props(s)[key]
-            put(p,'at',expr(f'(at {mm(px)} {mm(py)} 0)'))
+            put(p,'at',expr(f'(at {mm(px)} {mm(py)} {90 if angle in (90,270) else 0})'))
             put(p,'effects',expr('(effects (font (size 1.016 1.016))'+(f' (justify {side})' if side else '')+')'))
         self.tree.append(s); self.placed[reference]=s
         return s
@@ -180,7 +184,7 @@ class Drawing:
         self.wire((104,36),(153,36),(153,38));self.ground(153,38)
         self.place('U2',183,103,fields=[(183,10,None),(183,14,None)])
         for y in (30,34,38,42):self.wire((163,y),(169,y))
-        self.note('Protected input / PVIN1-4 bypass',102,10)
+        self.note('Protected input / PVIN1-4 bypass',102,12)
         for reference,x,ysignal in [('C141',156,54),('C140',146,68)]:
             self.place(reference,x,ysignal+5,270)
             self.wire((169,ysignal),(x,ysignal),(x,ysignal+1))
@@ -216,7 +220,7 @@ class Drawing:
         self.place('R43',84,176,270)
         self.wire((94,170),(84,170),(84,172));self.annotate('SEQ_DOWN',84,170)
         self.wire((84,180),(84,182));self.ground(84,182)
-        self.place('R40',32,152);self.place('D40',32,143,180,fields=[(32,140,None),(32,137,None)])
+        self.place('R40',32,152);self.place('D40',32,143,180,fields=[(32,140,None),(32,146,None)])
         self.place('C42',44,158,270);self.place('U12',60,152,fields=[(70,146,'left'),(70,159,'left')])
         self.name('EFUSE_PG',14,152,True,180);self.wire((14,152),(28,152))
         self.wire((24,152),(24,143),(28,143));self.wire((36,143),(44,143),(44,152))
@@ -232,7 +236,7 @@ class Drawing:
         for ch,y,ind,cout,rtop,rbot,cbst,rcomp,ccomp,rail,pflag in channels:
             self.place(ind,237,y);self.wire((197,y),(233,y));self.annotate(f'SW{ch}',224,y)
             self.place(cout,252,y+8,270);self.place(rtop,280,y+7,270);self.place(rbot,280,y+19,270)
-            self.wire((241,y),(308,y));self.name(rail,308,y,True)
+            self.wire((241,y),(296,y),(308,y));self.name(rail,308,y,True)
             self.wire((252,y),(252,y+4));self.wire((252,y+12),(252,y+16));self.ground(252,y+16)
             self.wire((280,y),(280,y+3));self.wire((280,y+11),(280,y+15))
             self.wire((280,y+23),(280,y+25));self.ground(280,y+25)
@@ -242,18 +246,18 @@ class Drawing:
             if pflag:
                 s=self.place(pflag,296,y,fields=[(297,y-5,'left'),(297,y-2,'left')])
                 put(props(s)['Value'],'effects',expr('(effects (font (size 1.016 1.016)) hide)'))
-            self.place(rcomp,211,y+30);self.place(ccomp,237,y+30)
-            self.wire((197,y+30),(207,y+30));self.annotate(f'COMP{ch}',198,y+30)
-            self.wire((215,y+30),(233,y+30));self.annotate(f'COMP{ch}_RC',219,y+30)
-            self.wire((241,y+30),(252,y+30),(252,y+34));self.ground(252,y+34)
+            self.place(rcomp,211,y+25);self.place(ccomp,237,y+25)
+            self.wire((197,y+25),(207,y+25));self.annotate(f'COMP{ch}',198,y+25)
+            self.wire((215,y+25),(233,y+25));self.annotate(f'COMP{ch}_RC',219,y+25)
+            self.wire((241,y+25),(252,y+25),(252,y+29));self.ground(252,y+29)
             if ch <= 2:
                 q=f'Q{ch}';r='R142' if ch==1 else 'R143'
                 self.place(q,220,y+10,fields=[(226,y+6,'left'),(226,y+10,'left')])
                 self.wire((220,y),(220,y+4));self.wire((220,y+16),(220,y+17));self.ground(220,y+17)
-                self.wire((197,y+8),(211,y+8),(211,y+10),(214,y+10));self.annotate(f'DL{ch}',198,y+8)
+                self.wire((197,y+8),(205,y+8),(211,y+8),(211,y+10),(214,y+10));self.annotate(f'DL{ch}',198,y+8)
                 self.place(r,205,y+12,270,fields=[(203,y+12,'right'),(203,y+15,'right')])
                 self.wire((205,y+16),(205,y+17));self.ground(205,y+17)
-            self.note(f'CH{ch}: {rail}  /  PRELIM',251,y-14,1.016)
+            self.note(f'CH{ch}: {rail}  /  PRELIM',278,y-12,1.016)
         self.note('Sequence: CH1 (1.0 V) -> CH3 (1.8 V) -> CH4 (3.3 V) -> CH2 (6.0 V) -> ANALOG_EN.',14,199,1.016)
         self.note('U2/U3/Q1/Q2 are FUNCTIONAL PRELAYOUT symbols: package pins and device qualification remain open.',14,206,1.016)
         self.note('Magnetics, compensation, MOSFETs, MLCC derating, startup and thermal limits are NOT frozen. NO PCB RELEASE.',14,213,1.016)

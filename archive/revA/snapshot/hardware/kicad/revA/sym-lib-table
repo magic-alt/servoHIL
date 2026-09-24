@@ -1,5 +1,12 @@
 (sym_lib_table
   (version 7)
-  (lib (name "ServoHIL")(type "KiCad")(uri "${KIPRJMOD}/servohil_power.kicad_sym")(options "")(descr "ServoHIL Rev.A project-local symbols"))
-  (lib (name "ServoHILCore")(type "KiCad")(uri "${KIPRJMOD}/servohil_core.kicad_sym")(options "")(descr "ServoHIL Rev.A HIL/FPGA/DAC symbols"))
+  (lib (name "ServoHIL") (type "KiCad") (uri "${KIPRJMOD}/servohil_power.kicad_sym") (options "") (descr "ServoHIL Rev.A project-local symbols"))
+  (lib (name "ServoHILCore") (type "KiCad") (uri "${KIPRJMOD}/servohil_core.kicad_sym") (options "") (descr "ServoHIL Rev.A HIL/FPGA/DAC symbols"))
+  (lib
+    (name "ServoHILDigitalReview")
+    (type "KiCad")
+    (uri "${KIPRJMOD}/servohil_digital_review.kicad_sym")
+    (options "")
+    (descr "Rev.A digital-power drawing variants; original electrical pin signatures retained")
+  )
 )

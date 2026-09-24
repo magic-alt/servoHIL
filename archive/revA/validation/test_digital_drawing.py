@@ -56,11 +56,13 @@ class WireGraph:
         points.update(p for segment in self.segments for p in segment)
         points.update(point(one(j, 'at')) for j in items(tree, 'junction'))
         self.parent = {p: p for p in points}
+        conductive_points = {p for segment in self.segments for p in segment}
+        conductive_points.update(point(one(j, "at")) for j in items(tree, "junction"))
         for a, b in self.segments:
             if a[0] != b[0] and a[1] != b[1]:
                 raise ValueError('Nonorthogonal wire: ' + str((a, b)))
             for p in points:
-                if on_segment(p, a, b): self.parent[self.find(p)] = self.find(a)
+                if p in conductive_points and on_segment(p, a, b): self.parent[self.find(p)] = self.find(a)
 
     def find(self, p):
         if self.parent[p] != p: self.parent[p] = self.find(self.parent[p])
