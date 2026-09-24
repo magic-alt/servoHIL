@@ -14,63 +14,79 @@ permissions:
 concurrency:
   group: reva-native-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
 jobs:
   native-review:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      KICAD10_SYMBOL_DIR: /usr/share/kicad/symbols
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
-      - name: Record exact source and baseline
+      - name: Record exact source and immutable connectivity reference
         run: |
           mkdir -p build/reva
           git rev-parse HEAD > build/reva/source_commit.txt
           git rev-parse origin/main > build/reva/main_commit.txt
           git archive --format=zip --output=build/reva/source.zip HEAD archive/revA tools tests
           sha256sum build/reva/source.zip > build/reva/SHA256SUMS
-      - name: Install native KiCad
+      - name: Install independent native exporter and libraries
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols
+          mkdir -p "$HOME/.config/kicad/10.0"
+          cp /usr/share/kicad/template/sym-lib-table "$HOME/.config/kicad/10.0/sym-lib-table"
           kicad-cli version | tee build/reva/kicad-version.txt
-      - name: Export actual hierarchy netlist
+      - name: Read-only hierarchy drawing and project-library regressions
+        run: |
+          python -m unittest discover -s archive/revA/validation -p 'test*.py' -v 2>&1 | tee build/reva/tests.txt
+          python archive/revA/validation/check_sheet_pin_sides.py | tee build/reva/sheet-pins.json
+      - name: Export actual hierarchy and compare native pin partitions
         run: |
           native=archive/revA/snapshot/hardware/kicad/revA
           kicad-cli sch export netlist --format kicadxml -o build/reva/netlist.xml "$native/servohil_io_revA.kicad_sch" 2>&1 | tee build/reva/netlist-export.log
           ! grep -qi 'annotation errors' build/reva/netlist-export.log
-      - name: Native ERC including existing exclusions
+          python archive/revA/validation/check_pin_contract.py build/reva/netlist.xml | tee build/reva/pin-contract.json
+          python - <<'PY'
+          import json,sys
+          sys.path.insert(0,'tools')
+          from check_native_readability import graph
+          actual=graph('build/reva/netlist.xml')
+          expected=json.load(open('archive/revA/validation/native_pin_contract.json'))['graph']
+          assert actual==expected,'Physical components or native pin connectivity changed'
+          result={'result':'ELECTRICALLY_EQUIVALENT','components':len(actual['components']),'nets':len(actual['partition']),'pins':sum(map(len,actual['partition']))}
+          json.dump(result,open('build/reva/equivalence.json','w'),indent=2)
+          print(result)
+          PY
+      - name: Complete native ERC with no exclusions or disabled severities
         run: |
           native=archive/revA/snapshot/hardware/kicad/revA
-          set +e
           kicad-cli sch erc --format json --severity-all --exit-code-violations -o build/reva/erc.json "$native/servohil_io_revA.kicad_sch" 2>&1 | tee build/reva/erc.log
-          code=${PIPESTATUS[0]}
-          echo "$code" > build/reva/erc-exit-code.txt
           python - <<'PY'
-          import collections, json
-          from pathlib import Path
-          p = Path('build/reva/erc.json')
-          if p.exists():
-              report = json.loads(p.read_text())
-              counts = collections.Counter()
-              for sheet in report.get('sheets', []):
-                  for v in sheet.get('violations', []):
-                      counts[(v.get('severity'), v.get('type'))] += 1
-                      print(sheet.get('path'), json.dumps(v, ensure_ascii=False))
-              print('ERC_COUNTS', dict(counts))
+          import json
+          report=json.load(open('build/reva/erc.json'))
+          violations=[v for sheet in report['sheets'] for v in sheet['violations']]
+          assert not violations,violations
+          json.dump({'result':'PASS','errors':0,'warnings':0,'exclusions':0},open('build/reva/erc-summary.json','w'),indent=2)
           PY
-          exit "$code"
-      - name: Export native review pages
+      - name: Export all native review pages
         if: always()
         run: |
           native=archive/revA/snapshot/hardware/kicad/revA
           mkdir -p build/reva/svg
           kicad-cli sch export svg -o build/reva/svg/ "$native/servohil_io_revA.kicad_sch"
-      - name: Verify validation did not change native sources
+          test "$(find build/reva/svg -name '*.svg' | wc -l)" = 8
+      - name: Assert validation did not rewrite native sources
         if: always()
-        run: git diff --exit-code -- archive/revA
+        run: |
+          git diff --exit-code -- archive/revA
+          git diff --check
       - uses: actions/upload-artifact@v4
         if: always()
         with:
