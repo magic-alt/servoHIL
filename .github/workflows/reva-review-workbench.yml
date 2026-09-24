@@ -37,17 +37,36 @@ jobs:
           mkdir -p "$HOME/.config/kicad/10.0"
           cp /usr/share/kicad/template/sym-lib-table "$HOME/.config/kicad/10.0/sym-lib-table"
           kicad-cli version | tee build/reva-final/kicad-version.txt
-      - name: Reproduce final drawing regressions
+      - name: Reproduce drawing and ground-library regressions
         run: |
           set +e
           python archive/revA/validation/test_review_finish.py > build/reva-final/red.txt 2>&1
           code=$?
+          python archive/revA/validation/test_ground_library.py > build/reva-final/ground-red.txt 2>&1
+          ground_code=$?
           set -e
           test "$code" = 1
+          test "$ground_code" = 1
           grep -q 'FAIL: test_root_wires_have_no_unterminated_tails' build/reva-final/red.txt
           kicad-cli sch erc --format json --severity-all -o build/reva-final/erc-before.json archive/revA/snapshot/hardware/kicad/revA/servohil_io_revA.kicad_sch
-      - name: Apply reviewed geometry and matching project libraries
-        run: python archive/revA/validation/_finish_review.py --power-library /usr/share/kicad/symbols/power.kicad_sym
+          python - <<'PY'
+          import sys,json
+          from pathlib import Path
+          sys.path[:0]=['tools','archive/revA/validation']
+          from kicad_sexpr import parse,items,one,walk,dump
+          from test_digital_drawing import NATIVE
+          old=next(s for s in items(one(parse((NATIVE/'01_power_entry.kicad_sch').read_text()),'lib_symbols'),'symbol') if s[1]=='power:GND')
+          new=next(s for s in items(parse(Path('/usr/share/kicad/symbols/power.kicad_sym').read_text()),'symbol') if s[1]=='GND')
+          sig=lambda s:[(one(p,'number')[1],one(p,'name')[1],p[1],p[2]) for p in walk(s,'pin')]
+          result={'original_pin_signature':sig(old),'installed_pin_signature':sig(new),'action':'Preserve exact original under project-owned ServoHILGround:GND; no pin-type changes.'}
+          json.dump(result,open('build/reva-final/ground-library-review.json','w'),indent=2)
+          print(result)
+          Path('build/reva-final/installed-ground-definition.txt').write_text(dump(new)+'\n')
+          PY
+      - name: Apply geometry library reconciliation and exact original ground copy
+        run: |
+          python archive/revA/validation/_finish_review.py
+          python archive/revA/validation/_freeze_ground_library.py
       - name: Full drawing regressions and native pin equivalence
         run: |
           python -m unittest discover -s archive/revA/validation -p 'test*.py' -v 2>&1 | tee build/reva-final/reva-tests.txt
@@ -65,7 +84,7 @@ jobs:
           json.dump(result,open('build/reva-final/equivalence.json','w'),indent=2)
           print(result)
           PY
-      - name: Complete native ERC with no excluded errors or warnings
+      - name: Complete native ERC with no exclusions
         run: |
           kicad-cli sch erc --format json --severity-all --exit-code-violations -o build/reva-final/erc.json archive/revA/snapshot/hardware/kicad/revA/servohil_io_revA.kicad_sch
           python - <<'PY'
@@ -89,7 +108,7 @@ jobs:
           git diff --check
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add archive/revA/snapshot/hardware/kicad/revA/*.kicad_sch archive/revA/snapshot/hardware/kicad/revA/*.kicad_sym
+          git add archive/revA/snapshot/hardware/kicad/revA/*.kicad_sch archive/revA/snapshot/hardware/kicad/revA/*.kicad_sym archive/revA/snapshot/hardware/kicad/revA/sym-lib-table archive/revA/validation/test_digital_drawing.py
           git commit -m 'fix(revA): phase 3 reconcile symbol libraries and clear native ERC drawing warnings'
           git push origin HEAD:fix/reva-kicad-connectivity
           git rev-parse HEAD > build/reva-final/source_commit.txt
