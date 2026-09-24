@@ -59,3 +59,56 @@ pin against a reviewed net contract, distinguish NC from dangling pins, detect
 conflicting names, check local-vs-global scope, and inspect the drawing geometry.
 Native KiCad hierarchy load, netlist export and ERC remain separate acceptance
 checks and must be reported with the actual tool version and output when run.
+
+
+## 2026-09-24 global-label scope audit
+
+PR #18 now applies a strict scope rule to the native Rev.A hierarchy:
+
+- a sheet-local node is represented by a local label or continuous wiring, not a
+  global label;
+- an actual cross-sheet net keeps exactly one explicit global label per sheet;
+- additional occurrences of that same cross-sheet net on the sheet are local
+  labels unless a power symbol provides the connection;
+- pages 01/02/04 intentionally use `power:GND` symbols, so they do not require
+  a separate explicit `GND` global-label object.
+
+Current explicit global/local label counts after the scope cleanup are:
+
+| Sheet | Global | Local |
+| --- | ---: | ---: |
+| 01_POWER_ENTRY | 3 | 7 |
+| 02_ANALOG_POWER | 7 | 13 |
+| 03_DIGITAL_POWER | 10 | 172 |
+| 04_AXU_HIL_LINK | 25 | 10 |
+| 05_IO_FPGA | 50 | 68 |
+| 06_DAC_0_3 | 21 | 19 |
+| 07_DAC_4_7 | 21 | 79 |
+
+Structural audit of all seven child schematics at the current branch state:
+
+- zero sheet-local nets remain as explicit global labels;
+- zero duplicate explicit global labels remain for the same net on one sheet;
+- every baseline cross-sheet net retains one global entry on each participating
+  sheet, except GND where the reviewed pages use KiCad power symbols;
+- S-expression parentheses/strings are balanced on all seven files;
+- no duplicate schematic UUID was found in any child sheet;
+- all explicit `no_connect` records use the valid two-coordinate KiCad form.
+
+The three pages called out for the remaining label cleanup were committed
+independently:
+
+- `03_digital_power.kicad_sch`: `b26e38a`;
+- `05_io_fpga.kicad_sch`: `2b935cd`;
+- `07_dac_4_7.kicad_sch`: `62072ba`.
+
+The whole-hierarchy audit also found and removed the remaining duplicate
+cross-sheet rail entries in analog power and DAC0-3 in follow-up commits
+`cc6dac6` and `54fbe28`.
+
+GitHub Actions currently cannot serve as the Rev.A native KiCad gate because the
+repository-level Rev.B workflow intentionally rejects any modification of the
+historical snapshot with `historical snapshot bytes changed` before reaching
+its KiCad stages. Unit/mutation regressions complete first; a native KiCad
+open/export/ERC still has to be run from a workstation for final graphical and
+electrical acceptance of this archive repair.
