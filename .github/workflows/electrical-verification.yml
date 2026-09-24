@@ -17,6 +17,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install ngspice
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ngspice
+          ngspice --version
+      - name: Record reproducible simulator runtime
+        run: |
+          mkdir -p build/edv/runtime
+          cp "$(command -v ngspice)" build/edv/runtime/ngspice
+          cp /usr/share/doc/ngspice/copyright build/edv/runtime/COPYRIGHT
+          ngspice --version > build/edv/runtime/version.txt
+          ldd "$(command -v ngspice)" > build/edv/runtime/ldd.txt
+          sha256sum build/edv/runtime/ngspice > build/edv/runtime/ngspice.sha256
       - name: Electrical regressions
         run: python -m unittest discover -s tests -p 'test_edv*.py' -v
       - name: Native-bound analytical report
@@ -28,11 +41,6 @@ jobs:
           set -e
           test "$rc" -eq 2
           cat build/edv/strict-design.log
-      - name: Install ngspice
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends ngspice
-          ngspice --version
       - name: Execute switching stages and LDO envelopes
         run: python sim/power/spice.py --output build/edv/spice
       - name: Show raw simulator failure context
