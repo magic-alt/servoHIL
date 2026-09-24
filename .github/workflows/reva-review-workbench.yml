@@ -1,50 +1,79 @@
 name: reva-review-workbench
-# Temporary PR #18 review transport; removed after native edits are verified.
+# One-shot PR #18 edit. Removed after completion; ordinary verification is read-only.
 on:
   push:
     branches: [fix/reva-kicad-connectivity]
     paths: ['.github/workflows/reva-review-workbench.yml']
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: reva-reviewed-edit
+  cancel-in-progress: false
 jobs:
-  provision:
+  apply-reviewed-edit:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Install matching native tooling
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Install native KiCad
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends kicad kicad-symbols
-      - name: Package native review runtime for the offline workbench
+      - name: Reproduce invisible wires before repair
         run: |
-          mkdir -p build/reva-tooling/runtime/bin build/reva-tooling/runtime/lib build/reva-tooling/runtime/share/kicad/symbols
+          mkdir -p build/reva-edit/before build/reva-edit/after
+          native=archive/revA/snapshot/hardware/kicad/revA
+          kicad-cli sch export netlist --format kicadxml -o build/reva-edit/before.xml "$native/servohil_io_revA.kicad_sch"
+          kicad-cli sch export svg -o build/reva-edit/before/ "$native/servohil_io_revA.kicad_sch"
           python - <<'PY'
-          import pathlib, re, shutil, subprocess
-          dst = pathlib.Path('build/reva-tooling/runtime')
-          entries = [pathlib.Path('/usr/bin/kicad-cli')]
-          entries += [p for p in pathlib.Path('/usr/bin').glob('*eeschema*kiface')]
-          entries += [p for p in pathlib.Path('/usr/lib').rglob('*kicommon*.so*') if p.is_file()]
-          libs = set()
-          for entry in entries:
-              shutil.copy2(entry, dst/'bin'/entry.name, follow_symlinks=True)
-              result = subprocess.run(['ldd', str(entry)], capture_output=True, text=True, check=True)
-              print(entry, result.stdout)
-              libs.update(re.findall(r'(/[^\s()]+)', result.stdout))
-          for lib in sorted(libs):
-              p = pathlib.Path(lib)
-              if p.is_file():
-                  shutil.copy2(p, dst/'lib'/p.name, follow_symlinks=True)
-          shutil.copy2('/usr/share/kicad/symbols/power.kicad_sym', dst/'share/kicad/symbols/power.kicad_sym')
+          from pathlib import Path
+          p=Path('build/reva-edit/before/servohil_io_revA-01_POWER_ENTRY.svg')
+          t=p.read_text(); i=t.index('M48.2600 49.5300')
+          group=t[t.rfind('<g',0,i):t.find('>',t.rfind('<g',0,i))+1]
+          assert 'stroke:none' in group, group
+          print('RED: native wire path is invisible:', group)
           PY
-          kicad-cli version > build/reva-tooling/runtime/VERSION
-          dpkg-query -W kicad kicad-symbols > build/reva-tooling/runtime/PACKAGES
-          tar -C build/reva-tooling -czf build/reva-native-runtime.tar.gz runtime
-          sha256sum build/reva-native-runtime.tar.gz
+      - name: Restore explicit schematic wire stroke only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('archive/revA/snapshot/hardware/kicad/revA')
+          changed=0
+          for p in root.glob('*.kicad_sch'):
+              old=p.read_text(); new=old.replace('(stroke (width 0) (type default))','(stroke (width 0.1524) (type solid))')
+              if new!=old:
+                  p.write_text(new); changed+=1
+          assert changed==7, changed
+          PY
+          native=archive/revA/snapshot/hardware/kicad/revA
+          kicad-cli sch export netlist --format kicadxml -o build/reva-edit/after.xml "$native/servohil_io_revA.kicad_sch"
+          python tools/check_native_readability.py --before build/reva-edit/before.xml --after build/reva-edit/after.xml
+          kicad-cli sch export svg -o build/reva-edit/after/ "$native/servohil_io_revA.kicad_sch"
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('build/reva-edit/after/servohil_io_revA-01_POWER_ENTRY.svg')
+          t=p.read_text(); i=t.index('M48.2600 49.5300')
+          group=t[t.rfind('<g',0,i):t.find('>',t.rfind('<g',0,i))+1]
+          assert 'stroke:#009600' in group and 'stroke-width:0.1524' in group, group
+          print('GREEN: native wire stroke is visible:', group)
+          PY
+      - name: Commit verified native files without rewriting history
+        run: |
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add archive/revA/snapshot/hardware/kicad/revA/*.kicad_sch
+          git commit -m 'fix(revA): restore visible native wire strokes without changing connectivity'
+          git push origin HEAD:fix/reva-kicad-connectivity
+          git rev-parse HEAD > build/reva-edit/source_commit.txt
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: reva-native-runtime
-          path: build/reva-native-runtime.tar.gz
-          retention-days: 1
+          name: reva-visible-wire-proof
+          path: build/reva-edit/
           if-no-files-found: error
+          retention-days: 14
