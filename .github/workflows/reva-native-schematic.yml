@@ -12,7 +12,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: reva-native-${{ github.head_ref || github.ref_name }}
+  # An approval-gated PR event must not cancel the independent push validation.
+  group: reva-native-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 defaults:
   run:
