@@ -614,7 +614,7 @@
     (pts
       (xy 189.23 60.96) (xy 186.69 60.96)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "872c6912-d214-415a-b6c9-34c03d23e2ba")
   )
   (global_label "1V0_FPGA" (shape bidirectional) (at 186.69 60.96 180)
@@ -625,7 +625,7 @@
     (pts
       (xy 189.23 66.04) (xy 186.69 66.04)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "882c6aa5-f9e9-4c87-8d1f-9c71c30fad31")
   )
   (global_label "1V8_D" (shape bidirectional) (at 186.69 66.04 180)
@@ -636,7 +636,7 @@
     (pts
       (xy 189.23 71.12) (xy 186.69 71.12)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "852c65ec-826a-4b00-a376-0422314c4dcc")
   )
   (global_label "3V3_D" (shape bidirectional) (at 186.69 71.12 180)
@@ -647,7 +647,7 @@
     (pts
       (xy 189.23 76.2) (xy 186.69 76.2)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "862c677f-aa3f-462d-b9cc-6bd3b7381843")
   )
   (global_label "GND" (shape bidirectional) (at 186.69 76.2 180)
@@ -658,7 +658,7 @@
     (pts
       (xy 189.23 85.09) (xy 186.69 85.09)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8b2c6f5e-b00f-4776-82d6-110c54d30c96")
   )
   (global_label "HL_TX_CLK" (shape bidirectional) (at 186.69 85.09 180)
@@ -669,7 +669,7 @@
     (pts
       (xy 189.23 90.17) (xy 186.69 90.17)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8c2c70f1-d7e4-42a3-992c-78bddabed70d")
   )
   (global_label "HL_TX0" (shape bidirectional) (at 186.69 90.17 180)
@@ -680,7 +680,7 @@
     (pts
       (xy 189.23 93.98) (xy 186.69 93.98)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "542c18c9-0bc6-474b-b645-ca05c79679a5")
   )
   (global_label "HL_TX1" (shape bidirectional) (at 186.69 93.98 180)
@@ -691,7 +691,7 @@
     (pts
       (xy 189.23 97.79) (xy 186.69 97.79)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "512c1410-9447-45c4-8c9c-31b635d31a40")
   )
   (global_label "HL_TX2" (shape bidirectional) (at 186.69 97.79 180)
@@ -702,7 +702,7 @@
     (pts
       (xy 189.23 101.6) (xy 186.69 101.6)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "522c15a3-bc1c-40f1-a2f2-9967bbbee4b7")
   )
   (global_label "HL_TX3" (shape bidirectional) (at 186.69 101.6 180)
@@ -713,7 +713,7 @@
     (pts
       (xy 189.23 105.41) (xy 186.69 105.41)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "572c1d82-449d-4f6a-8695-c3905959d90a")
   )
   (global_label "HL_TX4" (shape bidirectional) (at 186.69 105.41 180)
@@ -724,7 +724,7 @@
     (pts
       (xy 189.23 109.22) (xy 186.69 109.22)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "582c1f15-6c72-4a97-9cec-2b41df45a381")
   )
   (global_label "HL_TX5" (shape bidirectional) (at 186.69 109.22 180)
@@ -735,7 +735,7 @@
     (pts
       (xy 189.23 113.03) (xy 186.69 113.03)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "552c1a5c-f4f3-4910-b342-92f24d82441c")
   )
   (global_label "HL_TX6" (shape bidirectional) (at 186.69 113.03 180)
@@ -746,7 +746,7 @@
     (pts
       (xy 189.23 118.11) (xy 186.69 118.11)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "892eaacf-7c99-4997-9bdb-b205df880b0f")
   )
   (global_label "HL_TX7" (shape bidirectional) (at 186.69 118.11 180)
@@ -757,7 +757,7 @@
     (pts
       (xy 189.23 121.92) (xy 186.69 121.92)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "882ea93c-54c4-4e6a-8585-4a54599c4098")
   )
   (global_label "HL_SYNC" (shape bidirectional) (at 186.69 121.92 180)
@@ -768,7 +768,7 @@
     (pts
       (xy 189.23 125.73) (xy 186.69 125.73)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8b2eadf5-2cef-433d-8888-8167eb5f9ffd")
   )
   (global_label "HL_SAFE_N" (shape bidirectional) (at 186.69 125.73 180)
@@ -779,7 +779,7 @@
     (pts
       (xy 189.23 129.54) (xy 186.69 129.54)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8a2eac62-051a-4810-b232-19b66573d586")
   )
   (global_label "HL_RESET_N" (shape bidirectional) (at 186.69 129.54 180)
@@ -790,7 +790,7 @@
     (pts
       (xy 189.23 133.35) (xy 186.69 133.35)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "852ea483-1bec-464b-8282-1341f73734eb")
   )
   (global_label "HL_HEARTBEAT" (shape bidirectional) (at 186.69 133.35 180)
@@ -801,7 +801,7 @@
     (pts
       (xy 189.23 137.16) (xy 186.69 137.16)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "842ea2f0-f417-4b1e-ac2b-ab90714b6a74")
   )
   (global_label "TRIG0" (shape bidirectional) (at 186.69 137.16 180)
@@ -812,7 +812,7 @@
     (pts
       (xy 189.23 140.97) (xy 186.69 140.97)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "872ea7a9-cc42-4ff1-af2e-e2a3030ec9d9")
   )
   (global_label "TRIG1" (shape bidirectional) (at 186.69 140.97 180)
@@ -823,7 +823,7 @@
     (pts
       (xy 219.71 60.96) (xy 222.25 60.96)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "862ea616-a46d-44c4-98d8-7af27d22ff62")
   )
   (global_label "HL_RX_CLK" (shape bidirectional) (at 222.25 60.96 0)
@@ -834,7 +834,7 @@
     (pts
       (xy 219.71 64.77) (xy 222.25 64.77)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "912eb767-bb40-42ff-8e8e-ef8db029b757")
   )
   (global_label "HL_RX0" (shape bidirectional) (at 222.25 64.77 0)
@@ -845,7 +845,7 @@
     (pts
       (xy 219.71 68.58) (xy 222.25 68.58)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "902eb5d4-936b-47d2-b838-87dc2a3dece0")
   )
   (global_label "HL_RX1" (shape bidirectional) (at 222.25 68.58 0)
@@ -856,7 +856,7 @@
     (pts
       (xy 219.71 72.39) (xy 222.25 72.39)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "382e2b4c-e23a-405a-b5b8-bb84334b85c8")
   )
   (global_label "HL_RX2" (shape bidirectional) (at 222.25 72.39 0)
@@ -867,7 +867,7 @@
     (pts
       (xy 219.71 76.2) (xy 222.25 76.2)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "3b2e3005-ba65-452d-b8bb-f297c50ee52d")
   )
   (global_label "HL_RX3" (shape bidirectional) (at 222.25 76.2 0)
@@ -878,7 +878,7 @@
     (pts
       (xy 219.71 80.01) (xy 222.25 80.01)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "3a2e2e72-9290-4a00-a265-8ae63f231ab6")
   )
   (global_label "HL_RX4" (shape bidirectional) (at 222.25 80.01 0)
@@ -889,7 +889,7 @@
     (pts
       (xy 219.71 85.09) (xy 222.25 85.09)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "352e2693-a963-483b-b2b5-8471d0e67a1b")
   )
   (global_label "HL_RX5" (shape bidirectional) (at 222.25 85.09 0)
@@ -900,7 +900,7 @@
     (pts
       (xy 219.71 88.9) (xy 222.25 88.9)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "342e2500-818e-4d0e-9c5f-1cc04afaafa4")
   )
   (global_label "HL_RX6" (shape bidirectional) (at 222.25 88.9 0)
@@ -911,7 +911,7 @@
     (pts
       (xy 219.71 92.71) (xy 222.25 92.71)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "372e29b9-59b9-41e1-9f62-53d3dcbe0f09")
   )
   (global_label "HL_RX7" (shape bidirectional) (at 222.25 92.71 0)
@@ -922,7 +922,7 @@
     (pts
       (xy 219.71 96.52) (xy 222.25 96.52)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "17273b94-457b-4d7c-a794-90866ec7635c")
   )
   (global_label "HL_IRQ" (shape bidirectional) (at 222.25 96.52 0)
@@ -933,7 +933,7 @@
     (pts
       (xy 219.71 105.41) (xy 222.25 105.41)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "18273d27-6d50-48a9-bdea-f837f4b32dd3")
   )
   (global_label "DAC_SCLK" (shape bidirectional) (at 222.25 105.41 0)
@@ -944,7 +944,7 @@
     (pts
       (xy 219.71 109.22) (xy 222.25 109.22)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "19273eba-9525-43d6-bae7-c1247a9ef84a")
   )
   (global_label "DAC_CS0_N" (shape bidirectional) (at 222.25 109.22 0)
@@ -955,7 +955,7 @@
     (pts
       (xy 219.71 113.03) (xy 222.25 113.03)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1a27404d-bcfa-4f03-913e-28d5008ac2c1")
   )
   (global_label "DAC_CS1_N" (shape bidirectional) (at 222.25 113.03 0)
@@ -966,7 +966,7 @@
     (pts
       (xy 219.71 118.11) (xy 222.25 118.11)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "13273548-a627-40c8-8e3a-f1c257183980")
   )
   (global_label "DAC_CS2_N" (shape bidirectional) (at 222.25 118.11 0)
@@ -977,7 +977,7 @@
     (pts
       (xy 219.71 121.92) (xy 222.25 121.92)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "142736db-cdfc-4bf5-a491-5973dd0403f7")
   )
   (global_label "DAC_CS3_N" (shape bidirectional) (at 222.25 121.92 0)
@@ -988,7 +988,7 @@
     (pts
       (xy 219.71 125.73) (xy 222.25 125.73)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1527386e-f5d1-4722-a18e-226062efce6e")
   )
   (global_label "DAC_LDAC_N" (shape bidirectional) (at 222.25 125.73 0)
@@ -999,7 +999,7 @@
     (pts
       (xy 219.71 129.54) (xy 222.25 129.54)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "16273a01-1da6-424f-b7e4-8a11e8db98e5")
   )
   (label "FPGA_WDI_3V3" (at 222.25 129.54 0)
@@ -1009,7 +1009,7 @@
     (pts
       (xy 219.71 135.89) (xy 222.25 135.89)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "0f272efc-06d4-4414-9a47-ce0e9e25b714")
   )
   (global_label "DAC_SDIO0" (shape bidirectional) (at 222.25 135.89 0)
@@ -1020,7 +1020,7 @@
     (pts
       (xy 219.71 139.7) (xy 222.25 139.7)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1027308f-2ea9-4f41-b09e-35bf2411818b")
   )
   (global_label "DAC_SDIO1" (shape bidirectional) (at 222.25 139.7 0)
@@ -1031,7 +1031,7 @@
     (pts
       (xy 219.71 143.51) (xy 222.25 143.51)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "482788b7-f564-4039-8db7-8707ce627303")
   )
   (global_label "DAC_SDIO2" (shape bidirectional) (at 222.25 143.51 0)
@@ -1042,7 +1042,7 @@
     (pts
       (xy 219.71 147.32) (xy 222.25 147.32)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "49278a4a-1d39-4b66-8ab4-4ff4544e3d7a")
   )
   (global_label "DAC_SDIO3" (shape bidirectional) (at 222.25 147.32 0)
@@ -1053,7 +1053,7 @@
     (pts
       (xy 219.71 151.13) (xy 222.25 151.13)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "4a278bdd-450e-4693-a10a-b7a5da3a07f1")
   )
   (global_label "DAC_SDIO4" (shape bidirectional) (at 222.25 151.13 0)
@@ -1064,7 +1064,7 @@
     (pts
       (xy 219.71 154.94) (xy 222.25 154.94)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "432780d8-2e3b-4858-9e07-809230c77eb0")
   )
   (global_label "DAC_SDIO5" (shape bidirectional) (at 222.25 154.94 0)
@@ -1075,7 +1075,7 @@
     (pts
       (xy 219.71 160.02) (xy 222.25 160.02)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "4427826b-5610-4385-b45d-e843b6b34927")
   )
   (global_label "DAC_SDIO6" (shape bidirectional) (at 222.25 160.02 0)
@@ -1086,7 +1086,7 @@
     (pts
       (xy 219.71 163.83) (xy 222.25 163.83)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "452783fe-7de5-4eb2-b15a-b1303c9f139e")
   )
   (global_label "DAC_SDIO7" (shape bidirectional) (at 222.25 163.83 0)
@@ -1097,7 +1097,7 @@
     (pts
       (xy 219.71 170.18) (xy 222.25 170.18)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "fda1323c-8184-4d0e-a945-20a028d7ba90")
   )
   (global_label "DAC_ALERT0_N" (shape bidirectional) (at 222.25 170.18 0)
@@ -1108,7 +1108,7 @@
     (pts
       (xy 219.71 173.99) (xy 222.25 173.99)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "fea133cf-a959-483b-bf9b-8851aec38507")
   )
   (global_label "DAC_ALERT1_N" (shape bidirectional) (at 222.25 173.99 0)
@@ -1119,7 +1119,7 @@
     (pts
       (xy 219.71 179.07) (xy 222.25 179.07)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "ffa13562-31da-46b4-95f1-f00234af4f7e")
   )
   (global_label "DAC_ALERT2_N" (shape bidirectional) (at 222.25 179.07 0)
@@ -1130,7 +1130,7 @@
     (pts
       (xy 219.71 182.88) (xy 222.25 182.88)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "00a136f5-59af-41e1-ac48-57b3ba9b19f5")
   )
   (global_label "DAC_ALERT3_N" (shape bidirectional) (at 222.25 182.88 0)
@@ -1141,7 +1141,7 @@
     (pts
       (xy 189.23 151.13) (xy 186.69 151.13)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "f9a12bf0-e231-405a-829e-bf644086e46c")
   )
   (label "FPGA_CLK100" (at 186.69 151.13 180)
@@ -1151,7 +1151,7 @@
     (pts
       (xy 189.23 154.94) (xy 186.69 154.94)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "faa12d83-0a06-4b87-98f5-2715c672aee3")
   )
   (label "FPGA_QSPI_CS_N" (at 186.69 154.94 180)
@@ -1161,7 +1161,7 @@
     (pts
       (xy 189.23 158.75) (xy 186.69 158.75)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "fba12f16-9287-4a00-af4b-8ec64c5e795a")
   )
   (label "FPGA_QSPI_SCLK" (at 186.69 158.75 180)
@@ -1171,7 +1171,7 @@
     (pts
       (xy 189.23 162.56) (xy 186.69 162.56)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "fca130a9-ba5c-452d-85a1-f677d24a43d1")
   )
   (label "FPGA_QSPI_DQ0" (at 186.69 162.56 180)
@@ -1181,7 +1181,7 @@
     (pts
       (xy 189.23 166.37) (xy 186.69 166.37)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "05a13ed4-c02c-4676-9bf8-5e2858360e48")
   )
   (label "FPGA_QSPI_DQ1" (at 186.69 166.37 180)
@@ -1191,7 +1191,7 @@
     (pts
       (xy 189.23 170.18) (xy 186.69 170.18)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "06a14067-e801-41a3-b24e-c5d9de21d8bf")
   )
   (label "FPGA_QSPI_DQ2" (at 186.69 170.18 180)
@@ -1201,7 +1201,7 @@
     (pts
       (xy 189.23 173.99) (xy 186.69 173.99)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "aea0b5df-1be3-464b-ba9b-efa1d5143fd7")
   )
   (label "FPGA_QSPI_DQ3" (at 186.69 173.99 180)
@@ -1211,7 +1211,7 @@
     (pts
       (xy 189.23 179.07) (xy 186.69 179.07)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "afa0b772-a464-44c4-90f2-57525b000a4e")
   )
   (label "FPGA_TCK" (at 186.69 179.07 180)
@@ -1221,7 +1221,7 @@
     (pts
       (xy 189.23 182.88) (xy 186.69 182.88)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "b0a0b905-cc39-4ff1-a748-bf03e0ebd4c5")
   )
   (label "FPGA_TMS" (at 186.69 182.88 180)
@@ -1231,7 +1231,7 @@
     (pts
       (xy 189.23 186.69) (xy 186.69 186.69)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "a9a0ae00-54ba-4e6a-bd9f-26b466d79f3c")
   )
   (label "FPGA_TDI" (at 186.69 186.69 180)
@@ -1241,7 +1241,7 @@
     (pts
       (xy 189.23 190.5) (xy 186.69 190.5)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "aaa0af93-7c8f-4997-93f5-8e65ecc369b3")
   )
   (label "FPGA_TDO" (at 186.69 190.5 180)
@@ -1251,7 +1251,7 @@
     (pts
       (xy 189.23 194.31) (xy 186.69 194.31)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "aba0b126-0510-4810-aa4b-f61672af342a")
   )
   (label "PROGRAM_B" (at 186.69 194.31 180)
@@ -1261,7 +1261,7 @@
     (pts
       (xy 189.23 198.12) (xy 186.69 198.12)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "03a37a45-8cb5-4897-b4fd-ff21ed05d141")
   )
   (label "INIT_B" (at 186.69 198.12 180)
@@ -1271,7 +1271,7 @@
     (pts
       (xy 189.23 203.2) (xy 186.69 203.2)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "02a378b2-64e0-4d6a-9ea7-9770671a06ca")
   )
   (label "FPGA_DONE" (at 186.69 203.2 180)
@@ -1299,7 +1299,7 @@
     (pts
       (xy 49.53 49.53) (xy 46.99 49.53)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "d1a32b8f-ca82-442d-a6aa-6733badd8183")
   )
   (label "FPGA_QSPI_CS_N" (at 46.99 49.53 180)
@@ -1309,7 +1309,7 @@
     (pts
       (xy 49.53 54.61) (xy 46.99 54.61)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "d0a329fc-a2ad-4900-9053-ff8234f1b70c")
   )
   (label "FPGA_QSPI_DQ1" (at 46.99 54.61 180)
@@ -1319,7 +1319,7 @@
     (pts
       (xy 49.53 59.69) (xy 46.99 59.69)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "cfa32869-b980-473b-9357-3695af05ec95")
   )
   (label "FPGA_QSPI_DQ2" (at 46.99 59.69 180)
@@ -1329,7 +1329,7 @@
     (pts
       (xy 49.53 64.77) (xy 46.99 64.77)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "cea326d6-91ab-4c0e-bd00-cee4291a221e")
   )
   (label "GND" (at 46.99 64.77 180)
@@ -1339,7 +1339,7 @@
     (pts
       (xy 80.01 49.53) (xy 82.55 49.53)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "cda32543-69d6-40e1-8004-05f7a32e57a7")
   )
   (label "3V3_D" (at 82.55 49.53 0)
@@ -1349,7 +1349,7 @@
     (pts
       (xy 80.01 54.61) (xy 82.55 54.61)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "89a68bce-5598-4c7c-9583-0522a7192372")
   )
   (label "FPGA_QSPI_DQ3" (at 82.55 54.61 0)
@@ -1359,7 +1359,7 @@
     (pts
       (xy 80.01 59.69) (xy 82.55 59.69)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8aa68d61-7d6d-47a9-abd9-6cd32d04ede9")
   )
   (label "FPGA_QSPI_SCLK" (at 82.55 59.69 0)
@@ -1369,7 +1369,7 @@
     (pts
       (xy 80.01 64.77) (xy 82.55 64.77)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "87a688a8-a542-42d6-a8d6-35c09b418e84")
   )
   (label "FPGA_QSPI_DQ0" (at 82.55 64.77 0)
@@ -1393,7 +1393,7 @@
     (pts
       (xy 49.53 100.33) (xy 46.99 100.33)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "81a67f36-16f0-4314-8836-42aa77bacfba")
   )
   (label "1V8_D" (at 46.99 100.33 180)
@@ -1403,7 +1403,7 @@
     (pts
       (xy 49.53 110.49) (xy 46.99 110.49)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "82a680c9-3ec5-4e41-9e8c-aa5bfda69a31")
   )
   (label "GND" (at 46.99 110.49 180)
@@ -1413,7 +1413,7 @@
     (pts
       (xy 80.01 105.41) (xy 82.55 105.41)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "baa6d8f1-0581-4f39-bba5-fba3493ae439")
   )
   (label "FPGA_CLK100" (at 82.55 105.41 0)
@@ -1423,7 +1423,7 @@
     (pts
       (xy 80.01 100.33) (xy 82.55 100.33)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "b7a6d438-2d56-4a66-b8a2-c490b77784d4")
   )
   (label "1V8_D" (at 82.55 100.33 0)
@@ -1453,7 +1453,7 @@
     (pts
       (xy 49.53 144.78) (xy 46.99 144.78)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8ca8cf1e-27f1-4fe6-b792-4b5411efc75e")
   )
   (label "3V3_D" (at 46.99 144.78 180)
@@ -1463,7 +1463,7 @@
     (pts
       (xy 49.53 149.86) (xy 46.99 149.86)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "87a8c73f-2221-4e9d-93ef-212bd3117a7b")
   )
   (label "FPGA_TMS" (at 46.99 149.86 180)
@@ -1473,7 +1473,7 @@
     (pts
       (xy 49.53 154.94) (xy 46.99 154.94)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "86a8c5ac-fa4d-4370-bd98-b97a4d25b004")
   )
   (label "GND" (at 46.99 154.94 180)
@@ -1483,7 +1483,7 @@
     (pts
       (xy 49.53 160.02) (xy 46.99 160.02)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "dea95034-b0e0-4548-bb18-ed2239fd529c")
   )
   (label "FPGA_TCK" (at 46.99 160.02 180)
@@ -1493,7 +1493,7 @@
     (pts
       (xy 49.53 165.1) (xy 46.99 165.1)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "e1a954ed-285f-46cf-a4c2-8571cbc0b201")
   )
   (label "GND" (at 46.99 165.1 180)
@@ -1503,7 +1503,7 @@
     (pts
       (xy 80.01 144.78) (xy 82.55 144.78)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "e0a9535a-008a-4ba2-8e6c-1dc045d4e78a")
   )
   (label "FPGA_TDO" (at 82.55 144.78 0)
@@ -1513,7 +1513,7 @@
     (pts
       (xy 80.01 154.94) (xy 82.55 154.94)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "dba94b7b-7809-4d29-aac8-f397a839f337")
   )
   (label "FPGA_TDI" (at 82.55 154.94 0)
@@ -1523,7 +1523,7 @@
     (pts
       (xy 80.01 160.02) (xy 82.55 160.02)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "daa949e8-5034-41fc-9472-8be6224e28c0")
   )
   (label "GND" (at 82.55 160.02 0)
@@ -1547,7 +1547,7 @@
     (pts
       (xy 110.49 144.78) (xy 107.95 144.78)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "89978144-ce62-42fe-939b-236046174f18")
   )
   (label "3V3_D" (at 107.95 144.78 180)
@@ -1557,7 +1557,7 @@
     (pts
       (xy 120.65 144.78) (xy 123.19 144.78)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8a9782d7-f636-4e2b-a9f1-8b11cc03198f")
   )
   (label "PROGRAM_B" (at 123.19 144.78 0)
@@ -1579,7 +1579,7 @@
     (pts
       (xy 110.49 158.75) (xy 107.95 158.75)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "7e976ff3-958a-4adf-b5fe-675db453efb3")
   )
   (label "3V3_D" (at 107.95 158.75 180)
@@ -1589,7 +1589,7 @@
     (pts
       (xy 120.65 158.75) (xy 123.19 158.75)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "d697fa7b-cecf-49e7-9317-b8a5bd61889b")
   )
   (label "INIT_B" (at 123.19 158.75 0)
@@ -1611,7 +1611,7 @@
     (pts
       (xy 110.49 172.72) (xy 107.95 172.72)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "da9800c7-6e23-469b-b9be-19e1a5b25ebf")
   )
   (label "3V3_D" (at 107.95 172.72 180)
@@ -1621,7 +1621,7 @@
     (pts
       (xy 120.65 172.72) (xy 123.19 172.72)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "db98025a-f6a4-4514-9014-81922b9e2936")
   )
   (label "FPGA_DONE" (at 123.19 172.72 0)
@@ -1643,7 +1643,7 @@
     (pts
       (xy 59.69 198.12) (xy 57.15 198.12)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8899be48-d2e8-4f6c-8f04-0856c89d1ce0")
   )
   (label "1V0_FPGA" (at 57.15 198.12 180)
@@ -1653,7 +1653,7 @@
     (pts
       (xy 69.85 198.12) (xy 72.39 198.12)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8f99c94d-ab13-443f-9f54-01e1720fa621")
   )
   (label "GND" (at 72.39 198.12 0)
@@ -1675,7 +1675,7 @@
     (pts
       (xy 59.69 209.55) (xy 57.15 209.55)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8399b669-0bbf-478b-ab60-de2d89becffd")
   )
   (label "1V8_D" (at 57.15 209.55 180)
@@ -1685,7 +1685,7 @@
     (pts
       (xy 69.85 209.55) (xy 72.39 209.55)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8299b4d6-e3ea-4c5e-950a-767c03d30586")
   )
   (label "GND" (at 72.39 209.55 0)
@@ -1707,7 +1707,7 @@
     (pts
       (xy 59.69 222.25) (xy 57.15 222.25)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "bf9a14dd-22ff-4caf-8f87-73114bbeeb51")
   )
   (label "3V3_D" (at 57.15 222.25 180)
@@ -1717,7 +1717,7 @@
     (pts
       (xy 69.85 222.25) (xy 72.39 222.25)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "be9a134a-fb2a-4182-b931-0b60c5d320da")
   )
   (label "GND" (at 72.39 222.25 0)
@@ -1741,7 +1741,7 @@
     (pts
       (xy 320.04 52.07) (xy 317.5 52.07)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8d9c04be-b7ff-4bec-bfd9-07e22c22f852")
   )
   (global_label "3V3_AON" (shape bidirectional) (at 317.5 52.07 180)
@@ -1752,7 +1752,7 @@
     (pts
       (xy 320.04 59.69) (xy 317.5 59.69)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8e9c0651-dfd4-4719-962f-6f93b20ec2c9")
   )
   (label "FPGA_WDI_3V3" (at 317.5 59.69 180)
@@ -1762,7 +1762,7 @@
     (pts
       (xy 320.04 67.31) (xy 317.5 67.31)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8b9c0198-07a9-4246-932c-3880204b6364")
   )
   (label "GND" (at 317.5 67.31 180)
@@ -1772,7 +1772,7 @@
     (pts
       (xy 350.52 59.69) (xy 353.06 59.69)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "8c9c032b-2f7e-4d73-a982-a031a6372ddb")
   )
   (label "LINK_WD_OK" (at 353.06 59.69 0)
@@ -1794,7 +1794,7 @@
     (pts
       (xy 374.65 59.69) (xy 372.11 59.69)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "df9c85d4-e042-4e02-a786-3e9424d22fd8")
   )
   (label "3V3_AON" (at 372.11 59.69 180)
@@ -1804,7 +1804,7 @@
     (pts
       (xy 384.81 59.69) (xy 387.35 59.69)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "e09c8767-0817-492f-bddc-a645aabdfa4f")
   )
   (label "LINK_WD_OK" (at 387.35 59.69 0)
@@ -1829,7 +1829,7 @@
     (pts
       (xy 320.04 105.41) (xy 317.5 105.41)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "f89eebc6-4bb2-45ee-a1e8-4e1496f99c3e")
   )
   (label "FPGA_DONE" (at 317.5 105.41 180)
@@ -1839,7 +1839,7 @@
     (pts
       (xy 320.04 115.57) (xy 317.5 115.57)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "fb9ef07f-8489-4e0d-8b91-e66328bcfba3")
   )
   (global_label "SEQ_DONE" (shape bidirectional) (at 317.5 115.57 180)
@@ -1850,7 +1850,7 @@
     (pts
       (xy 320.04 120.65) (xy 317.5 120.65)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "fa9eeeec-5cb4-42e0-b53b-7eb2a2d1312c")
   )
   (label "GND" (at 317.5 120.65 180)
@@ -1860,7 +1860,7 @@
     (pts
       (xy 350.52 110.49) (xy 353.06 110.49)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "fd9ef3a5-d433-4467-9ee5-170134949091")
   )
   
@@ -1868,7 +1868,7 @@
     (pts
       (xy 350.52 100.33) (xy 353.06 100.33)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "fc9ef212-ac5e-493a-888e-af50aea8c61a")
   )
   (label "3V3_AON" (at 353.06 100.33 0)
@@ -1893,7 +1893,7 @@
     (pts
       (xy 320.04 149.86) (xy 317.5 149.86)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "ca9ea35c-e4c8-4a70-ba3b-1762bf07277c")
   )
   
@@ -1901,7 +1901,7 @@
     (pts
       (xy 320.04 160.02) (xy 317.5 160.02)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "cd9ea815-5c47-4bf7-a3e4-afb150ca86e1")
   )
   (label "LINK_WD_OK" (at 317.5 160.02 180)
@@ -1911,7 +1911,7 @@
     (pts
       (xy 320.04 165.1) (xy 317.5 165.1)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "0d8dc3b4-ecbf-4ea6-b0a4-63a8d53be878")
   )
   (label "GND" (at 317.5 165.1 180)
@@ -1921,7 +1921,7 @@
     (pts
       (xy 350.52 154.94) (xy 353.06 154.94)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "0e8dc547-1494-49d3-86fa-cb595b27b2ef")
   )
   
@@ -1929,7 +1929,7 @@
     (pts
       (xy 350.52 144.78) (xy 353.06 144.78)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "0f8dc6da-9d15-484c-9d51-330ae1137d66")
   )
   (label "3V3_AON" (at 353.06 144.78 0)
@@ -1955,7 +1955,7 @@
     (pts
       (xy 320.04 194.31) (xy 317.5 194.31)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "be8d4757-a20b-4bc3-81fb-32a93ef1bc9f")
   )
   (label "3V3_AON" (at 317.5 194.31 180)
@@ -1965,7 +1965,7 @@
     (pts
       (xy 320.04 199.39) (xy 317.5 199.39)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "bf8d48ea-2a8c-4a3c-9851-9a5ac4dd8716")
   )
   
@@ -1973,7 +1973,7 @@
     (pts
       (xy 320.04 204.47) (xy 317.5 204.47)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "c08d4a7d-5261-4569-aea8-020b4ac9518d")
   )
   (label "GND" (at 317.5 204.47 180)
@@ -1983,7 +1983,7 @@
     (pts
       (xy 320.04 209.55) (xy 317.5 209.55)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "b98d3f78-dae2-43e2-84fe-69bcd0b51c04")
   )
   (label "GND" (at 317.5 209.55 180)
@@ -1993,7 +1993,7 @@
     (pts
       (xy 350.52 194.31) (xy 353.06 194.31)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "ba8d410b-02b7-4f0f-9b54-d16d56a0e67b")
   )
   (label "1V8_D" (at 353.06 194.31 0)
@@ -2003,7 +2003,7 @@
     (pts
       (xy 350.52 199.39) (xy 353.06 199.39)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "bb8d429e-8b38-4d88-b1ab-391edc8cb0f2")
   )
   (global_label "DAC_RESET_N" (shape bidirectional) (at 353.06 199.39 0)
@@ -2026,7 +2026,7 @@
     (pts
       (xy 384.81 204.47) (xy 382.27 204.47)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "10900704-95fc-4228-92b3-a9dafd8bdb44")
   )
   (label "DAC_RESET_N" (at 382.27 204.47 180)
@@ -2036,7 +2036,7 @@
     (pts
       (xy 394.97 204.47) (xy 397.51 204.47)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "0f900571-acce-4063-95b6-e0ed77a010cd")
   )
   (label "GND" (at 397.51 204.47 0)
@@ -2050,70 +2050,70 @@
     (pts
       (xy 353.06 110.49) (xy 363.22 110.49)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000001")
   )
   (wire
     (pts
       (xy 363.22 110.49) (xy 363.22 134.62)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000002")
   )
   (wire
     (pts
       (xy 363.22 134.62) (xy 307.34 134.62)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000003")
   )
   (wire
     (pts
       (xy 307.34 134.62) (xy 307.34 149.86)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000004")
   )
   (wire
     (pts
       (xy 307.34 149.86) (xy 317.5 149.86)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000005")
   )
   (wire
     (pts
       (xy 353.06 154.94) (xy 363.22 154.94)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000006")
   )
   (wire
     (pts
       (xy 363.22 154.94) (xy 363.22 181.61)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000007")
   )
   (wire
     (pts
       (xy 363.22 181.61) (xy 307.34 181.61)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000008")
   )
   (wire
     (pts
       (xy 307.34 181.61) (xy 307.34 199.39)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000009")
   )
   (wire
     (pts
       (xy 307.34 199.39) (xy 317.5 199.39)
     )
-    (stroke (width 0) (type default))
+    (stroke (width 0.1524) (type solid))
     (uuid "1818f5f5-0518-4000-8000-000000000010")
   )
   (sheet_instances (path "/" (page "6")))
