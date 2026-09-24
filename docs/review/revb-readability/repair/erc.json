@@ -1,0 +1,86 @@
+{
+    "$schema": "https://schemas.kicad.org/erc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-09-24T01:22:17",
+    "ignored_checks": [
+        {
+            "description": "Global label only appears once in the schematic",
+            "key": "single_global_label"
+        },
+        {
+            "description": "Four connection points are joined together",
+            "key": "four_way_junction"
+        },
+        {
+            "description": "SPICE model issue",
+            "key": "simulation_model_issue"
+        },
+        {
+            "description": "Assigned footprint doesn't match footprint filters",
+            "key": "footprint_filter"
+        }
+    ],
+    "included_severities": [
+        "error",
+        "warning"
+    ],
+    "kicad_version": "10.0.6",
+    "sheets": [
+        {
+            "path": "/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1",
+            "violations": []
+        },
+        {
+            "path": "/01_carrier_interface/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/eb5b4656-27b4-5a92-bb66-63f1114824b9",
+            "violations": []
+        },
+        {
+            "path": "/10_input_protection/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/2c33a327-1d87-5873-9985-2e050c72784e",
+            "violations": []
+        },
+        {
+            "path": "/20_positive_rails/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/14e4da12-7372-5403-8fad-d9b272d7178f",
+            "violations": []
+        },
+        {
+            "path": "/30_negative_reference/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/9576c0b1-8317-583e-9f0e-87270c17d17e",
+            "violations": []
+        },
+        {
+            "path": "/40_power_supervision/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/6daf9e7c-64e1-504c-b2f0-d9ef02e05e5f",
+            "violations": []
+        },
+        {
+            "path": "/03_peripheral_boundaries/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/73846c09-6306-5db3-9679-2686619beb33",
+            "violations": []
+        },
+        {
+            "path": "/04_dac_0_3/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/a3a93add-12b4-5bf3-bff6-eac5cdf6b889",
+            "violations": []
+        },
+        {
+            "path": "/05_dac_4_7/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/849bd93e-6f74-5ec6-a441-6e663cc5dd73",
+            "violations": []
+        },
+        {
+            "path": "/06_analog_outputs/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/85913450-4763-5590-90b1-cdfc721368a4",
+            "violations": []
+        },
+        {
+            "path": "/41_power_status/",
+            "uuid_path": "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1/146a13d1-5488-50b1-a748-36dedf76a14c",
+            "violations": []
+        }
+    ],
+    "source": "servohil_io_revB.kicad_sch"
+}

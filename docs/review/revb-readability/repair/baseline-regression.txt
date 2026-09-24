@@ -1,0 +1,13 @@
+Native power pin/net check PASS: input 735 connected pins
+Native cumulative electrical check PASS: supervision
+Traceback (most recent call last):
+  File "/home/runner/work/servoHIL/servoHIL/tools/verify_native_all.py", line 7, in <module>
+    if a.stage=='supervision':check(nets,values)
+                              ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/servoHIL/servoHIL/tools/native_supervision_rules.py", line 13, in check
+    for pin,net in pins.items():need(ref,pin,net)
+                                ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/servoHIL/servoHIL/tools/native_supervision_rules.py", line 6, in need
+    if actual!=net:raise ValueError(f'{ref}.{pin}: expected {net}, got {actual}')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: U408.6: expected HIL_ARM, got INPUT_OK

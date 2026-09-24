@@ -28,4 +28,7 @@
 (instances (project "servohil_io_revB" (path "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1" (page "9"))))) (sheet (at 25.4 254) (size 139.7 30.48) (stroke (width 0.254) (type default)) (fill (color 0 0 0 0)) (uuid "85913450-4763-5590-90b1-cdfc721368a4")
 (property "Sheetname" "06_analog_outputs" (at 25.4 251.46 0) (effects (font (size 1.27 1.27))))
 (property "Sheetfile" "06_analog_outputs.kicad_sch" (at 25.4 287.02 0) (effects (font (size 1.27 1.27))))
-(instances (project "servohil_io_revB" (path "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1" (page "10"))))) (sheet_instances (path "/" (page "1"))))
+(instances (project "servohil_io_revB" (path "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1" (page "10"))))) (sheet (at 203.2 254) (size 139.7 30.48) (stroke (width 0.254) (type default)) (fill (color 0 0 0 0)) (uuid "146a13d1-5488-50b1-a748-36dedf76a14c")
+(property "Sheetname" "41_power_status" (at 203.2 251.46 0) (effects (font (size 1.27 1.27))))
+(property "Sheetfile" "41_power_status.kicad_sch" (at 203.2 287.02 0) (effects (font (size 1.27 1.27))))
+(instances (project "servohil_io_revB" (path "/8ab18791-d5eb-50b1-a6c4-35f9e4c661f1" (page "11"))))) (sheet_instances (path "/" (page "1"))))
