@@ -1,7 +1,8 @@
 {
   "baseline": "49cdeb395d31e2844b1f50189508aa9dbf940d40",
   "completed": [
-    "scope"
+    "scope",
+    "positive"
   ],
   "source_hashes": {
     "01_carrier_interface.kicad_sch": "f9ba5307a2c15da9ad3626f5dd1524ddd5cdfa4f225acdbd66cd4d893072e2d8",
@@ -10,7 +11,7 @@
     "05_dac_4_7.kicad_sch": "e81d607530ae28ebcaf4aad52f7d7c54220eb0192cbcfa56d4e72ddfdd03b674",
     "06_analog_outputs.kicad_sch": "aa8f319a1ce6fd7d85279a5632583e5628302bf79063de5d421e46ca03adae45",
     "10_input_protection.kicad_sch": "4d63f399b020d5963c28fedcc7c6b311aa652f8c6d09a7210010bbbc6d3a79e8",
-    "20_positive_rails.kicad_sch": "f35cb6549a5e2dcfb0a4041aed0204e4eb9356edf0d781c71f459c69c031fdf2",
+    "20_positive_rails.kicad_sch": "57e4dee2e8372d49f04d536086f182e750b626ff3a70bc83436b17f09093412e",
     "30_negative_reference.kicad_sch": "204610113c62ea64f0c1ea82cb5fe4ee291350a0b247f22423918f02988c7f0e",
     "40_power_supervision.kicad_sch": "ab91ca5b0e8b8b04445b39a7f0c89dc5eb16b37928c4239f2607549fc91ec5a9",
     "41_power_status.kicad_sch": "e73205499ce1ee559d4df00cfe1b81d512b8eed097c0cffd6e0a9fa967338541",
