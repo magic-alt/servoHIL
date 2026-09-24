@@ -1,0 +1,83 @@
+name: native-power-stage
+# One-shot PR17 finalize. Retire after source commit; normal review is read-only.
+on:
+  push:
+    branches: [feat/revb-native-power-safety-dac]
+    paths:
+      - tools/migrations/pr17_finalize.py
+      - .github/workflows/native-power-stage.yml
+permissions:
+  contents: write
+concurrency:
+  group: native-power-stage
+  cancel-in-progress: false
+jobs:
+  finish-native-power-source:
+    if: github.repository == 'magic-alt/servoHIL' && github.ref_name == 'feat/revb-native-power-safety-dac'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Install KiCad and footprint library
+        run: |
+          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
+          mkdir -p build/native-power
+      - name: Reproduce disarm wiring failure on previous native source
+        run: |
+          kicad-cli sch export netlist --format kicadxml -o build/native-power/before.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'tools')
+          from verify_native import verify
+          from native_supervision_rules import check
+          n,v=verify('build/native-power/before.xml','supervision')
+          try: check(n,v)
+          except ValueError as e:
+              assert 'U408.6' in str(e),str(e)
+              print('RED reproduced:',e)
+          else: raise RuntimeError('Regression did not reproduce')
+          PY
+      - name: Apply guarded native source fixes
+        run: python tools/migrations/pr17_finalize.py
+      - name: Validate real native circuit
+        run: |
+          kicad-cli version > build/native-power/kicad-version.txt
+          kicad-cli sch export netlist --format kicadxml -o build/native-power/netlist.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+          python tools/verify_native_all.py build/native-power/netlist.xml --stage supervision
+          python tools/check_revb_netlist.py build/native-power/netlist.xml hardware/kicad/revB/axu2cgb_expansion/expected_connections.json
+          NATIVE_NETLIST=build/native-power/netlist.xml python -m unittest discover -s tests -p test_native_power_netlist.py -v
+          kicad-cli sch erc --format json --exit-code-violations -o build/native-power/erc.json hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+          python tools/check_revb_erc.py build/native-power/erc.json
+          kicad-cli sch export pdf -o build/native-power/schematic-review.pdf hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+      - name: Commit verified source immediately - no force
+        run: |
+          git config user.name 'servoHIL hardware integration'
+          git config user.email '59996146+magic-alt@users.noreply.github.com'
+          git add hardware/kicad/revB/axu2cgb_expansion
+          git commit -m 'fix(power): close native ERC and implement disarm/fail-low power status'
+          git push origin HEAD:feat/revb-native-power-safety-dac
+          git rev-parse HEAD > build/native-power/source_commit.txt
+          git archive --format=zip --output=build/native-power/native-source.zip HEAD hardware/kicad/revB/axu2cgb_expansion
+      - name: Print ERC diagnostics if needed
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('build/native-power/erc.json')
+          if p.exists():
+              data=json.loads(p.read_text())
+              for s in data.get('sheets',[]):
+                  for v in s.get('violations',[]):
+                      print(v.get('type'),v.get('severity'),v.get('description'))
+                      for i in v.get('items',[]): print(i.get('description'))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: servohil-native-power-finalize
+          path: build/native-power/
+          if-no-files-found: warn

@@ -1,0 +1,32 @@
+name: native-sch-devtools
+on:
+  push:
+    branches: [feat/revb-native-power-safety-dac]
+    paths: [.github/workflows/native-sch-devtools.yml]
+  pull_request:
+    paths: [.github/workflows/native-sch-devtools.yml]
+permissions:
+  contents: read
+jobs:
+  assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package complete KiCad native runtime and library assets
+        run: |
+          mkdir -p devtools
+          docker run --rm -v "$PWD/devtools:/out" debian:trixie-slim bash -euxc '
+            apt-get update
+            apt-get install -y --no-install-recommends kicad kicad-footprints kicad-symbols
+            # KiCad CLI dynamically loads eeschema/pcbnew kiface modules outside
+            # x86_64-linux-gnu. Preserve bin+lib, not just the CLI executable.
+            tar -C / -czf /out/kicad-runtime.tar.gz usr/bin usr/lib usr/share/kicad usr/share/fonts/truetype/dejavu
+            kicad-cli version > /out/kicad-version.txt
+          '
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kicad-offline-runtime
+          path: devtools/
+          if-no-files-found: error
+          retention-days: 2
