@@ -110,7 +110,7 @@ class DigitalDrawingTests(unittest.TestCase):
     def test_no_ground_text_labels_and_explicit_ground_symbols(self):
         self.assertFalse([n for n in self.tree if isinstance(n, list) and n and
                           n[0] in ('label', 'global_label') and n[1] == 'GND'])
-        self.assertGreaterEqual(sum(one(s, 'lib_id')[1] == 'power:GND'
+        self.assertGreaterEqual(sum(one(s, 'lib_id')[1] == 'ServoHILGround:GND'
                                     for s in items(self.tree, 'symbol')), 15)
 
     def test_all_connection_points_on_grid_and_inside_drawing_area(self):

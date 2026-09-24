@@ -16,4 +16,11 @@
     (options "")
     (descr "Rev.A reviewed functional FPGA drawing; original pin signatures retained")
   )
+  (lib
+    (name "ServoHILGround")
+    (type "KiCad")
+    (uri "${KIPRJMOD}/servohil_ground.kicad_sym")
+    (options "")
+    (descr "Exact archived global GND symbol; original power_in pin preserved")
+  )
 )

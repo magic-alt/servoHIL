@@ -191,7 +191,7 @@
       (pin passive line (at -15.24 -16.51 0) (length 5.08) (name "P10" (effects (font (size 1.27 1.27)))) (number "10" (effects (font (size 1.27 1.27)))))
     )
   )
-  (symbol "power:GND"
+  (symbol "ServoHILGround:GND"
     (power)
     (pin_numbers hide)
     (pin_names (offset 0) hide)
@@ -765,7 +765,7 @@
 )
   (label "DAC2_CVREF" (at 134.62 166.37 0) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "47aae747-5d8b-576e-9dea-4f68102ddece"))
   (symbol
-  (lib_id "power:GND")
+  (lib_id "ServoHILGround:GND")
   (at 17.78 182.88 0)
   (unit 1)
   (exclude_from_sim no)

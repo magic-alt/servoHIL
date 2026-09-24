@@ -162,7 +162,7 @@
       )
     )
   )
-  (symbol "power:GND"
+  (symbol "ServoHILGround:GND"
     (power)
     (pin_numbers hide)
     (pin_names (offset 0) hide)
@@ -294,7 +294,7 @@
  (symbol (lib_id "ServoHILCore:C") (at 137.16 173.99 270) (unit 1) (exclude_from_sim no) (in_bom yes) (on_board yes) (dnp no) (uuid "e9e9e9e9-0000-4000-802f-000000002f34") (property "Reference" "C302" (at 142.875 172.339 0) (effects (font (size 1.27 1.27)) (justify left))) (property "Value" "1uF" (at 142.875 175.641 0) (effects (font (size 1.27 1.27)) (justify left))) (property "Footprint" "" (at 137.16 173.99 0) (effects (font (size 1.27 1.27)) hide)) (property "Datasheet" "~" (at 137.16 173.99 0) (effects (font (size 1.27 1.27)) hide)) (pin "1" (uuid "e9e9e9e9-0000-4000-802f-000000002f32")) (pin "2" (uuid "e9e9e9e9-0000-4000-802f-000000002f33")) (instances (project "servohil_io_revA" (path "/81ee3c62-caf6-424d-9468-a01d18b0858d" (reference "C302") (unit 1)))))
  (label "DAC0_CVREF" (at 134.62 166.37 0) (effects (font (size 1.27 1.27)) (justify left bottom)) (uuid "e22a6bcf-ab39-55e6-8fcb-b560e747c8b0"))
  (symbol
-  (lib_id "power:GND")
+  (lib_id "ServoHILGround:GND")
   (at 17.78 182.88 0)
   (unit 1)
   (exclude_from_sim no)
