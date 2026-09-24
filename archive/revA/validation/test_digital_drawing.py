@@ -5,7 +5,6 @@ The contract is the pre-existing reviewed pin assignment, not a generator's
 output. In particular, removing a wire and adding same-name labels must fail.
 """
 from __future__ import annotations
-import copy
 import json
 import math
 from pathlib import Path
@@ -42,8 +41,8 @@ def terminals(tree):
             if mirror and mirror[1] == 'x': py = -py
             if mirror and mirror[1] == 'y': px = -px
             out[ref + '.' + one(pin, 'number')[1]] = (
-                round(x + px * math.cos(rad) + py * math.sin(rad), 4),
-                round(y - px * math.sin(rad) + py * math.cos(rad), 4))
+                round(x + px * math.cos(rad) - py * math.sin(rad), 4),
+                round(y - px * math.sin(rad) - py * math.cos(rad), 4))
     return out
 
 
@@ -127,12 +126,29 @@ class DigitalDrawingTests(unittest.TestCase):
                 self.assertAlmostEqual(y / 1.27, round(y / 1.27), places=3)
 
     def test_wire_graph_does_not_accept_label_only_connection(self):
-        # A deliberately label-connected synthetic circuit must stay disconnected.
         t = expr('(kicad_sch (lib_symbols) (wire (pts (xy 0 0) (xy 1 0))) '
                  '(wire (pts (xy 2 0) (xy 3 0))) '
                  '(label "TEST" (at 1 0 0)) (label "TEST" (at 2 0 0)))')
         g = WireGraph(t)
         self.assertNotEqual(g.find((1.0, 0.0)), g.find((2.0, 0.0)))
+
+    def test_symbol_library_y_axis_and_quarter_turns(self):
+        # Library symbols use Cartesian Y; sheet coordinates grow downwards.
+        for angle, expected in [(0, (12.0, 17.0)), (90, (7.0, 18.0)),
+                                (180, (8.0, 23.0)), (270, (13.0, 22.0))]:
+            t = expr('(kicad_sch (lib_symbols (symbol "Test:X" (symbol "X_1_1" '
+                     '(pin passive line (at 2 3 0) (length 0) (name "P") (number "1"))))) '
+                     f'(symbol (lib_id "Test:X") (at 10 20 {angle}) (property "Reference" "X1")))')
+            with self.subTest(angle=angle): self.assertEqual(expected, terminals(t)['X1.1'])
+
+    def test_wires_do_not_short_distinct_contract_nets(self):
+        expected = json.loads(CONTRACT.read_text())['sheets'][SHEET]
+        groups = {}
+        for reference, pins in expected.items():
+            for pin, net in pins.items():
+                endpoint = self.graph.pins[reference + '.' + pin]
+                groups.setdefault(self.graph.find(endpoint), set()).add(net)
+        self.assertFalse({p: nets for p, nets in groups.items() if len(nets) > 1})
 
     def test_private_net_names_remain_single_annotations_not_aliases(self):
         private = set(private_groups())
