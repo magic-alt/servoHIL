@@ -1,0 +1,22 @@
+{
+  "native_source_commit": "846ce4a285e4c31f3840e6058e376be4b8a25a84",
+  "sha256": {
+    "archive/revA/snapshot/hardware/kicad/revA/01_power_entry.kicad_sch": "3892616d99503e471338e11124c50e3c06fea9a6606b3cc72ecc9f4c9733efbe",
+    "archive/revA/snapshot/hardware/kicad/revA/02_analog_power.kicad_sch": "4815ce041f5aea7fac7aa85cd1d6386e3fc037e649b037a0b34d60a09d71898f",
+    "archive/revA/snapshot/hardware/kicad/revA/03_digital_power.kicad_sch": "70bc3b6e2d3181e80a65f9a56479af6680a1540217db1ebac9b911fc9a10eb60",
+    "archive/revA/snapshot/hardware/kicad/revA/04_axu_hil_link.kicad_sch": "005931cc3c41ab6fba0a9282dec55e2b70fe719063638ee1147204d75252a27a",
+    "archive/revA/snapshot/hardware/kicad/revA/05_io_fpga.kicad_sch": "8d883c6c10a965f0902fa5f7fa6a53a5ac4872eb9f4134c5280286ef66522651",
+    "archive/revA/snapshot/hardware/kicad/revA/06_dac_0_3.kicad_sch": "54679e58fd708f0a8c6940c645b7b3feca022d2cdc11b93e8079e94f302823af",
+    "archive/revA/snapshot/hardware/kicad/revA/07_dac_4_7.kicad_sch": "81fe40421c1c47a6d08096f580c9c7a7172a9668148bd8e22054b84de3fedf7e",
+    "archive/revA/snapshot/hardware/kicad/revA/fp-lib-table": "175eb6843bcdc85ee4db7e28e92dc4d2e69fc14d81d48f2bfdf38ebedce0e71c",
+    "archive/revA/snapshot/hardware/kicad/revA/servohil_core.kicad_sym": "8acbc3f441910977a5fd6a2974b55b054b466ee20a9800592ca5562f14eeb722",
+    "archive/revA/snapshot/hardware/kicad/revA/servohil_digital_review.kicad_sym": "5068a451d2664bbefd3561defdae2230552f63c9eb7270609a0c7a8aeb019643",
+    "archive/revA/snapshot/hardware/kicad/revA/servohil_fpga_review.kicad_sym": "bc9fa022e5ebd95af09fead64c279391cb27cc4110fe6769c72bac220ee9c7f3",
+    "archive/revA/snapshot/hardware/kicad/revA/servohil_ground.kicad_sym": "55692285a47d872cbbb977e6db074501b8903f12c9e2375a85fa2d4b113166a9",
+    "archive/revA/snapshot/hardware/kicad/revA/servohil_io_revA.kicad_pro": "fc83940aa41711b0fe38d623555d84872726c520ccb28cd40b82ec5897039082",
+    "archive/revA/snapshot/hardware/kicad/revA/servohil_io_revA.kicad_sch": "d573cfe14f3ad2a262553592ed2c0835a28c7e0ba15b9851fbb04ba93aea055b",
+    "archive/revA/snapshot/hardware/kicad/revA/servohil_power.kicad_sym": "5de96eaa533fd88ed70ee425581aec838fa6d3612c2573fa1784a4babe0cd631",
+    "archive/revA/snapshot/hardware/kicad/revA/sym-lib-table": "0212e3871a6e219ddfbd4d003c54770041583374ad56cdf7a7e1943ce385ad84"
+  },
+  "validation_run": 35982150393
+}
