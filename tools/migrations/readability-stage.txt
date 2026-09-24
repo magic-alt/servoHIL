@@ -1,1 +1,1 @@
-scope positive input negative dac
+positive input negative dac supervision status
