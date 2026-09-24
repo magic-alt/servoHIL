@@ -6,7 +6,15 @@ import re
 import subprocess
 
 ROOT=Path(__file__).resolve().parents[1]
-BASE_TREE='6ddd828a8b7ca289a4f2acfee7eb2e1f07569e2e'
+# PR18 intentionally repaired the archived native drawings; freeze the exact
+# already merged snapshot, not an arbitrary newly generated archive. Original
+# snapshot 6ddd828a8b7ca289a4f2acfee7eb2e1f07569e2e remains in Git history.
+# Source: main c29abb07e9fca5584235860dbe7f2bd1460141ca, 2026-09-24.
+BASE_TREE='052a06c6e6e5b0ce23e94f75774a9f1cc7f3f167'
+
+def check_archive_tree(actual):
+    if actual != BASE_TREE:
+        raise ValueError('reviewed PR18 archive snapshot bytes changed')
 
 def check(root=ROOT):
     for old in ['hardware/fpga/revA','hardware/kicad/revA','docs/icd/j12-hil-link.csv']:
@@ -23,9 +31,9 @@ def check(root=ROOT):
         raise ValueError('legacy gates must be SUPERSEDED, never PASS')
     if (root/'.git').exists():
         result=subprocess.check_output(['git','rev-parse','HEAD:archive/revA/snapshot'],cwd=root,text=True).strip()
-        if result!=BASE_TREE: raise ValueError('historical snapshot bytes changed')
+        check_archive_tree(result)
     else:
         print('Archive Git-tree verification not available outside a checkout')
-    print('Rev.B repository guard PASS; historical target is not active')
+    print('Rev.B repository guard PASS; reviewed PR18 archive frozen; historical target is not active')
 
 if __name__=='__main__': check()

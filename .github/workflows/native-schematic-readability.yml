@@ -16,13 +16,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Source-only schematic regressions
         run: python -m unittest discover -s tests -p test_native_readability.py -v
-      - name: Install native KiCad CLI
+      - name: Install native KiCad CLI and numerical regression dependency
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases >/tmp/ppa.log 2>&1
           sudo apt-get update >/tmp/apt-update.log 2>&1
-          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints >/tmp/apt-install.log 2>&1
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints ngspice >/tmp/apt-install.log 2>&1
           mkdir -p build/readability
           kicad-cli version > build/readability/kicad-version.txt
+          ngspice --version > build/readability/ngspice-version.txt
       - name: Local-versus-cross-sheet label policy
         run: |
           python tools/check_native_readability.py --audit-only > build/readability/label-audit.json
@@ -36,11 +37,12 @@ jobs:
           python tools/check_native_readability.py --normalize build/readability/netlist.xml --output build/readability/canonical.xml
           python tools/verify_native_all.py build/readability/canonical.xml --stage supervision
           python tools/check_revb_netlist.py build/readability/canonical.xml "$native/expected_connections.json"
-          NATIVE_NETLIST=build/readability/canonical.xml python -m unittest discover -s tests -v
-      - name: Wiring-equivalent to separately reviewed safety correction
+          NATIVE_NETLIST=build/readability/canonical.xml python -m unittest discover -s tests -v > build/readability/tests.log 2>&1
+          tail -20 build/readability/tests.log
+      - name: Frozen existing wiring and explicit safety delta
         run: |
-          python tools/check_native_readability.py --before docs/review/revb-readability/repair/corrected-baseline.xml --after build/readability/netlist.xml > build/readability/equivalence.json
-          cat build/readability/equivalence.json
+          python tools/check_native_safety.py build/readability/canonical.xml > build/readability/safety-delta.json
+          cat build/readability/safety-delta.json
       - name: Native ERC - do not suppress warnings
         run: |
           kicad-cli sch erc --format json --exit-code-violations -o build/readability/erc.json hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
