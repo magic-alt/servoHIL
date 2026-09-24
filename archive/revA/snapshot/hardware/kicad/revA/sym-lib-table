@@ -9,4 +9,11 @@
     (options "")
     (descr "Rev.A digital-power drawing variants; original electrical pin signatures retained")
   )
+  (lib
+    (name "ServoHILFPGAReview")
+    (type "KiCad")
+    (uri "${KIPRJMOD}/servohil_fpga_review.kicad_sym")
+    (options "")
+    (descr "Rev.A reviewed functional FPGA drawing; original pin signatures retained")
+  )
 )
