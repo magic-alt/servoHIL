@@ -1,1 +1,5 @@
-(sym_lib_table (version 7) (lib (name "RevB") (type "KiCad") (uri "${KIPRJMOD}/revb.kicad_sym") (options "") (descr "Generated single-SoC interface review")))
+(sym_lib_table
+  (version 7)
+  (lib (name "RevB") (type "KiCad") (uri "${KIPRJMOD}/revb.kicad_sym") (options "") (descr "Generated single-SoC interface review"))
+  (lib (name "Safety") (type "KiCad") (uri "${KIPRJMOD}/safety.kicad_sym") (options "") (descr "Native Rev.B safety review - package qualification open"))
+)
