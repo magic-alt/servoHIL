@@ -1,3 +1,5 @@
+> Historical review log. Current final results and limitations: [2026-09-24 PR18 handoff](validation/2026-09-24-pr18-handoff.md). Earlier label/ERC statements below are superseded.
+
 # Rev.A local-wiring repair / PR #18
 
 ## Scope and authority

@@ -1,67 +1,29 @@
-# ServoHIL-I/O Rev.A KiCad project
+# ServoHIL-I/O Rev.A — editable native KiCad project
 
-This directory is the native KiCad hierarchy for the first ServoHIL-I/O board.
+Open `servohil_io_revA.kicad_pro`, then its root schematic. Keep all seven child sheets, project symbol libraries,
+`sym-lib-table` and the project file together. Replacing only the two child files leaves an old root without matching sheet pins.
 
-## Current state
+## Reviewed source
 
-- all seven child schematic sheets are populated;
-- historical pre-repair baseline: KiCad 10.0.6 parsed the full hierarchy;
-- historical pre-repair ERC baseline: **0 errors / 0 warnings**; rerun ERC after the archive readability repair before relying on that result;
-- CI exports the complete schematic PDF review artifact;
-- POWER topology is implemented but switching-stage values are still PRELIM;
-- AXU2CGB J12 HIL-Link mapping is implemented from the ICD;
-- XC7A35T is intentionally represented as a functional pre-layout symbol;
-- FGG484 PACKAGE_PIN / footprint assignment remains deferred to Vivado I/O Planner;
-- four AD3542R devices implement the 8-channel AO path;
-- PCB placement/routing has **not** started.
+The three native repair commits are `615e1f1` (power interfaces), `9e6f133` (FPGA local wiring and complete hierarchy),
+and `846ce4a` (library reconciliation and zero-warning ERC).
+All eight sheets contain zero Global Label objects; root sheet pins match 133 child interfaces.
+GND remains a global power network, represented by the exact archived symbol in the portable `ServoHILGround` project library.
 
-`layout_gate.yaml` remains the authority:
+[Full handoff and evidence](../../../../validation/2026-09-24-pr18-handoff.md).
+`native-source-2026-09-24.json` is a historical source manifest, not a generator or restriction on future reviewed edits.
+Use KiCad 10.0.6 for reproducing the recorded results; newer versions must be revalidated.
 
-- `schematic_erc: true`
-- `power_tree_frozen: false`
-- `fpga_pinplan_frozen: false`
-- `j12_xdc_crosscheck: false`
-- `dac_network_review: false`
-- `layout_allowed: false`
+## Verification
 
-## 2026-09-23 archive readability repair
+Read-only checks and actual native XML equivalence passed: 191 components, 209 nets, 716 physical pins.
+Complete ERC passed with 0 errors, 0 warnings and no exclusions. Twenty-three Rev.A drawing tests passed.
+No temporary generator runs when opening or validating this project.
 
-The Rev.A circuit/net intent is unchanged, but the native schematic presentation
-has been repaired so the pages are usable in the editor:
+## Not a fabrication release
 
-- every former pin-mounted global label now terminates a 2.54 mm explicit wire
-  stub, making connectivity visible without renaming or merging nets;
-- visible Reference/Value fields are restored to the placement defined by each
-  embedded symbol instead of the scattered generated coordinates;
-- the two analog-power flags and the crowded/off-page digital-power passives are
-  repositioned inside the A3 sheet; the four digital-power output rows are
-  separated from the ADP5054 body;
-- all global-label names/multiplicities, reference designators, component values
-  and explicit no-connect markers are preserved.
-
-This is an archive-only editability/readability repair, not a Rev.A redesign.
-A fresh KiCad ERC should be run on a workstation before merging or using the
-archived schematic for any engineering decision.
-
-## Hierarchy
-
-- `01_power_entry.kicad_sch`
-- `02_analog_power.kicad_sch`
-- `03_digital_power.kicad_sch`
-- `04_axu_hil_link.kicad_sch`
-- `05_io_fpga.kicad_sch`
-- `06_dac_0_3.kicad_sch`
-- `07_dac_4_7.kicad_sch`
-
-Open `servohil_io_revA.kicad_pro` / `servohil_io_revA.kicad_sch` in KiCad 8+.
-
-## No-layout rule
-
-A zero-warning ERC result does **not** authorize placement/routing. Before layout:
-
-1. freeze ADP5054/LTC7149 power-stage values and thermal budget;
-2. replace functional pre-layout power/FPGA symbols with verified complete package symbols where required;
-3. complete Vivado FGG484 I/O planning and reviewed PACKAGE_PIN XDC;
-4. close the J12↔schematic↔XDC cross-check gate;
-5. close the AD3542R package/output-stability/layout review gate;
-6. set `layout_allowed: true` only in a dedicated reviewed commit.
+FPGA package/ball assignment remains FUNCTIONAL_PRELAYOUT. C230/C231/C232 are bulk capacitors, not a completed per-pin bypass design.
+Power magnetics, compensation, startup, MLCC derating, thermal and hardware safety qualification remain open.
+Legacy AO0..3 sharing between DAC sheets is preserved for pin equivalence, not approved as a product output architecture.
+`layout_gate.yaml` remains unchanged and `layout_allowed` stays false. PCB routing has not been performed by this repair.
+The separate whole-repository immutable-archive check still reports `historical snapshot bytes changed`; it was not disabled.
