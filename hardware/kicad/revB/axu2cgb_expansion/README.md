@@ -1,42 +1,36 @@
-# Native editable AXU2CGB expansion
+# Native editable AXU2CGB expansion — 15-page development source
 
-Open `servohil_io_revB.kicad_pro`. The checked-in native KiCad files and local
-libraries are the hardware source of truth. Edit them directly. Do not run the
-early `tools/revb.py generate` review builder into this directory. One-shot PR21
-writers and their temporary write-enabled workflow were removed after the
-verified native blobs were committed; their history remains in Git.
+Open `servohil_io_revB.kicad_pro`. Checked-in native KiCad files and local libraries
+are the hardware source of truth. Edit them directly; never run the early review
+generator into this directory. Normal CI only validates and exports.
 
-## Current 13-page scope
+PR #21 added the watchdog, eight-channel AO disconnect and normally-open DUT
+permit. PR #22 replaces reserved J3/J4 with native ADC/PWM/encoder/RS485 circuits:
+`70_adc_frontend`, `80_encoder_phy` and updated `03_peripheral_boundaries`.
+There are 409 physical components: 263 prior - 2 headers + 148 peripheral parts.
+The existing 64-signal carrier pin allocation is unchanged. No dedicated CAN or
+EtherCAT hardware was allocated or added. The SoM alternative remains unbound.
 
-The original power/DAC/interface pages are retained. `50_watchdog_interlock`
-adds TPS3430, two heartbeat-edge qualification stages, delayed release and an
-AON-domain SAFE_ENABLE gate. `06_analog_outputs` now contains two ADG5412F quad
-switches between the DAC nets and J5. `60_dut_permit` contains a normally-open
-PhotoMOS permit contact. The existing RAILS_OK net is now explicitly cross-sheet
-so the heartbeat qualifier can inhibit the old ARM latch and DAC reset path.
+[ADC/PHY circuit contract, native evidence and physical acceptance](../../../../docs/review/revb-peripherals/README.md)
+records pin mapping, serial initialization, roles, load/RC calculations and open
+qualifications. [Safety-chain history](../../../../docs/review/revb-safety/README.md)
+remains a PR #21 checkpoint, not current full-board qualification.
 
-No second FPGA; SoM remains a separate unbound carrier contract. This is ongoing
-board development, not a manufacturing release. ADC/PHY are not populated.
-**A drawn DUT permit contact does not complete system-level DUT inhibition.**
-High-impedance AO must be given an application-specific neutral state by the
-adapter, and an open/leaking contact must be interpreted as inhibited by the
-actual DUT. The interface is not certified STO and does not switch motor power.
+Independent checks freeze the historical power/DAC connections except explicit
+J5 output rerouting and J3/J4 removal. Existing safety checks cover 47 parts/168
+pins; additional peripheral checks cover 148 parts/461 pins and reject ADC supply,
+reference, lane and input swaps, DE bypass and PWM bypass. The historical netlist
+baseline was not silently regenerated. `expected_connections.json` alone is not
+an independent design oracle. Actual KiCad export/ERC is required.
 
-The [safety review and acceptance plan](../../../../docs/review/revb-safety/README.md)
-records heartbeat semantics, source-bound evidence and all open qualifications.
-U501/U506/U507/U701 and the new connectors still need final package/land-pattern
-binding; no blank footprint is an approval. The existing EDV rail/headroom,
-thermal, transient, MLCC and power-off blockers remain. Release gates stay blocked.
+New footprint identifiers have local library files, not final package/MPN sign-off.
+The new ADC is a low-energy single-ended candidate; its configuration, calibration,
+alias filter, timing and input-fault energy need qualification. The directional
+encoder profile is SSI/BiSS, not arbitrary ABZ/SPI. PWM/AUX are low-voltage logic.
+Non-isolated cables, unpowered-host backfeed and source roles must be reviewed.
 
-## Verification boundaries
-
-`expected_connections.json` is a historical migration checkpoint plus the eight
-explicit J5 changes, NOT an independent hardware oracle. Use
-`tools/check_native_safety.py` together with existing power and converter pin
-checks on actual KiCad XML. It preserves the historical old-pin partition,
-checks 47 added components / 168 pins, source/drain orientation, default pulls,
-no parallel AO bypass and independently floating permit contacts.
-
-Actual KiCad 10.0.6 export/ERC and PDF review were performed. Pin checks and ERC
-are not physical power-off, analogue settling, relay reaction-time or safety
-qualification. `hardware/revB/gates.json` is intentionally unchanged.
+This is NOT fabrication-ready. Power EDV, full BOM/footprints, real DUT neutral
+bias/permit leakage/shutdown timing, partial power, AON/thermal and measurements
+remain open. The standalone health RTL is not a complete board bitstream.
+`hardware/revB/gates.json` remains unchanged with `layout_allowed=false`.
+Temporary native writers/workbench were removed after reviewed blobs were committed.
