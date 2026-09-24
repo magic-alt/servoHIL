@@ -40,8 +40,7 @@ def parse_measures(log, requested):
 
 
 def measures(nominal, step, release, settled, end):
-    # FIND at exact TSTOP may be out-of-interval after floating point rounding.
-    # Measure at 99.9% TSTOP, explicitly inside the unchanged simulation window.
+    # ngspice FIND at exact TSTOP can fail on floating point endpoint rounding.
     return f'''
 .meas tran output_mean AVG v(mag) FROM={settled[0]} TO={settled[1]}
 .meas tran ripple_v PP v(mag) FROM={settled[0]} TO={settled[1]}
@@ -54,7 +53,7 @@ def measures(nominal, step, release, settled, end):
 
 
 def switching_deck(kind,vin,vo,load,l1,l2,cap,derated,transfer=1e-6):
-    """Actual L/C/switch network with imposed duty. NO internal chip controller."""
+    """Actual power network, imposed fixed duty and input ramp, NOT chip soft-start."""
     if kind=='buck':
         freq=450000 if derated else 500000
         ramp=.004;step=.007;release=.010;off=.012;end=.018
@@ -95,14 +94,14 @@ Bpk ipk 0 V=abs(i(Vsense))
     else:raise ValueError('unknown switching topology')
     dt=1/(freq*30)
     return f'''EDV {kind} SWITCHED POWER STAGE - NOT A VENDOR MODEL
-* Open-loop imposed duty; startup ramp/load-step are test stimuli, not IC behavior.
+* Open-loop fixed duty with an INPUT VOLTAGE RAMP; this is NOT IC soft-start behavior.
+* Explicit PULSE edges give the solver breakpoints; no untracked comparator crossing.
 * DOES NOT verify compensation, soft start, current limit, hiccup or protection.
 * Ron/ESR/DCR/diode are assumptions; native capacitor totals are nominal, NOT effective.
-Vbus vin 0 PWL(0 0 100u {vin} {end} {vin})
+Vbus vin 0 PWL(0 0 {ramp} {vin} {end} {vin})
 Venable enable 0 PWL(0 1 {off} 1 {off+1e-6} 0 {end} 0)
-Vduty duty 0 PWL(0 0 100u 0 {ramp} {duty} {off} {duty} {off+1e-6} 0 {end} 0)
-Vsaw saw 0 PULSE(0 1 0 {1/freq-2e-9} 1n 1n {1/freq})
-Bdrive gate 0 V=(v(saw)<v(duty))*(v(enable)>0.5)
+Vpwm pwm 0 PULSE(0 1 0 1n 1n {duty/freq-1e-9} {1/freq})
+Bdrive gate 0 V=v(pwm)*(v(enable)>0.5)
 Vstep loadstep 0 PWL(0 0 {step} 0 {step+2e-6} 1 {release} 1 {release+2e-6} 0 {end} 0)
 {network}
 Bload out 0 I=v(out)*({0.5*load/vo}+{0.5*load/vo}*v(loadstep))
@@ -113,6 +112,7 @@ Rbleed out 0 2200
 .save v(mag) v(out) v(ipk) v(vin) v(gate)
 .tran {dt*5} {end} 0 {dt}
 {measures(vo,step,release,settle,end)}
+.meas tran gate_duty AVG v(gate) FROM={settle[0]} TO={settle[1]}
 .end
 '''
 
@@ -150,10 +150,11 @@ def make_cases(root=ROOT):
     assumptions=json.loads((root/'sim/power/assumptions.json').read_text())
     val=lambda ref:a.numeric(v[ref]);result=[]
     def append(name,kind,nominal,bindings,deck,**conditions):
+        if kind!='ldo':conditions['expected_gate_duty']=nominal/conditions['vin'] if kind=='buck' else (nominal+.5)/(conditions['vin']+nominal+.5)
         result.append({'id':name,'kind':kind,'nominal_v':nominal,'bindings':{r:v[r] for r in bindings},
                        'vendor_model':False,'fidelity':'IMPOSED_DUTY_POWER_STAGE' if kind!='ldo' else 'MAGNITUDE_BEHAVIORAL_ENVELOPE',
-                       'conditions':conditions,'deck':deck,'measures':MEASURES,
-                       'wave_signals':['v(mag)','v(ipk)','v(vin)']})
+                       'conditions':conditions,'deck':deck,'measures':MEASURES+(['gate_duty'] if kind!='ldo' else []),
+                       'wave_signals':['v(mag)','v(ipk)','v(vin)']+(['v(gate)'] if kind!='ldo' else [])})
     for i,rail in enumerate(['6V2_PRE','3V3_D','1V8_D']):
         base=210+i*10
         refs=[f'R{base}',f'R{base+1}',f'L{201+i}',f'C{base+3}',f'C{base+4}']
@@ -185,9 +186,13 @@ def make_cases(root=ROOT):
 
 def assess(case,measured):
     delta=abs(measured['output_mean']-case['nominal_v'])/case['nominal_v']
-    return {'qualification':'NOT_QUALIFIED','layout_allowed':False,'relative_mean_error':delta,
-            'screen':'OUTSIDE_5_PERCENT_SCREEN' if delta>.05 else 'WITHIN_5_PERCENT_SCREEN',
-            'interpretation':'Open-loop/behavioral case only; neither outcome is chip control-loop qualification.'}
+    r={'qualification':'NOT_QUALIFIED','layout_allowed':False,'relative_mean_error':delta,
+       'screen':'OUTSIDE_5_PERCENT_SCREEN' if delta>.05 else 'WITHIN_5_PERCENT_SCREEN',
+       'interpretation':'Open-loop/behavioral case only; neither outcome is chip control-loop qualification.'}
+    if 'expected_gate_duty' in case['conditions']:
+        r['gate_duty_absolute_error']=abs(measured['gate_duty']-case['conditions']['expected_gate_duty'])
+        r['solver_gate_ok']=r['gate_duty_absolute_error']<.001
+    return r
 
 
 def run_cases(cases,output,executable='ngspice',root=ROOT):
@@ -218,11 +223,12 @@ quit
         if completed.returncode:raise RuntimeError(f"{case['id']}: ngspice exit {completed.returncode}")
         logfile=path/'ngspice.log'
         if not logfile.is_file():raise ValueError('missing simulator log')
-        measured=parse_measures(logfile.read_text(),case['measures'])
+        measured=parse_measures(logfile.read_text(),case['measures']);assessment=assess(case,measured)
+        if assessment.get('solver_gate_ok') is False:raise ValueError('simulated PWM duty differs from imposed duty: '+case['id'])
         waveform=path/'waveform.dat'
         if not waveform.is_file() or waveform.stat().st_size<100:raise ValueError('missing/empty waveform')
         row={k:v for k,v in case.items() if k!='deck'}
-        row.update(measured=measured,assessment=assess(case,measured),
+        row.update(measured=measured,assessment=assessment,
                    deck_sha256=hashlib.sha256(case['deck'].encode()).hexdigest(),
                    executable=exe,command=invocation,
                    artifact_sha256={p.name:hashlib.sha256(p.read_bytes()).hexdigest()
