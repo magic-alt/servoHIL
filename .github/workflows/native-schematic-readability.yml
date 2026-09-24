@@ -37,10 +37,10 @@ jobs:
           python tools/verify_native_all.py build/readability/canonical.xml --stage supervision
           python tools/check_revb_netlist.py build/readability/canonical.xml "$native/expected_connections.json"
           NATIVE_NETLIST=build/readability/canonical.xml python -m unittest discover -s tests -v
-      - name: Wiring-equivalent to separately reviewed safety correction
+      - name: Frozen existing wiring and explicit safety delta
         run: |
-          python tools/check_native_readability.py --before docs/review/revb-readability/repair/corrected-baseline.xml --after build/readability/netlist.xml > build/readability/equivalence.json
-          cat build/readability/equivalence.json
+          python tools/check_native_safety.py build/readability/canonical.xml > build/readability/safety-delta.json
+          cat build/readability/safety-delta.json
       - name: Native ERC - do not suppress warnings
         run: |
           kicad-cli sch erc --format json --exit-code-violations -o build/readability/erc.json hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
