@@ -54,36 +54,21 @@ def report(root=ROOT):
             peak=stress['worst_peak']['peak_a'];rms=stress['worst_rms_a']
         else:
             stress=base['cuk'];side='lin' if ref=='L301' else 'lout'
-            # Conservative: use combined switch peak for each individual inductor's screening.
+            # CCM arithmetic only: invalid-mode corners cannot provide safe bounds.
             peak=stress['worst_switch']['switch_peak_a'];rms=stress['worst_'+side+'_rms_a']
         rows.append({'reference':ref,'part_number':mpn,'source_url':part['source_url'],
             'inductance_h':val(ref),'dcr_max_ohm_25c':part['dcr_max_ohm_25c'],
             'screen_peak_a':peak,'screen_rms_a':rms,
+            'stress_model_status':stress['status'],
             'catalog_isat_to_peak_ratio':part['isat_typ_a_30pct_25c']/peak,
             'catalog_irms20_to_screen_ratio':part['irms_ref_a_20c_rise']/rms,
             'copper_loss_w_at125c':copper_loss(rms,part['dcr_max_ohm_25c'],125),
             'qualification':'NOT_QUALIFIED','open':'L(I,T), AC/core loss, startup/short circuit, footprint and board heat',
             'ratings_basis':'25C catalog typical/reference, NOT guaranteed actual-board current limits'})
-    m=base['assumptions']['mlcc']
-    capacitor_banks=[
-        ('input_protected',['C105'],22e-6),
-        ('buck_6v2',['C213','C214'],20e-6),
-        ('buck_3v3',['C223','C224'],20e-6),
-        ('buck_1v8',['C233','C234'],20e-6),
-        ('lt3045_5v0',['C243','C244'],10e-6),
-        ('lt3045_5v2',['C263','C264'],10e-6),
-        ('lt3094_n5v2',['C423','C424'],10e-6)]
-    mlcc=[]
-    for name,refs,target in capacitor_banks:
-        total=sum(val(r) for r in refs)
-        r=a.mlcc_screen(total,1,m['tolerance_loss'],m['temperature_loss'],m['aging_loss'],target,None)
-        mlcc.append(dict(bank=name,references=refs,nominal_total_f=total,target_f=target,**r))
-    # These capacitance targets are not yet justified by loop/ripple validation.
-    for name,refs in [('cuk_transfer',['C410']),('cuk_output',['C414','C415'])]:
-        mlcc.append({'bank':name,'references':refs,'nominal_total_f':sum(val(r) for r in refs),
-                     'status':'BLOCKED_EFFECTIVE_C_TARGET_AND_CURVE','target_f':None})
+    mlcc=[dict(bank=name,**row) for name,row in base['mlcc'].items()]
     return {'status':'SCREENED_NOT_QUALIFIED','layout_allowed':False,'source_digest':a.content_digest(root),
             'magnetics':rows,'mlcc':mlcc,'thermal':base['thermal'],
+            'thermal_summary':base['thermal_summary'],'analytical_blocker_ids':base['blocker_ids'],
             'mlcc_curve_warning':'No vendor DC-bias curve imported. Interpolation helper is not a qualification certificate.'}
 
 

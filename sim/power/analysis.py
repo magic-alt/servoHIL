@@ -95,7 +95,13 @@ def cuk_stress(vin, magnitude, lin, lout, frequency, load, diode_drop, efficienc
     iin = magnitude*load/(vin*efficiency)
     di1 = vin*duty/(lin*frequency)
     di2 = vin*duty/(lout*frequency)
+    # During the diode interval its current is the sum of the two inductor
+    # current magnitudes. Individual reversal alone is NOT the DCM criterion.
+    valley = iin+load-(di1+di2)/2
     return {'duty':duty, 'input_average_a':iin, 'output_average_a':load,
+            'lin_valley_a':iin-di1/2, 'lout_valley_a':load-di2/2,
+            'switch_valley_a':valley, 'ccm_consistent':valley>0,
+            'stress_is_guaranteed_bound':False,
             'lin_ripple_a':di1, 'lout_ripple_a':di2,
             'lin_peak_a':iin+di1/2, 'lout_peak_a':load+di2/2,
             'lin_rms_a':math.sqrt(iin**2+di1**2/12),
@@ -132,6 +138,7 @@ def ldo_power(vin, vout, load, ground_current):
 def content_digest(root=ROOT):
     h = hashlib.sha256()
     paths = list((root/NATIVE).glob('*.kicad_sch')) + list((root/'sim').rglob('*'))
+    paths += [root/'tools/kicad_sexpr.py']
     for path in sorted(p for p in paths if p.is_file() and '__pycache__' not in str(p) and p.suffix != '.pyc'):
         h.update(str(path.relative_to(root)).encode()+b'\0'+path.read_bytes()+b'\0')
     return h.hexdigest()
@@ -171,17 +178,37 @@ def build_report(root=ROOT):
                 'efficiency_assumed':eta,'loss_upper_envelope_w':loss,'tj_screen_c':ta+theta*loss,
                 'status':'SENSITIVITY_NOT_THERMAL_QUALIFICATION'})
     c = a['cuk'];mag = divider(.8,val('R410'),val('R411'))
-    cuk_cases = [dict(vin=vin,frequency=freq,**cuk_stress(vin,mag,val('L301')*lf,val('L302')*lf,freq,c['output_load_a'],c['diode_drop_v'],c['efficiency']))
-                 for vin,freq,lf in itertools.product(a['vin_prot_v'],c['frequency_hz'],b['inductor_fraction'])]
-    report['cuk'] = {'nominal_v':-mag, 'worst_switch':max(cuk_cases,key=lambda r:r['switch_peak_a']),
+    # LT8330 negative FBX magnitude, pin-current and line-regulation bounds.
+    # The data-sheet table's reference VIN is 12 V. This is a static screening
+    # envelope, not a dynamic, loop-stability or dropout guarantee.
+    fblo, fbhi = divider_limits(min(c['feedback_magnitude_v']),max(c['feedback_magnitude_v']),
+                                val('R410'),val('R411'),tol)
+    line = c['line_regulation_fraction_per_v']*max(abs(v-12) for v in a['vin_prot_v'])
+    bias = c['feedback_bias_bound_a']*val('R410')*(1+tol)
+    maglo, maghi = fblo*(1-line)-bias, fbhi*(1+line)+bias
+    cuk_cases = [dict(vin=vin,frequency=freq,l_fraction=lf,load_fraction=loadf,magnitude_v=vo,
+                     **cuk_stress(vin,vo,val('L301')*lf,val('L302')*lf,freq,
+                                  c['output_load_a']*loadf,c['diode_drop_v'],c['efficiency']))
+                 for vin,vo,freq,lf,loadf in itertools.product(a['vin_prot_v'],[maglo,mag,maghi],
+                     c['frequency_hz'],b['inductor_fraction'],[.5,1.0])]
+    invalid = [r for r in cuk_cases if not r['ccm_consistent']]
+    report['cuk'] = {'nominal_v':-mag, 'magnitude_limits_v':[maglo,maghi],
+                     'static_bounds_basis':c['feedback_source'],
+                     'load_fractions':[.5,1.0], 'case_count':len(cuk_cases),
+                     'ccm_invalid_case_count':len(invalid), 'stress_is_guaranteed_bound':False,
+                     'minimum_switch_valley':min(cuk_cases,key=lambda r:r['switch_valley_a']),
+                     'worst_switch':max(cuk_cases,key=lambda r:r['switch_peak_a']),
                      'worst_lin_rms_a':max(r['lin_rms_a'] for r in cuk_cases),
                      'worst_lout_rms_a':max(r['lout_rms_a'] for r in cuk_cases),
                      'max_transfer_v':max(r['transfer_v'] for r in cuk_cases),
-                     'note':'0.15A Cuk load includes allowance for LT3094 GND current; assumptions documented'}
+                     'status':'CCM_NOT_VALID_ALL_CORNERS' if invalid else 'CCM_SCREEN_ONLY',
+                     'note':'0.15A full-load budget includes LT3094 GND allowance. Half-load matches the portable settled window. CCM-invalid numbers are not guaranteed stress bounds.'}
+    if invalid:
+        report['blocker_ids'].append('CUK_CCM_MODEL_LIMIT')
     l = a['ldo']
     for ref, rset, rail, device, supply in [('U211','R240','+5V0_DAC','LT3045',report['bucks']['6V2_PRE']['static_limits_v'][1]),
                                            ('U212','R260','+5V2_PVDD','LT3045',report['bucks']['6V2_PRE']['static_limits_v'][1]),
-                                           ('U302','R420','-5V2_PVSS','LT3094',mag*1.025)]:
+                                           ('U302','R420','-5V2_PVSS','LT3094',maghi)]:
         lo, hi = ldo_limits(val(rset),tol,min(l['set_current_a']),max(l['set_current_a']),l['offset_bound_v'])
         report['ldos'][rail] = {'nominal_magnitude_v':val(rset)*100e-6,'magnitude_limits_v':[lo,hi],
                                'ground_current_screen_a':l['gnd_current_screen_a'][device]}
@@ -208,12 +235,32 @@ def build_report(root=ROOT):
         'minimum_ohm_for_headroom':(d['requested_output_peak_v']+d['recommended_headroom_v']+l['offset_bound_v'])/(min(l['set_current_a'])*(1-tol)),
         'maximum_ohm_for_pvss_limit':(abs(d['minimum_pvss_v'])-d['dynamic_margin_v']-l['offset_bound_v'])/(max(l['set_current_a'])*(1+tol)),
         'action':'Review tighter rail accuracy or allowed output span; do not blindly lower RSET'}
-    m=a['mlcc']
-    report['mlcc']={}
-    for name,ref,count,target in [('buck_6v2','C213',2,20e-6),('ldo_5v0','C243',2,10e-6)]:
-        if ref not in values:
-            raise ValueError('native capacitor binding missing: '+ref)
-        report['mlcc'][name]=dict(ref=ref,**mlcc_screen(val(ref),count,m['tolerance_loss'],m['temperature_loss'],m['aging_loss'],target,m['bias_retention']))
+    # Summation must use EVERY installed capacitor, not the first value * count.
+    # Targets for input/CCM stages are engineering requirements, not qualification.
+    m=a['mlcc']; report['mlcc']={}
+    banks=[('input_protected',['C105'],22e-6),
+           ('buck_6v2',['C213','C214'],20e-6),('buck_3v3',['C223','C224'],20e-6),
+           ('buck_1v8',['C233','C234'],20e-6),('ldo_5v0',['C243','C244'],10e-6),
+           ('ldo_5v2',['C263','C264'],10e-6),('ldo_n5v2',['C423','C424'],10e-6),
+           ('cuk_transfer',['C410'],None),('cuk_output',['C414','C415'],None)]
+    for name,refs,target in banks:
+        total=sum(val(ref) for ref in refs)
+        row={'references':refs,'nominal_total_f':total,'target_f':target}
+        if target is None:
+            row.update(status='BLOCKED_EFFECTIVE_C_TARGET_AND_CURVE',effective_f=None)
+        else:
+            row.update(mlcc_screen(total,1,m['tolerance_loss'],m['temperature_loss'],
+                                   m['aging_loss'],target,m['bias_retention']))
+        report['mlcc'][name]=row
+    report['thermal_summary']=[]
+    for device in sorted({t['device'] for t in report['thermal']}):
+        worst=max((t for t in report['thermal'] if t['device']==device),key=lambda t:t['tj_screen_c'])
+        margin=l['junction_design_limit_c']-worst['tj_screen_c']
+        report['thermal_summary'].append(dict(worst,margin_c=margin,
+            design_limit_c=l['junction_design_limit_c'],
+            status='FAIL_ASSUMED_THERMAL_CORNER' if margin<0 else 'SCREEN_ONLY_NOT_QUALIFIED'))
+    if any(t['margin_c']<0 for t in report['thermal_summary']):
+        report['blocker_ids'].append('THERMAL_SENSITIVITY_OVER_DESIGN_LIMIT')
     report['blocker_ids'] += ['MLCC_DC_BIAS_CURVES','MAGNETICS_LOSS_AND_LAYOUT','SWITCHING_VENDOR_MODEL',
                              'INPUT_PROTECTION_ENERGY','PARTIAL_POWER_BACKFEED','BENCH_THERMAL_AND_TRANSIENT']
     for ref in sorted(values):
