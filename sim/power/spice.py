@@ -93,6 +93,10 @@ Bpk ipk 0 V=abs(i(Vsense))
 '''
     else:raise ValueError('unknown switching topology')
     dt=1/(freq*30)
+    # 1 ns edges were not resolved by ngspice-42 at this maximum step:
+    # D=0.773 integrated to 0.7744167. Use finite, period-scaled edges and
+    # compensate their triangular area, NOT a wider duty acceptance limit.
+    edge=1/(freq*100)
     return f'''EDV {kind} SWITCHED POWER STAGE - NOT A VENDOR MODEL
 * Open-loop fixed duty with an INPUT VOLTAGE RAMP; this is NOT IC soft-start behavior.
 * Explicit PULSE edges give the solver breakpoints; no untracked comparator crossing.
@@ -100,7 +104,7 @@ Bpk ipk 0 V=abs(i(Vsense))
 * Ron/ESR/DCR/diode are assumptions; native capacitor totals are nominal, NOT effective.
 Vbus vin 0 PWL(0 0 {ramp} {vin} {end} {vin})
 Venable enable 0 PWL(0 1 {off} 1 {off+1e-6} 0 {end} 0)
-Vpwm pwm 0 PULSE(0 1 0 1n 1n {duty/freq-1e-9} {1/freq})
+Vpwm pwm 0 PULSE(0 1 0 {edge} {edge} {duty/freq-edge} {1/freq})
 Bdrive gate 0 V=v(pwm)*(v(enable)>0.5)
 Vstep loadstep 0 PWL(0 0 {step} 0 {step+2e-6} 1 {release} 1 {release+2e-6} 0 {end} 0)
 {network}
@@ -152,7 +156,7 @@ def make_cases(root=ROOT):
     def append(name,kind,nominal,bindings,deck,**conditions):
         if kind!='ldo':conditions['expected_gate_duty']=nominal/conditions['vin'] if kind=='buck' else (nominal+.5)/(conditions['vin']+nominal+.5)
         result.append({'id':name,'kind':kind,'nominal_v':nominal,'bindings':{r:v[r] for r in bindings},
-                       'vendor_model':False,'fidelity':'IMPOSED_DUTY_POWER_STAGE' if kind!='ldo' else 'MAGNITUDE_BEHAVIORAL_ENVELOPE',
+                       'vendor_model':False,'load_model':'NOMINAL_RESISTIVE_LOAD_STEP','fidelity':'IMPOSED_DUTY_POWER_STAGE' if kind!='ldo' else 'MAGNITUDE_BEHAVIORAL_ENVELOPE',
                        'conditions':conditions,'deck':deck,'measures':MEASURES+(['gate_duty'] if kind!='ldo' else []),
                        'wave_signals':['v(mag)','v(ipk)','v(vin)']+(['v(gate)'] if kind!='ldo' else [])})
     for i,rail in enumerate(['6V2_PRE','3V3_D','1V8_D']):
@@ -196,54 +200,89 @@ def assess(case,measured):
 
 
 def run_cases(cases,output,executable='ngspice',root=ROOT):
+    """Run into a NEW directory; a failed or empty run cannot reuse old evidence."""
+    cases=list(cases)
+    if not cases:
+        raise ValueError('empty SPICE case matrix')
+    ids=[c['id'] for c in cases]
+    if len(set(ids))!=len(ids):
+        raise ValueError('duplicate SPICE case identifiers')
+    if any(not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*',name) for name in ids):
+        raise ValueError('unsafe SPICE case identifier')
     exe=shutil.which(executable)
     if exe is None:raise FileNotFoundError('ngspice missing; simulation was NOT run')
-    output.mkdir(parents=True,exist_ok=True)
-    version=subprocess.run([exe,'--version'],capture_output=True,text=True,check=True,timeout=15).stdout
-    results=[]
-    try:commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
-    except (subprocess.SubprocessError,FileNotFoundError):commit='UNVERSIONED'
-    for case in cases:
-        path=output/case['id'];path.mkdir(exist_ok=True)
-        (path/'bench.cir').write_text(case['deck'])
-        wrapper=case['deck'].rsplit('.end',1)[0]+f'''
+    output=Path(output).resolve()
+    # No exist_ok: this also closes the check/create race and rejects symlinks.
+    output.mkdir(parents=True,exist_ok=False)
+    try:
+        commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+        dirty=bool(subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True).strip())
+    except (subprocess.SubprocessError,FileNotFoundError):
+        commit='UNVERSIONED';dirty=True
+    report={'status':'RUNNING','layout_allowed':False,'source_commit':commit,
+            'source_worktree_dirty':dirty,'source_digest':analysis(root).content_digest(root),
+            'executable_sha256':hashlib.sha256(Path(exe).read_bytes()).hexdigest(),
+            'planned_case_ids':ids,'completed_case_count':0,'cases':[],
+            'vendor_model_cases':0,'bench_measurements':0}
+    def persist():
+        temp=output/'results.json.tmp'
+        temp.write_text(json.dumps(report,indent=2,allow_nan=False)+'\n')
+        temp.replace(output/'results.json')
+    persist()
+    current=None
+    try:
+        report['simulator_version']=subprocess.run(
+            [exe,'--version'],capture_output=True,text=True,check=True,timeout=15).stdout
+        for case in cases:
+            current=case['id']
+            path=output/current;path.mkdir()
+            (path/'bench.cir').write_text(case['deck'])
+            wrapper=case['deck'].rsplit('.end',1)[0]+f'''
 .control
 set wr_singlescale
 set wr_vecnames
+set numdgt=17
 run
 wrdata waveform.dat {' '.join(case['wave_signals'])}
 quit
 .endc
 .end
 '''
-        (path/'ngspice.cir').write_text(wrapper)
-        invocation=[exe,'-b','-o','ngspice.log','ngspice.cir']
-        completed=subprocess.run(invocation,cwd=path,capture_output=True,text=True,timeout=120)
-        (path/'process.txt').write_text(completed.stdout+'\n'+completed.stderr)
-        if completed.returncode:raise RuntimeError(f"{case['id']}: ngspice exit {completed.returncode}")
-        logfile=path/'ngspice.log'
-        if not logfile.is_file():raise ValueError('missing simulator log')
-        measured=parse_measures(logfile.read_text(),case['measures']);assessment=assess(case,measured)
-        if assessment.get('solver_gate_ok') is False:raise ValueError('simulated PWM duty differs from imposed duty: '+case['id'])
-        waveform=path/'waveform.dat'
-        if not waveform.is_file() or waveform.stat().st_size<100:raise ValueError('missing/empty waveform')
-        row={k:v for k,v in case.items() if k!='deck'}
-        row.update(measured=measured,assessment=assessment,
-                   deck_sha256=hashlib.sha256(case['deck'].encode()).hexdigest(),
-                   executable=exe,command=invocation,
-                   artifact_sha256={p.name:hashlib.sha256(p.read_bytes()).hexdigest()
-                                    for p in (path/'bench.cir',path/'ngspice.cir',logfile,waveform)})
-        results.append(row)
-        print(case['id'],json.dumps(measured),flush=True)
-        (output/'results.json').write_text(json.dumps({'status':'PARTIAL','cases':results},indent=2)+'\n')
-    report={'status':'EXECUTED_NOT_QUALIFIED','layout_allowed':False,'source_commit':commit,
-            'source_digest':analysis(root).content_digest(root),'simulator_version':version,'cases':results,
-            'vendor_model_cases':0,'bench_measurements':0}
-    (output/'results.json').write_text(json.dumps(report,indent=2,allow_nan=False)+'\n')
+            (path/'ngspice.cir').write_text(wrapper)
+            # -n excludes user/system spiceinit changes from reproducible runs.
+            invocation=[exe,'-n','-b','-o','ngspice.log','ngspice.cir']
+            completed=subprocess.run(invocation,cwd=path,capture_output=True,text=True,timeout=120)
+            (path/'process.txt').write_text(completed.stdout+'\n'+completed.stderr)
+            if completed.returncode:raise RuntimeError(f"{current}: ngspice exit {completed.returncode}")
+            logfile=path/'ngspice.log'
+            if not logfile.is_file():raise ValueError('missing simulator log')
+            measured=parse_measures(logfile.read_text(),case['measures']);assessment=assess(case,measured)
+            if assessment.get('solver_gate_ok') is False:
+                raise ValueError('simulated PWM duty differs from imposed duty: '+current)
+            waveform=path/'waveform.dat'
+            if not waveform.is_file() or waveform.stat().st_size<100:
+                raise ValueError('missing/empty waveform')
+            row={k:v for k,v in case.items() if k!='deck'}
+            row.update(measured=measured,assessment=assessment,
+                       deck_sha256=hashlib.sha256(case['deck'].encode()).hexdigest(),
+                       executable=exe,command=invocation,
+                       artifact_sha256={p.name:hashlib.sha256(p.read_bytes()).hexdigest()
+                                        for p in (path/'bench.cir',path/'ngspice.cir',
+                                                  path/'process.txt',logfile,waveform)})
+            report['cases'].append(row)
+            report['completed_case_count']=len(report['cases'])
+            persist()
+            print(current,json.dumps(measured),flush=True)
+    except (Exception,KeyboardInterrupt) as exc:
+        report.update(status='FAILED',failed_case=current,error=str(exc))
+        persist()
+        raise
+    report['status']='EXECUTED_NOT_QUALIFIED'
+    persist()
     lines=['# Portable SPICE results — not manufacturer simulation','',
            'Status: EXECUTED_NOT_QUALIFIED. All cases use imposed-duty stages or LDO envelopes.',
            '', '| Case | Mean V | Ripple Vpp | Peak A | Startup s | Screen |', '|---|---:|---:|---:|---:|---|']
-    for r in results:
+    for r in report['cases']:
         m=r['measured'];lines.append(f"| {r['id']} | {m['output_mean']:.5g} | {m['ripple_v']:.4g} | {m['current_peak']:.4g} | {m['startup_s']:.4g} | {r['assessment']['screen']} |")
     (output/'results.md').write_text('\n'.join(lines)+'\n')
     return report
