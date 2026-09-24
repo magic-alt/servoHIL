@@ -41,8 +41,14 @@ jobs:
           set -e
           test "$rc" -eq 2
           cat build/edv/strict-design.log
+      - name: Exact magnetic and MLCC candidate reports
+        run: |
+          python sim/power/qualification.py --output build/edv/components
+          python sim/power/capacitors.py --output build/edv/capacitors
       - name: Execute switching stages and LDO envelopes
         run: python sim/power/spice.py --output build/edv/spice
+      - name: Verify complete source-bound simulation evidence
+        run: python sim/power/evidence.py build/edv/spice --expected-source-commit "$(git rev-parse HEAD)" > build/edv/evidence-integrity.json
       - name: Show raw simulator failure context
         if: failure()
         run: |
