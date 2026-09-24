@@ -1,5 +1,5 @@
 name: reva-review-workbench
-# Temporary PR18 reviewed edit; removed after completion. Normal CI never rewrites native drawings.
+# Temporary PR18 reviewed edit; normal CI never rewrites native drawings.
 on:
   push:
     branches: [fix/reva-kicad-connectivity]
@@ -9,6 +9,9 @@ permissions:
 concurrency:
   group: reva-reviewed-edit
   cancel-in-progress: false
+defaults:
+  run:
+    shell: bash
 jobs:
   apply-reviewed-edit:
     runs-on: ubuntu-latest
@@ -23,6 +26,39 @@ jobs:
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends kicad kicad-symbols
+      - name: Apply independently reproduced native-vertex and field refinements
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('archive/revA/validation/_apply_digital_drawing.py')
+          s=p.read_text()
+          replacements={
+            'self.wire((241,y),(308,y))':'self.wire((241,y),(296,y),(308,y))',
+            'self.wire((197,y+8),(211,y+8),(211,y+10),(214,y+10))':'self.wire((197,y+8),(205,y+8),(211,y+8),(211,y+10),(214,y+10))',
+            "put(p,'at',expr(f'(at {mm(px)} {mm(py)} 0)'))":"put(p,'at',expr(f'(at {mm(px)} {mm(py)} {90 if angle in (90,270) else 0})'))",
+            '(-8,0,8,20,30)':'(-8,0,8,20,25)',
+            'y+30':'y+25', 'y+34':'y+29',
+            '[(32,140,None),(32,137,None)]':'[(32,140,None),(32,146,None)]',
+            '251,y-14,1.016':'278,y-12,1.016',
+            '102,10)':'102,12)',
+          }
+          for a,b in replacements.items():
+              assert a in s,a
+              s=s.replace(a,b)
+          a="        cap = next(s for s in items(self.defs['C'],'symbol')"
+          b="        for name in ('R','C','L','D'):\n            definition = self.defs[name]\n            put(definition,'pin_names',expr('(pin_names (offset 0) hide)'))\n            put(definition,'pin_numbers',expr('(pin_numbers hide)'))\n"+a
+          assert a in s
+          p.write_text(s.replace(a,b))
+          p=Path('archive/revA/validation/test_digital_drawing.py');s=p.read_text()
+          a='        self.parent = {p: p for p in points}'
+          b=a+'\n        conductive_points = {p for segment in self.segments for p in segment}\n        conductive_points.update(point(one(j, "at")) for j in items(tree, "junction"))'
+          assert a in s
+          s=s.replace(a,b)
+          a='if on_segment(p, a, b): self.parent[self.find(p)] = self.find(a)'
+          assert a in s
+          s=s.replace(a,'if p in conductive_points and on_segment(p, a, b): self.parent[self.find(p)] = self.find(a)')
+          p.write_text(s)
+          PY
       - name: Establish original main connectivity and reproduce drawing failures
         run: |
           mkdir -p build/reva-digital/main
@@ -52,18 +88,19 @@ jobs:
           python - <<'PY'
           import json
           from collections import Counter
+          assert json.load(open('build/reva-digital/pin-contract.json'))['result']=='PASS'
           r=json.load(open('build/reva-digital/erc.json'))
           violations=[v for s in r['sheets'] for v in s['violations']]
           print(Counter((v['severity'],v['type']) for v in violations))
           assert not [v for v in violations if v['severity']=='error']
           PY
           git diff --check
-      - name: Commit only independently verified native files
+      - name: Commit only independently verified native changes
         run: |
           native=archive/revA/snapshot/hardware/kicad/revA
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$native/03_digital_power.kicad_sch" "$native/servohil_digital_review.kicad_sym" "$native/sym-lib-table"
+          git add "$native/03_digital_power.kicad_sch" "$native/servohil_digital_review.kicad_sym" "$native/sym-lib-table" archive/revA/validation/_apply_digital_drawing.py archive/revA/validation/test_digital_drawing.py
           git commit -m 'fix(revA): draw continuous sequencer buck feedback and compensation circuits'
           git push origin HEAD:fix/reva-kicad-connectivity
           git rev-parse HEAD > build/reva-digital/source_commit.txt
