@@ -1,0 +1,285 @@
+{
+  "pages": {
+    "01_carrier_interface.kicad_sch": {
+      "global": 64,
+      "local": 0,
+      "wires": 70,
+      "ground_symbols": 6
+    },
+    "03_peripheral_boundaries.kicad_sch": {
+      "global": 43,
+      "local": 0,
+      "wires": 45,
+      "ground_symbols": 2
+    },
+    "04_dac_0_3.kicad_sch": {
+      "global": 40,
+      "local": 28,
+      "wires": 86,
+      "ground_symbols": 18
+    },
+    "05_dac_4_7.kicad_sch": {
+      "global": 40,
+      "local": 28,
+      "wires": 86,
+      "ground_symbols": 18
+    },
+    "06_analog_outputs.kicad_sch": {
+      "global": 8,
+      "local": 0,
+      "wires": 10,
+      "ground_symbols": 2
+    },
+    "10_input_protection.kicad_sch": {
+      "global": 12,
+      "local": 27,
+      "wires": 56,
+      "ground_symbols": 17
+    },
+    "20_positive_rails.kicad_sch": {
+      "global": 49,
+      "local": 57,
+      "wires": 148,
+      "ground_symbols": 42
+    },
+    "30_negative_reference.kicad_sch": {
+      "global": 22,
+      "local": 34,
+      "wires": 79,
+      "ground_symbols": 23
+    },
+    "40_power_supervision.kicad_sch": {
+      "global": 43,
+      "local": 37,
+      "wires": 108,
+      "ground_symbols": 28
+    },
+    "41_power_status.kicad_sch": {
+      "global": 6,
+      "local": 7,
+      "wires": 17,
+      "ground_symbols": 4
+    },
+    "servohil_io_revB.kicad_sch": {
+      "global": 0,
+      "local": 0,
+      "wires": 0,
+      "ground_symbols": 0
+    }
+  },
+  "global_total": 327,
+  "local_total": 218,
+  "repeated_cross_sheet_labels": [
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "1V8_D",
+      "count": 6
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC_SCLK",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC_LDAC_N",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC_RESET_N",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "+5V2_PVDD",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "+5V0_DAC",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "VREF_2V5",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "-5V2_PVSS",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "1V8_D",
+      "count": 6
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC_SCLK",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC_LDAC_N",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC_RESET_N",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "+5V2_PVDD",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "+5V0_DAC",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "VREF_2V5",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "-5V2_PVSS",
+      "count": 4
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "VIN_PROT",
+      "count": 6
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "INPUT_OK",
+      "count": 2
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "3V3_AON",
+      "count": 4
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "VIN_PROT",
+      "count": 9
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "INPUT_OK",
+      "count": 6
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "3V3_D",
+      "count": 7
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "1V8_D",
+      "count": 7
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "+5V0_DAC",
+      "count": 7
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "PG_5V0",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "3V3_AON",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "+5V2_PVDD",
+      "count": 7
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "PG_PVDD",
+      "count": 2
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "VIN_PROT",
+      "count": 4
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "-5V2_PVSS",
+      "count": 7
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "PG_PVSS",
+      "count": 2
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "+5V0_DAC",
+      "count": 3
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "VREF_2V5",
+      "count": 4
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "3V3_AON",
+      "count": 21
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "1V8_D",
+      "count": 3
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "INPUT_OK",
+      "count": 3
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "VREF_2V5",
+      "count": 3
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "HIL_ARM",
+      "count": 3
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "ARM_LATCH",
+      "count": 2
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "DAC_RESET_N",
+      "count": 2
+    },
+    {
+      "sheet": "41_power_status.kicad_sch",
+      "net": "HIL_FAULT_N",
+      "count": 3
+    },
+    {
+      "sheet": "41_power_status.kicad_sch",
+      "net": "HIL_ARM",
+      "count": 2
+    }
+  ],
+  "errors": []
+}
