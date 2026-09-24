@@ -1,5 +1,5 @@
 name: reva-review-workbench
-# One-shot branch-specific reviewed edit; removed after the review phases.
+# One-shot branch-specific reviewed edit; remove after final review.
 on:
   push:
     branches: [fix/reva-kicad-connectivity]
@@ -21,93 +21,82 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Confirm current main is already included
+      - name: Establish phase 1 and current main
         run: |
-          mkdir -p build/reva-phase1
+          mkdir -p build/reva-phase2
           git merge-base --is-ancestor origin/main HEAD
-          git rev-parse origin/main > build/reva-phase1/main-commit.txt
+          git merge-base --is-ancestor 615e1f18f09db599c783d7cc2c13f9410e251f5e HEAD
+          git rev-parse origin/main > build/reva-phase2/main-commit.txt
       - name: Install independent native exporter
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends kicad kicad-symbols
-          kicad-cli version | tee build/reva-phase1/kicad-version.txt
-      - name: Reproduce remaining global-interface failures
+          kicad-cli version | tee build/reva-phase2/kicad-version.txt
+      - name: Reproduce FPGA label-only links before editing
         run: |
           set +e
-          REVA_STAGE=power python archive/revA/validation/test_interface_wiring.py > build/reva-phase1/red.txt 2>&1
+          python archive/revA/validation/test_interface_wiring.py > build/reva-phase2/red.txt 2>&1
           code=$?
           set -e
           test "$code" = 1
-          grep -q 'test_digital_power_has_no_global_labels' build/reva-phase1/red.txt
-      - name: Apply phase 1 and native sheet-pin orientation correction
+          grep -q 'FAIL: test_fpga_private_links_are_wires_not_same_name_aliases' build/reva-phase2/red.txt
+      - name: Apply continuous FPGA wiring and complete matching hierarchy
         run: |
-          python archive/revA/validation/_migrate_interfaces.py
-          set +e
-          python archive/revA/validation/check_sheet_pin_sides.py > build/reva-phase1/sides-red.json
-          code=$?
-          set -e
-          test "$code" = 1
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('archive/revA/validation/_migrate_interfaces.py')
-          s=p.read_text();old="angle=180 if side=='right' else 0"
-          assert old in s
-          p.write_text(s.replace(old,"angle=0 if side=='right' else 180"))
-          PY
-          python archive/revA/validation/_migrate_interfaces.py
-          python archive/revA/validation/check_sheet_pin_sides.py | tee build/reva-phase1/sides-green.json
-      - name: Read-only drawing and native electrical validation
+          python archive/revA/validation/_wire_fpga_local.py
+          python archive/revA/validation/_migrate_interfaces.py --full
+      - name: Read-only drawing and independent native electrical validation
         run: |
           native=archive/revA/snapshot/hardware/kicad/revA
-          REVA_STAGE=power python archive/revA/validation/test_interface_wiring.py 2>&1 | tee build/reva-phase1/hierarchy-tests.txt
-          python archive/revA/validation/test_digital_drawing.py 2>&1 | tee build/reva-phase1/digital-tests.txt
-          kicad-cli sch export netlist --format kicadxml -o build/reva-phase1/netlist.xml "$native/servohil_io_revA.kicad_sch"
-          python archive/revA/validation/check_pin_contract.py build/reva-phase1/netlist.xml | tee build/reva-phase1/pin-contract.json
+          python archive/revA/validation/test_interface_wiring.py 2>&1 | tee build/reva-phase2/hierarchy-tests.txt
+          python archive/revA/validation/test_digital_drawing.py 2>&1 | tee build/reva-phase2/digital-tests.txt
+          python archive/revA/validation/check_sheet_pin_sides.py | tee build/reva-phase2/sheet-pins.json
+          kicad-cli sch export netlist --format kicadxml -o build/reva-phase2/netlist.xml "$native/servohil_io_revA.kicad_sch"
+          python archive/revA/validation/check_pin_contract.py build/reva-phase2/netlist.xml | tee build/reva-phase2/pin-contract.json
           python - <<'PY'
           import json,sys
           sys.path.insert(0,'tools')
           from check_native_readability import graph
-          actual=graph('build/reva-phase1/netlist.xml')
+          actual=graph('build/reva-phase2/netlist.xml')
           expected=json.load(open('archive/revA/validation/native_pin_contract.json'))['graph']
           assert actual==expected,'Native component/pin partition differs from original main'
           result={'result':'ELECTRICALLY_EQUIVALENT','components':len(actual['components']),'nets':len(actual['partition']),'pins':sum(map(len,actual['partition']))}
-          json.dump(result,open('build/reva-phase1/equivalence.json','w'),indent=2)
+          json.dump(result,open('build/reva-phase2/equivalence.json','w'),indent=2)
           print(result)
           PY
-          kicad-cli sch erc --format json --severity-all -o build/reva-phase1/erc.json "$native/servohil_io_revA.kicad_sch"
+          kicad-cli sch erc --format json --severity-all -o build/reva-phase2/erc.json "$native/servohil_io_revA.kicad_sch"
           python - <<'PY'
           import json,collections
-          r=json.load(open('build/reva-phase1/erc.json'))
+          r=json.load(open('build/reva-phase2/erc.json'))
           violations=[v for s in r['sheets'] for v in s['violations']]
           counts=collections.Counter(v['severity']+':'+v['type'] for v in violations)
-          json.dump(dict(counts),open('build/reva-phase1/erc-counts.json','w'),indent=2)
+          json.dump(dict(counts),open('build/reva-phase2/erc-counts.json','w'),indent=2)
           print(counts)
           assert not [v for v in violations if v['severity']=='error']
           PY
           git diff --check
-      - name: Export eight pages even when a native check fails
+      - name: Export eight pages for independent visual review
         if: always()
         run: |
-          kicad-cli sch export svg -o build/reva-phase1/svg/ archive/revA/snapshot/hardware/kicad/revA/servohil_io_revA.kicad_sch
-      - name: Commit phase 1 native files immediately
+          kicad-cli sch export svg -o build/reva-phase2/svg/ archive/revA/snapshot/hardware/kicad/revA/servohil_io_revA.kicad_sch
+      - name: Commit phase 2 native files immediately
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add archive/revA/snapshot/hardware/kicad/revA/*.kicad_sch archive/revA/validation/_migrate_interfaces.py
-          git commit -m 'fix(revA): phase 1 replace digital power globals with explicit hierarchy'
+          git add archive/revA/snapshot/hardware/kicad/revA/*.kicad_sch archive/revA/snapshot/hardware/kicad/revA/servohil_fpga_review.kicad_sym archive/revA/snapshot/hardware/kicad/revA/sym-lib-table
+          git commit -m 'fix(revA): phase 2 wire FPGA peripherals and replace all global interfaces'
           git push origin HEAD:fix/reva-kicad-connectivity
-          git rev-parse HEAD > build/reva-phase1/source_commit.txt
-      - name: Capture source and native evidence
+          git rev-parse HEAD > build/reva-phase2/source_commit.txt
+      - name: Capture exact source and native evidence
         if: always()
         run: |
-          git diff > build/reva-phase1/uncommitted.patch
-          git archive --format=zip -o build/reva-phase1/source.zip HEAD
-          tar -czf build/reva-phase1/native-working-copy.tar.gz archive/revA/snapshot/hardware/kicad/revA
-          git bundle create build/reva-phase1/review.bundle HEAD
+          git diff > build/reva-phase2/uncommitted.patch
+          git archive --format=zip -o build/reva-phase2/source.zip HEAD
+          tar -czf build/reva-phase2/native-working-copy.tar.gz archive/revA/snapshot/hardware/kicad/revA
+          git bundle create build/reva-phase2/review.bundle HEAD
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: reva-phase1-power-hierarchy
-          path: build/reva-phase1/
+          name: reva-phase2-fpga-hierarchy
+          path: build/reva-phase2/
           retention-days: 14
