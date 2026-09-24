@@ -1,0 +1,80 @@
+name: reva-native-schematic
+on:
+  push:
+    branches: [fix/reva-kicad-connectivity]
+    paths:
+      - 'archive/revA/**'
+      - '.github/workflows/reva-native-schematic.yml'
+  pull_request:
+    paths:
+      - 'archive/revA/**'
+      - '.github/workflows/reva-native-schematic.yml'
+permissions:
+  contents: read
+concurrency:
+  group: reva-native-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  native-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - name: Record exact source and baseline
+        run: |
+          mkdir -p build/reva
+          git rev-parse HEAD > build/reva/source_commit.txt
+          git rev-parse origin/main > build/reva/main_commit.txt
+          git archive --format=zip --output=build/reva/source.zip HEAD archive/revA tools tests
+          sha256sum build/reva/source.zip > build/reva/SHA256SUMS
+      - name: Install native KiCad
+        run: |
+          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
+          kicad-cli version | tee build/reva/kicad-version.txt
+      - name: Export actual hierarchy netlist
+        run: |
+          native=archive/revA/snapshot/hardware/kicad/revA
+          kicad-cli sch export netlist --format kicadxml -o build/reva/netlist.xml "$native/servohil_io_revA.kicad_sch" 2>&1 | tee build/reva/netlist-export.log
+          ! grep -qi 'annotation errors' build/reva/netlist-export.log
+      - name: Native ERC including existing exclusions
+        run: |
+          native=archive/revA/snapshot/hardware/kicad/revA
+          set +e
+          kicad-cli sch erc --format json --severity-all --exit-code-violations -o build/reva/erc.json "$native/servohil_io_revA.kicad_sch" 2>&1 | tee build/reva/erc.log
+          code=${PIPESTATUS[0]}
+          echo "$code" > build/reva/erc-exit-code.txt
+          python - <<'PY'
+          import collections, json
+          from pathlib import Path
+          p = Path('build/reva/erc.json')
+          if p.exists():
+              report = json.loads(p.read_text())
+              counts = collections.Counter()
+              for sheet in report.get('sheets', []):
+                  for v in sheet.get('violations', []):
+                      counts[(v.get('severity'), v.get('type'))] += 1
+                      print(sheet.get('path'), json.dumps(v, ensure_ascii=False))
+              print('ERC_COUNTS', dict(counts))
+          PY
+          exit "$code"
+      - name: Export native review pages
+        if: always()
+        run: |
+          native=archive/revA/snapshot/hardware/kicad/revA
+          mkdir -p build/reva/svg
+          kicad-cli sch export svg -o build/reva/svg/ "$native/servohil_io_revA.kicad_sch"
+      - name: Verify validation did not change native sources
+        if: always()
+        run: git diff --exit-code -- archive/revA
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reva-native-schematic
+          path: build/reva/
+          if-no-files-found: error
+          retention-days: 14
