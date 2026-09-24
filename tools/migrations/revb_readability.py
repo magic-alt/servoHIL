@@ -25,16 +25,20 @@ def main():
         apply(DST)
     else:
         import revb_wiring,revb_power_wiring,revb_supervision_wiring
+        from revb_wire_geometry import clean
         class PageScopedEditor(revb_wiring.Editor):
             def __init__(self,directory,name,title):
                 super().__init__(directory,name,title)
                 self.seq+=int(name.split('_')[0])*10000
                 self.original={r:s for r,s in self.original.items() if not r.startswith('#')}
             def label(self,net,p,side='left'):
-                # KiCad correctly warns if the SAME NAME is both local and global.
-                # True cross-page signals keep global scope; internal nets are local.
+                # Same-name global/local aliases cause ERC warnings. True cross-page
+                # signals retain global scope; all internal-only names remain local.
                 self.named.discard(net)
                 return super().label(net,p,side)
+            def finish(self):
+                clean(self)
+                return super().finish()
         revb_wiring.Editor=PageScopedEditor
         revb_power_wiring.Editor=PageScopedEditor
         revb_supervision_wiring.Editor=PageScopedEditor
