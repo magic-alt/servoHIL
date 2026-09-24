@@ -5,26 +5,27 @@ on:
   pull_request:
 permissions:
   contents: read
+concurrency:
+  group: native-readability-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   native-review:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Install native KiCad CLI
         run: |
-          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
+          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases >/tmp/ppa.log 2>&1
+          sudo apt-get update >/tmp/apt-update.log 2>&1
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints >/tmp/apt-install.log 2>&1
           mkdir -p build/readability
           kicad-cli version > build/readability/kicad-version.txt
       - name: Local-versus-cross-sheet label policy
         run: |
           python tools/check_native_readability.py --audit-only > build/readability/label-audit.json
           python tools/check_native_readability.py
-      - name: Actual native netlist and existing electrical assertions
+      - name: Actual native netlist and existing independent electrical assertions
         run: |
           native=hardware/kicad/revB/axu2cgb_expansion
           kicad-cli sch export netlist --format kicadxml -o build/readability/netlist.xml "$native/servohil_io_revB.kicad_sch"
@@ -32,13 +33,10 @@ jobs:
           python tools/verify_native_all.py build/readability/canonical.xml --stage supervision
           python tools/check_revb_netlist.py build/readability/canonical.xml "$native/expected_connections.json"
           NATIVE_NETLIST=build/readability/canonical.xml python -m unittest discover -s tests -p test_native_power_netlist.py -v
-      - name: Original-source pin graph equivalence
+      - name: Wiring-equivalent to the separately reviewed safety correction
         run: |
-          mkdir -p build/before
-          git archive 49cdeb395d31e2844b1f50189508aa9dbf940d40 hardware/kicad/revB/axu2cgb_expansion | tar -x -C build/before
-          before=build/before/hardware/kicad/revB/axu2cgb_expansion
-          kicad-cli sch export netlist --format kicadxml -o build/readability/before.xml "$before/servohil_io_revB.kicad_sch"
-          python tools/check_native_readability.py --before build/readability/before.xml --after build/readability/netlist.xml > build/readability/equivalence.json
+          python tools/check_native_readability.py --before docs/review/revb-readability/repair/corrected-baseline.xml --after build/readability/netlist.xml > build/readability/equivalence.json
+          cat build/readability/equivalence.json
       - name: Native ERC - do not suppress warnings
         run: |
           kicad-cli sch erc --format json --exit-code-violations -o build/readability/erc.json hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
