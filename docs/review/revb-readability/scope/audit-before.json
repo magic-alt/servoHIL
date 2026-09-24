@@ -1,0 +1,1034 @@
+{
+  "pages": {
+    "01_carrier_interface.kicad_sch": {
+      "global": 70,
+      "local": 0,
+      "wires": 70,
+      "ground_symbols": 0
+    },
+    "03_peripheral_boundaries.kicad_sch": {
+      "global": 45,
+      "local": 0,
+      "wires": 45,
+      "ground_symbols": 0
+    },
+    "04_dac_0_3.kicad_sch": {
+      "global": 86,
+      "local": 0,
+      "wires": 86,
+      "ground_symbols": 0
+    },
+    "05_dac_4_7.kicad_sch": {
+      "global": 86,
+      "local": 0,
+      "wires": 86,
+      "ground_symbols": 0
+    },
+    "06_analog_outputs.kicad_sch": {
+      "global": 10,
+      "local": 0,
+      "wires": 10,
+      "ground_symbols": 0
+    },
+    "10_input_protection.kicad_sch": {
+      "global": 56,
+      "local": 0,
+      "wires": 56,
+      "ground_symbols": 0
+    },
+    "20_positive_rails.kicad_sch": {
+      "global": 148,
+      "local": 0,
+      "wires": 148,
+      "ground_symbols": 0
+    },
+    "30_negative_reference.kicad_sch": {
+      "global": 79,
+      "local": 0,
+      "wires": 79,
+      "ground_symbols": 0
+    },
+    "40_power_supervision.kicad_sch": {
+      "global": 108,
+      "local": 0,
+      "wires": 108,
+      "ground_symbols": 0
+    },
+    "41_power_status.kicad_sch": {
+      "global": 17,
+      "local": 0,
+      "wires": 17,
+      "ground_symbols": 0
+    },
+    "servohil_io_revB.kicad_sch": {
+      "global": 0,
+      "local": 0,
+      "wires": 0,
+      "ground_symbols": 0
+    }
+  },
+  "global_total": 705,
+  "local_total": 0,
+  "repeated_cross_sheet_labels": [
+    {
+      "sheet": "01_carrier_interface.kicad_sch",
+      "net": "GND",
+      "count": 6
+    },
+    {
+      "sheet": "03_peripheral_boundaries.kicad_sch",
+      "net": "GND",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "1V8_D",
+      "count": 6
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC_SCLK",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC_LDAC_N",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC_RESET_N",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "GND",
+      "count": 18
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "+5V2_PVDD",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "+5V0_DAC",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "VREF_2V5",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC0_CVREF",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC0_CAP1",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC0_VOUT1",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC0_VOUT0",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC0_CAP0",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "-5V2_PVSS",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC1_CVREF",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC1_CAP1",
+      "count": 2
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC1_VOUT1",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC1_VOUT0",
+      "count": 4
+    },
+    {
+      "sheet": "04_dac_0_3.kicad_sch",
+      "net": "DAC1_CAP0",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "1V8_D",
+      "count": 6
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC_SCLK",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC_LDAC_N",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC_RESET_N",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "GND",
+      "count": 18
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "+5V2_PVDD",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "+5V0_DAC",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "VREF_2V5",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC2_CVREF",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC2_CAP1",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC2_VOUT1",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC2_VOUT0",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC2_CAP0",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "-5V2_PVSS",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC3_CVREF",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC3_CAP1",
+      "count": 2
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC3_VOUT1",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC3_VOUT0",
+      "count": 4
+    },
+    {
+      "sheet": "05_dac_4_7.kicad_sch",
+      "net": "DAC3_CAP0",
+      "count": 2
+    },
+    {
+      "sheet": "06_analog_outputs.kicad_sch",
+      "net": "GND",
+      "count": 2
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "VIN_RAW",
+      "count": 2
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "GND",
+      "count": 17
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "VIN_FUSED",
+      "count": 2
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "VIN_EFUSE",
+      "count": 7
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "UVLO_IN",
+      "count": 4
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "OVLO_IN",
+      "count": 3
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "PGTH_IN",
+      "count": 3
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "VIN_PROT",
+      "count": 6
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "INPUT_OK",
+      "count": 2
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "DVDT_IN",
+      "count": 2
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "ILIM_IN",
+      "count": 2
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "ITIMER_IN",
+      "count": 2
+    },
+    {
+      "sheet": "10_input_protection.kicad_sch",
+      "net": "3V3_AON",
+      "count": 4
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "VIN_PROT",
+      "count": 9
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "INPUT_OK",
+      "count": 6
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "GND",
+      "count": 42
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "BST_201",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "SW_201",
+      "count": 3
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "FB_201",
+      "count": 3
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "6V2_PRE",
+      "count": 17
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "BST_202",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "SW_202",
+      "count": 3
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "FB_202",
+      "count": 3
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "3V3_D",
+      "count": 7
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "BST_203",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "SW_203",
+      "count": 3
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "FB_203",
+      "count": 3
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "1V8_D",
+      "count": 7
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "ILIM_211",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "+5V0_DAC",
+      "count": 7
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "SET_211",
+      "count": 3
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "PG_5V0",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "PGFB_211",
+      "count": 3
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "3V3_AON",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "ILIM_212",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "+5V2_PVDD",
+      "count": 7
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "SET_212",
+      "count": 3
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "PG_PVDD",
+      "count": 2
+    },
+    {
+      "sheet": "20_positive_rails.kicad_sch",
+      "net": "PGFB_212",
+      "count": 3
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "VIN_PROT",
+      "count": 4
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "GND",
+      "count": 23
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "SW_NEG",
+      "count": 3
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "FB_NEG",
+      "count": 4
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "INTVCC_NEG",
+      "count": 2
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "NEG_X",
+      "count": 3
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "-6V2_PRE",
+      "count": 14
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "PGFB_PVSS",
+      "count": 3
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "ILIM_PVSS",
+      "count": 2
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "-5V2_PVSS",
+      "count": 7
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "SET_PVSS",
+      "count": 3
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "PG_PVSS",
+      "count": 2
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "+5V0_DAC",
+      "count": 3
+    },
+    {
+      "sheet": "30_negative_reference.kicad_sch",
+      "net": "VREF_2V5",
+      "count": 4
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "3V3_AON",
+      "count": 21
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "SENSE_401",
+      "count": 4
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "ANALOG_OK",
+      "count": 2
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "GND",
+      "count": 28
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "RAILS_OK",
+      "count": 6
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "1V8_D",
+      "count": 3
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "SENSE_402",
+      "count": 4
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "INPUT_OK",
+      "count": 3
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "SENSE_403",
+      "count": 4
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "VREF_2V5",
+      "count": 3
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "NEG_REF625",
+      "count": 5
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "NEG_FOLD",
+      "count": 6
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "NEG_VALID",
+      "count": 4
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "ANALOG_PG",
+      "count": 2
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "HIL_ARM",
+      "count": 3
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "ARM_LATCH",
+      "count": 2
+    },
+    {
+      "sheet": "40_power_supervision.kicad_sch",
+      "net": "DAC_RESET_N",
+      "count": 2
+    },
+    {
+      "sheet": "41_power_status.kicad_sch",
+      "net": "FAULT_BASE",
+      "count": 4
+    },
+    {
+      "sheet": "41_power_status.kicad_sch",
+      "net": "GND",
+      "count": 4
+    },
+    {
+      "sheet": "41_power_status.kicad_sch",
+      "net": "HIL_FAULT_N",
+      "count": 3
+    },
+    {
+      "sheet": "41_power_status.kicad_sch",
+      "net": "RELEASE_BASE",
+      "count": 3
+    },
+    {
+      "sheet": "41_power_status.kicad_sch",
+      "net": "HIL_ARM",
+      "count": 2
+    }
+  ],
+  "errors": [
+    "01_carrier_interface.kicad_sch: replace GND global text with a power symbol",
+    "01_carrier_interface.kicad_sch: replace GND global text with a power symbol",
+    "01_carrier_interface.kicad_sch: replace GND global text with a power symbol",
+    "01_carrier_interface.kicad_sch: replace GND global text with a power symbol",
+    "01_carrier_interface.kicad_sch: replace GND global text with a power symbol",
+    "01_carrier_interface.kicad_sch: replace GND global text with a power symbol",
+    "03_peripheral_boundaries.kicad_sch: replace GND global text with a power symbol",
+    "03_peripheral_boundaries.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_CVREF",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_CAP1",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_VOUT1",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_VOUT1",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_VOUT0",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_VOUT0",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_CAP0",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_CAP0",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_VOUT0",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_CAP1",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_VOUT1",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_VOUT0",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_VOUT1",
+    "04_dac_0_3.kicad_sch: page-only global DAC0_CVREF",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_CVREF",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_CAP1",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_VOUT1",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_VOUT1",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_VOUT0",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_VOUT0",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_CAP0",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_CAP0",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_VOUT0",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_CAP1",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_VOUT1",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_VOUT0",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_VOUT1",
+    "04_dac_0_3.kicad_sch: page-only global DAC1_CVREF",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "04_dac_0_3.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_CVREF",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_CAP1",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_VOUT1",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_VOUT1",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_VOUT0",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_VOUT0",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_CAP0",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_CAP0",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_VOUT0",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_CAP1",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_VOUT1",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_VOUT0",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_VOUT1",
+    "05_dac_4_7.kicad_sch: page-only global DAC2_CVREF",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_CVREF",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_CAP1",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_VOUT1",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_VOUT1",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_VOUT0",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_VOUT0",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_CAP0",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_CAP0",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_VOUT0",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_CAP1",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_VOUT1",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_VOUT0",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_VOUT1",
+    "05_dac_4_7.kicad_sch: page-only global DAC3_CVREF",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "05_dac_4_7.kicad_sch: replace GND global text with a power symbol",
+    "06_analog_outputs.kicad_sch: replace GND global text with a power symbol",
+    "06_analog_outputs.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global VIN_RAW",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global VIN_RAW",
+    "10_input_protection.kicad_sch: page-only global VIN_FUSED",
+    "10_input_protection.kicad_sch: page-only global VIN_EFUSE",
+    "10_input_protection.kicad_sch: page-only global VIN_FUSED",
+    "10_input_protection.kicad_sch: page-only global VIN_EFUSE",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global VIN_EFUSE",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global VIN_EFUSE",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global VIN_EFUSE",
+    "10_input_protection.kicad_sch: page-only global VIN_EFUSE",
+    "10_input_protection.kicad_sch: page-only global UVLO_IN",
+    "10_input_protection.kicad_sch: page-only global OVLO_IN",
+    "10_input_protection.kicad_sch: page-only global PGTH_IN",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global DVDT_IN",
+    "10_input_protection.kicad_sch: page-only global ILIM_IN",
+    "10_input_protection.kicad_sch: page-only global ITIMER_IN",
+    "10_input_protection.kicad_sch: page-only global VIN_EFUSE",
+    "10_input_protection.kicad_sch: page-only global UVLO_IN",
+    "10_input_protection.kicad_sch: page-only global UVLO_IN",
+    "10_input_protection.kicad_sch: page-only global OVLO_IN",
+    "10_input_protection.kicad_sch: page-only global OVLO_IN",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global PGTH_IN",
+    "10_input_protection.kicad_sch: page-only global PGTH_IN",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global ILIM_IN",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global DVDT_IN",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global ITIMER_IN",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: page-only global UVLO_IN",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "10_input_protection.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global BST_201",
+    "20_positive_rails.kicad_sch: page-only global SW_201",
+    "20_positive_rails.kicad_sch: page-only global FB_201",
+    "20_positive_rails.kicad_sch: page-only global SW_201",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: page-only global BST_201",
+    "20_positive_rails.kicad_sch: page-only global SW_201",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: page-only global FB_201",
+    "20_positive_rails.kicad_sch: page-only global FB_201",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global BST_202",
+    "20_positive_rails.kicad_sch: page-only global SW_202",
+    "20_positive_rails.kicad_sch: page-only global FB_202",
+    "20_positive_rails.kicad_sch: page-only global SW_202",
+    "20_positive_rails.kicad_sch: page-only global BST_202",
+    "20_positive_rails.kicad_sch: page-only global SW_202",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global FB_202",
+    "20_positive_rails.kicad_sch: page-only global FB_202",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global BST_203",
+    "20_positive_rails.kicad_sch: page-only global SW_203",
+    "20_positive_rails.kicad_sch: page-only global FB_203",
+    "20_positive_rails.kicad_sch: page-only global SW_203",
+    "20_positive_rails.kicad_sch: page-only global BST_203",
+    "20_positive_rails.kicad_sch: page-only global SW_203",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global FB_203",
+    "20_positive_rails.kicad_sch: page-only global FB_203",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: page-only global ILIM_211",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global SET_211",
+    "20_positive_rails.kicad_sch: page-only global PGFB_211",
+    "20_positive_rails.kicad_sch: page-only global SET_211",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global SET_211",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global ILIM_211",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global PGFB_211",
+    "20_positive_rails.kicad_sch: page-only global PGFB_211",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: page-only global ILIM_212",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global SET_212",
+    "20_positive_rails.kicad_sch: page-only global PGFB_212",
+    "20_positive_rails.kicad_sch: page-only global SET_212",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global SET_212",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global ILIM_212",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global PGFB_212",
+    "20_positive_rails.kicad_sch: page-only global PGFB_212",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: page-only global 6V2_PRE",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "20_positive_rails.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global SW_NEG",
+    "30_negative_reference.kicad_sch: page-only global FB_NEG",
+    "30_negative_reference.kicad_sch: page-only global INTVCC_NEG",
+    "30_negative_reference.kicad_sch: page-only global SW_NEG",
+    "30_negative_reference.kicad_sch: page-only global SW_NEG",
+    "30_negative_reference.kicad_sch: page-only global NEG_X",
+    "30_negative_reference.kicad_sch: page-only global NEG_X",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global NEG_X",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global INTVCC_NEG",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: page-only global FB_NEG",
+    "30_negative_reference.kicad_sch: page-only global FB_NEG",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: page-only global FB_NEG",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: page-only global PGFB_PVSS",
+    "30_negative_reference.kicad_sch: page-only global ILIM_PVSS",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: page-only global SET_PVSS",
+    "30_negative_reference.kicad_sch: page-only global SET_PVSS",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global SET_PVSS",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global ILIM_PVSS",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global PGFB_PVSS",
+    "30_negative_reference.kicad_sch: page-only global PGFB_PVSS",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: page-only global -6V2_PRE",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "30_negative_reference.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global SENSE_401",
+    "40_power_supervision.kicad_sch: page-only global ANALOG_OK",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global RAILS_OK",
+    "40_power_supervision.kicad_sch: page-only global SENSE_401",
+    "40_power_supervision.kicad_sch: page-only global SENSE_401",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global SENSE_401",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global SENSE_402",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global RAILS_OK",
+    "40_power_supervision.kicad_sch: page-only global SENSE_402",
+    "40_power_supervision.kicad_sch: page-only global SENSE_402",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global SENSE_402",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global SENSE_403",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global RAILS_OK",
+    "40_power_supervision.kicad_sch: page-only global SENSE_403",
+    "40_power_supervision.kicad_sch: page-only global SENSE_403",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global SENSE_403",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global RAILS_OK",
+    "40_power_supervision.kicad_sch: page-only global NEG_REF625",
+    "40_power_supervision.kicad_sch: page-only global NEG_FOLD",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global NEG_VALID",
+    "40_power_supervision.kicad_sch: page-only global NEG_FOLD",
+    "40_power_supervision.kicad_sch: page-only global NEG_FOLD",
+    "40_power_supervision.kicad_sch: page-only global NEG_REF625",
+    "40_power_supervision.kicad_sch: page-only global NEG_REF625",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global NEG_VALID",
+    "40_power_supervision.kicad_sch: page-only global NEG_REF625",
+    "40_power_supervision.kicad_sch: page-only global NEG_VALID",
+    "40_power_supervision.kicad_sch: page-only global NEG_FOLD",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global NEG_FOLD",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global NEG_FOLD",
+    "40_power_supervision.kicad_sch: page-only global NEG_REF625",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global ANALOG_PG",
+    "40_power_supervision.kicad_sch: page-only global ANALOG_PG",
+    "40_power_supervision.kicad_sch: page-only global NEG_VALID",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global ANALOG_OK",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global RAILS_OK",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: page-only global RAILS_OK",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "40_power_supervision.kicad_sch: replace GND global text with a power symbol",
+    "41_power_status.kicad_sch: page-only global FAULT_BASE",
+    "41_power_status.kicad_sch: replace GND global text with a power symbol",
+    "41_power_status.kicad_sch: page-only global RELEASE_BASE",
+    "41_power_status.kicad_sch: replace GND global text with a power symbol",
+    "41_power_status.kicad_sch: page-only global FAULT_BASE",
+    "41_power_status.kicad_sch: page-only global FAULT_BASE",
+    "41_power_status.kicad_sch: page-only global FAULT_BASE",
+    "41_power_status.kicad_sch: replace GND global text with a power symbol",
+    "41_power_status.kicad_sch: page-only global RELEASE_BASE",
+    "41_power_status.kicad_sch: page-only global RELEASE_BASE",
+    "41_power_status.kicad_sch: replace GND global text with a power symbol"
+  ]
+}
