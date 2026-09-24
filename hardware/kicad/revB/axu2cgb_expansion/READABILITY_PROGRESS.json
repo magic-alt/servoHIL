@@ -4,13 +4,14 @@
     "scope",
     "positive",
     "input",
-    "negative"
+    "negative",
+    "dac"
   ],
   "source_hashes": {
     "01_carrier_interface.kicad_sch": "f9ba5307a2c15da9ad3626f5dd1524ddd5cdfa4f225acdbd66cd4d893072e2d8",
     "03_peripheral_boundaries.kicad_sch": "e40cb026254fde37936888a28e8e34cb84afee95e846a27c259da37b080c40f0",
-    "04_dac_0_3.kicad_sch": "215b9118e97994fc73084dcb5467b7c4f250196255899c96f7cbdd9528dd8eea",
-    "05_dac_4_7.kicad_sch": "e81d607530ae28ebcaf4aad52f7d7c54220eb0192cbcfa56d4e72ddfdd03b674",
+    "04_dac_0_3.kicad_sch": "310f4610e691c3624d49c71af95c101e510b169d1010ac122d3838e11ca374c3",
+    "05_dac_4_7.kicad_sch": "43fca8207c94eb5e4cc35ee595b76d7ef40233048ca0056496a3ff3f30e432e4",
     "06_analog_outputs.kicad_sch": "aa8f319a1ce6fd7d85279a5632583e5628302bf79063de5d421e46ca03adae45",
     "10_input_protection.kicad_sch": "79d14f1367b9ff51504412d33a5cc523ed3c9a9b3fa5f3c39bbae7c3b052204f",
     "20_positive_rails.kicad_sch": "57e4dee2e8372d49f04d536086f182e750b626ff3a70bc83436b17f09093412e",
