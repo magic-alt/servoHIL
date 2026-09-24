@@ -6,6 +6,7 @@ on:
     branches: [feat/revb-hardware-safety-chain]
     paths:
       - tools/migrations/pr21_native_safety.py
+      - tools/migrations/pr21_finish_native.py
       - tools/check_native_safety.py
       - tests/test_native_safety.py
       - .github/workflows/revb-safety-native-bootstrap.yml
@@ -32,6 +33,8 @@ jobs:
           sudo apt-get update >/tmp/apt-update.log 2>&1
           sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints ngspice >/tmp/apt-install.log 2>&1
           kicad-cli version > build/bootstrap/kicad-version.txt
+      - name: Apply reviewed ERC, package and readability corrections
+        run: python tools/migrations/pr21_finish_native.py --apply
       - name: Actual native netlist, independent pin and frozen-delta checks
         run: |
           native=hardware/kicad/revB/axu2cgb_expansion
@@ -57,7 +60,7 @@ jobs:
           if os.environ['GITHUB_REPOSITORY'] != 'magic-alt/servoHIL' or os.environ['GITHUB_REF'] != 'refs/heads/feat/revb-hardware-safety-chain':
               raise SystemExit('branch/repository guard')
           prefix='hardware/kicad/revB/axu2cgb_expansion/'
-          names=['50_watchdog_interlock.kicad_sch','60_dut_permit.kicad_sch','06_analog_outputs.kicad_sch','40_power_supervision.kicad_sch','servohil_io_revB.kicad_sch','safety.kicad_sym','sym-lib-table','expected_connections.json']
+          names=['50_watchdog_interlock.kicad_sch','60_dut_permit.kicad_sch','06_analog_outputs.kicad_sch','40_power_supervision.kicad_sch','servohil_io_revB.kicad_sch','safety.kicad_sym','sym-lib-table','expected_connections.json','footprints/Capacitor_SMD.pretty/C_0603_1608Metric.kicad_mod','footprints/Package_SO.pretty/TSSOP-16_4.4x5mm_P0.65mm.kicad_mod']
           allowed={prefix+n for n in names}
           changed=set(subprocess.check_output(['git','diff','--name-only'],text=True).splitlines())
           untracked=set(subprocess.check_output(['git','ls-files','--others','--exclude-standard',prefix],text=True).splitlines())
