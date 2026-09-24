@@ -11,7 +11,7 @@ concurrency:
 jobs:
   analytical-and-spice:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,3 +19,35 @@ jobs:
           python-version: '3.12'
       - name: Electrical regressions
         run: python -m unittest discover -s tests -p 'test_edv*.py' -v
+      - name: Native-bound analytical report
+        run: |
+          python sim/power/analysis.py --output build/edv/analytical
+          set +e
+          python sim/power/analysis.py --strict-design --output build/edv/analytical > build/edv/strict-design.log 2>&1
+          rc=$?
+          set -e
+          test "$rc" -eq 2
+          cat build/edv/strict-design.log
+      - name: Install ngspice
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ngspice
+          ngspice --version
+      - name: Execute switching stages and LDO envelopes
+        run: python sim/power/spice.py --output build/edv/spice
+      - name: Confirm native hardware and qualification gates unchanged
+        run: git diff --exit-code -- hardware archive
+      - name: Exact source and run identity
+        if: always()
+        run: |
+          mkdir -p build/edv
+          git rev-parse HEAD > build/edv/source_commit.txt
+          git rev-parse HEAD^{tree} > build/edv/source_tree.txt
+          git archive --format=zip -o build/edv/source.zip HEAD
+          sha256sum build/edv/source.zip > build/edv/source.zip.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: revb-electrical-verification
+          path: build/edv/
+          if-no-files-found: error
