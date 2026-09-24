@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
 from check_native_readability import graph
+import native_peripheral_rules as peripheral
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT/'docs/review/revb-readability/repair/corrected-baseline.xml'
@@ -75,10 +76,11 @@ passive('R703','10k','PERMIT_BASE',GND)
 
 def check(source: str | Path, baseline: str | Path = BASELINE) -> dict:
     old, new = graph(baseline), graph(source)
-    oldrefs=set(old['components'])
-    if set(new['components']) != oldrefs | set(PARTS):
+    oldrefs=set(old['components']) - peripheral.REMOVED_RESERVED
+    if set(new['components']) != oldrefs | set(PARTS) | set(peripheral.PARTS):
         raise ValueError('unexpected or missing physical component set')
-    for ref,attributes in {**old['components'],**PARTS}.items():
+    retained={r:a for r,a in old['components'].items() if r in oldrefs}
+    for ref,attributes in {**retained,**PARTS,**peripheral.PARTS}.items():
         if new['components'][ref] != attributes:
             raise ValueError('component/value/footprint changed: '+ref)
     moved={f'J5.{p}' for p in range(1,9)}
@@ -115,7 +117,8 @@ def check(source: str | Path, baseline: str | Path = BASELINE) -> dict:
     for n,net in enumerate(('DUT_PERMIT_A','DUT_PERMIT_B')):
         if members[net] != {f'U701.{3+n}',f'J701.{1+n}'}:
             raise ValueError('permit contact not independently floating: '+net)
-    return {'result':'PIN_CONTRACT_PASS_NOT_HARDWARE_QUALIFIED',
+    peripheral_result=peripheral.check_pins(nets,members)
+    return {**peripheral_result, 'result':'PIN_CONTRACT_PASS_NOT_HARDWARE_QUALIFIED',
             'frozen_existing_components':len(oldrefs),'new_components':len(PARTS),
             'new_pin_assertions':len(PINS),'connector_delta_pins':8,
             'layout_allowed':False,'physical_validation':'NOT_RUN'}
