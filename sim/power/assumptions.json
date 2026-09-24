@@ -49,9 +49,9 @@
     ],
     "theta_status": "89 is DS41326 p4 single-layer test-board figure; 120 is layout sensitivity, neither proves actual PCB thermal behavior",
     "load_budget_a": {
-      "6V2_PRE": 0.5,
-      "3V3_D": 0.3,
-      "1V8_D": 0.3
+      "6V2_PRE": 0.55,
+      "3V3_D": 0.7,
+      "1V8_D": 0.32
     }
   },
   "ldo": {
@@ -63,7 +63,7 @@
     "offset_bound_v": 0.002,
     "set_current_status": "LT3045 RevD p3 / LT3094 RevB p4 full electrical-condition min/max, not initial +/-1%",
     "load_budget_a": {
-      "+5V0_DAC": 0.2,
+      "+5V0_DAC": 0.25,
       "+5V2_PVDD": 0.12,
       "-5V2_PVSS": 0.12
     },
@@ -119,5 +119,18 @@
     "requested_output_peak_v": 5.0,
     "dynamic_margin_v": 0.05,
     "source": "AD3542R RevC electrical/AC conditions pp4-6, recommended headroom/footroom p5"
+  },
+  "peripheral_load_revision": {
+    "basis": "PR22 additive reservation on top of the full pre-PR22 budgets; deliberately conservative, not a measured total",
+    "previous_buck_a": {
+      "6V2_PRE": 0.5,
+      "3V3_D": 0.3,
+      "1V8_D": 0.3
+    },
+    "previous_5v0_ldo_a": 0.2,
+    "new_adc_avcc_a": 0.05,
+    "new_adc_vdrive_a": 0.0019,
+    "phy_basis": "Five THVD1450 loaded-driver stress cases, not just quiescent Icc; see sim/peripherals/screen.py",
+    "qualification": "AON, loaded dynamics, simultaneous faults and board thermal remain BLOCKED"
   }
 }
