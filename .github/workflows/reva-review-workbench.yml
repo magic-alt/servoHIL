@@ -1,0 +1,50 @@
+name: reva-review-workbench
+# Temporary PR #18 review transport; removed after native edits are verified.
+on:
+  push:
+    branches: [fix/reva-kicad-connectivity]
+    paths: ['.github/workflows/reva-review-workbench.yml']
+permissions:
+  contents: read
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install matching native tooling
+        run: |
+          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols
+      - name: Package native review runtime for the offline workbench
+        run: |
+          mkdir -p build/reva-tooling/runtime/bin build/reva-tooling/runtime/lib build/reva-tooling/runtime/share/kicad/symbols
+          python - <<'PY'
+          import pathlib, re, shutil, subprocess
+          dst = pathlib.Path('build/reva-tooling/runtime')
+          entries = [pathlib.Path('/usr/bin/kicad-cli')]
+          entries += [p for p in pathlib.Path('/usr/bin').glob('*eeschema*kiface')]
+          entries += [p for p in pathlib.Path('/usr/lib').rglob('*kicommon*.so*') if p.is_file()]
+          libs = set()
+          for entry in entries:
+              shutil.copy2(entry, dst/'bin'/entry.name, follow_symlinks=True)
+              result = subprocess.run(['ldd', str(entry)], capture_output=True, text=True, check=True)
+              print(entry, result.stdout)
+              libs.update(re.findall(r'(/[^\s()]+)', result.stdout))
+          for lib in sorted(libs):
+              p = pathlib.Path(lib)
+              if p.is_file():
+                  shutil.copy2(p, dst/'lib'/p.name, follow_symlinks=True)
+          shutil.copy2('/usr/share/kicad/symbols/power.kicad_sym', dst/'share/kicad/symbols/power.kicad_sym')
+          PY
+          kicad-cli version > build/reva-tooling/runtime/VERSION
+          dpkg-query -W kicad kicad-symbols > build/reva-tooling/runtime/PACKAGES
+          tar -C build/reva-tooling -czf build/reva-native-runtime.tar.gz runtime
+          sha256sum build/reva-native-runtime.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reva-native-runtime
+          path: build/reva-native-runtime.tar.gz
+          retention-days: 1
+          if-no-files-found: error
