@@ -1,5 +1,5 @@
 name: reva-review-workbench
-# Temporary PR #18 one-shot edit. Ordinary validation never writes schematics.
+# Temporary PR18 reviewed edit; removed after completion. Normal CI never rewrites native drawings.
 on:
   push:
     branches: [fix/reva-kicad-connectivity]
@@ -23,66 +23,75 @@ jobs:
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends kicad kicad-symbols
-      - name: Establish original main intent and reproduce four DAC splits
+      - name: Establish original main connectivity and reproduce drawing failures
         run: |
-          mkdir -p build/reva-edit/main
+          mkdir -p build/reva-digital/main
+          kicad-cli version | tee build/reva-digital/kicad-version.txt
           native=archive/revA/snapshot/hardware/kicad/revA
-          git archive 8a1d00a06bd3dac5758fd14a551b9f27e5e5358e archive/revA | tar -x -C build/reva-edit/main
-          kicad-cli sch export netlist --format kicadxml -o build/reva-edit/main.xml "build/reva-edit/main/$native/servohil_io_revA.kicad_sch"
-          kicad-cli sch export netlist --format kicadxml -o build/reva-edit/before.xml "$native/servohil_io_revA.kicad_sch"
+          git archive 8a1d00a06bd3dac5758fd14a551b9f27e5e5358e archive/revA | tar -x -C build/reva-digital/main
+          kicad-cli sch export netlist --format kicadxml -o build/reva-digital/main.xml "build/reva-digital/main/$native/servohil_io_revA.kicad_sch"
+          kicad-cli sch export netlist --format kicadxml -o build/reva-digital/before.xml "$native/servohil_io_revA.kicad_sch"
           set +e
-          python archive/revA/validation/check_pin_contract.py build/reva-edit/before.xml > build/reva-edit/red.json
+          python archive/revA/validation/test_digital_drawing.py > build/reva-digital/red.txt 2>&1
           code=$?
           set -e
+          cat build/reva-digital/red.txt
           test "$code" = 1
-          python - <<'PY'
-          import json
-          r=json.load(open('build/reva-edit/red.json'))
-          assert {v.get('expected_net') for v in r['issues']}=={'DAC2_VOUT0','DAC2_VOUT1','DAC3_VOUT0','DAC3_VOUT1'}, r
-          assert all(v['kind']=='split' for v in r['issues'])
-          print('RED: four disconnected DAC output/feedback groups')
-          PY
-      - name: Apply and independently verify native DAC repair
+          grep -q 'Sheet-local functional circuits are still label islands' build/reva-digital/red.txt
+      - name: Apply reviewed native drawing
+        run: python archive/revA/validation/_apply_digital_drawing.py
+      - name: Native verification and eight-page rendering
         run: |
-          python archive/revA/validation/_apply_reviewed_dac_layout.py
           native=archive/revA/snapshot/hardware/kicad/revA
-          kicad-cli sch export netlist --format kicadxml -o build/reva-edit/after.xml "$native/servohil_io_revA.kicad_sch"
-          python archive/revA/validation/check_pin_contract.py build/reva-edit/after.xml | tee build/reva-edit/green.json
-          python tools/check_native_readability.py --before build/reva-edit/main.xml --after build/reva-edit/after.xml | tee build/reva-edit/original-equivalence.json
-          kicad-cli sch erc --format json --severity-all -o build/reva-edit/erc.json "$native/servohil_io_revA.kicad_sch"
+          python archive/revA/validation/test_digital_drawing.py 2>&1 | tee build/reva-digital/geometry.txt
+          kicad-cli sch export netlist --format kicadxml -o build/reva-digital/after.xml "$native/servohil_io_revA.kicad_sch"
+          python archive/revA/validation/check_pin_contract.py build/reva-digital/after.xml | tee build/reva-digital/pin-contract.json
+          python tools/check_native_readability.py --before build/reva-digital/main.xml --after build/reva-digital/after.xml | tee build/reva-digital/original-equivalence.json
+          kicad-cli sch erc --format json --severity-all -o build/reva-digital/erc.json "$native/servohil_io_revA.kicad_sch"
+          kicad-cli sch export svg -o build/reva-digital/svg/ "$native/servohil_io_revA.kicad_sch"
           python - <<'PY'
           import json
-          r=json.load(open('build/reva-edit/erc.json'))
-          assert not [v for s in r['sheets'] for v in s['violations'] if v['severity']=='error']
+          from collections import Counter
+          r=json.load(open('build/reva-digital/erc.json'))
+          violations=[v for s in r['sheets'] for v in s['violations']]
+          print(Counter((v['severity'],v['type']) for v in violations))
+          assert not [v for v in violations if v['severity']=='error']
           PY
-          kicad-cli sch export svg -o build/reva-edit/svg/ "$native/servohil_io_revA.kicad_sch"
           git diff --check
+      - name: Commit only independently verified native files
+        run: |
+          native=archive/revA/snapshot/hardware/kicad/revA
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$native/07_dac_4_7.kicad_sch"
-          git commit -m 'fix(revA): wire U22/U23 feedback outputs and match the reviewed DAC layout'
+          git add "$native/03_digital_power.kicad_sch" "$native/servohil_digital_review.kicad_sym" "$native/sym-lib-table"
+          git commit -m 'fix(revA): draw continuous sequencer buck feedback and compensation circuits'
           git push origin HEAD:fix/reva-kicad-connectivity
-          git rev-parse HEAD > build/reva-edit/dac_commit.txt
-      - name: Freeze complete independently exported native pin partition
+          git rev-parse HEAD > build/reva-digital/source_commit.txt
+      - name: Run complete current repository regression suite
+        if: success()
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          import hashlib,json,sys
-          sys.path.insert(0,'tools')
-          from check_native_readability import graph
-          source=Path('build/reva-edit/main.xml')
-          record={'schema':1,'provenance':{'source_commit':'8a1d00a06bd3dac5758fd14a551b9f27e5e5358e','project':'archive/revA/snapshot/hardware/kicad/revA/servohil_io_revA.kicad_sch','native_netlist_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'exporter':'KiCad 10.0.6','scope':'Connectivity intent only; not package, stability, thermal or fabrication approval.'},'graph':graph(source)}
-          Path('archive/revA/validation/native_pin_contract.json').write_text(json.dumps(record,indent=2)+'\n')
-          PY
-          git add archive/revA/validation/native_pin_contract.json
-          git commit -m 'test(revA): freeze all-sheet native pin partition from original main'
-          git push origin HEAD:fix/reva-kicad-connectivity
-          git rev-parse HEAD > build/reva-edit/source_commit.txt
-          git archive --format=zip -o build/reva-edit/source.zip HEAD archive/revA tools tests
+          kicad-cli sch export netlist --format kicadxml -o build/reva-digital/revb.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+          python tools/check_native_readability.py --normalize build/reva-digital/revb.xml --output build/reva-digital/revb-canonical.xml
+          set +e
+          NATIVE_NETLIST=build/reva-digital/revb-canonical.xml python -m unittest discover -s tests -v > build/reva-digital/full-tests.txt 2>&1
+          code=$?
+          set -e
+          echo "$code" > build/reva-digital/full-tests.exit
+          cat build/reva-digital/full-tests.txt
+          exit "$code"
+      - name: Capture exact source and diff for review
+        if: always()
+        run: |
+          mkdir -p build/reva-digital
+          git rev-parse HEAD > build/reva-digital/checked-out-commit.txt
+          git diff --stat > build/reva-digital/uncommitted-stat.txt
+          git diff > build/reva-digital/uncommitted.patch
+          git archive --format=zip -o build/reva-digital/source.zip HEAD
+          tar -czf build/reva-digital/native-working-copy.tar.gz archive/revA/snapshot/hardware/kicad/revA
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: reva-dac-repair
-          path: build/reva-edit/
+          name: reva-continuous-digital
+          path: build/reva-digital/
           if-no-files-found: error
           retention-days: 14
