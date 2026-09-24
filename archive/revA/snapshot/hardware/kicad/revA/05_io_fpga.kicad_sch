@@ -1863,9 +1863,7 @@
     (stroke (width 0) (type default))
     (uuid "fd9ef3a5-d433-4467-9ee5-170134949091")
   )
-  (label "SAFE_STAGE1" (at 353.06 110.49 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "d8d8d8d8-0000-4000-8028-000000002876"))
+  
   (wire
     (pts
       (xy 350.52 100.33) (xy 353.06 100.33)
@@ -1898,9 +1896,7 @@
     (stroke (width 0) (type default))
     (uuid "ca9ea35c-e4c8-4a70-ba3b-1762bf07277c")
   )
-  (label "SAFE_STAGE1" (at 317.5 149.86 180)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "d8d8d8d8-0000-4000-8028-00000000287e"))
+  
   (wire
     (pts
       (xy 320.04 160.02) (xy 317.5 160.02)
@@ -1928,9 +1924,7 @@
     (stroke (width 0) (type default))
     (uuid "0e8dc547-1494-49d3-86fa-cb595b27b2ef")
   )
-  (label "SAFE_RELEASE_3V3" (at 353.06 154.94 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "d8d8d8d8-0000-4000-8028-000000002881"))
+  
   (wire
     (pts
       (xy 350.52 144.78) (xy 353.06 144.78)
@@ -1974,9 +1968,7 @@
     (stroke (width 0) (type default))
     (uuid "bf8d48ea-2a8c-4a3c-9851-9a5ac4dd8716")
   )
-  (label "SAFE_RELEASE_3V3" (at 317.5 199.39 180)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "d8d8d8d8-0000-4000-8028-00000000288b"))
+  
   (wire
     (pts
       (xy 320.04 204.47) (xy 317.5 204.47)
@@ -2054,5 +2046,75 @@
     (effects (font (size 1.2 1.2)) (justify left bottom)) (uuid "d8d8d8d8-0000-4000-8028-000000002895"))
   (text "DAC_RESET_N defaults LOW via R234; release requires FPGA_DONE + SEQ_DONE + external watchdog OK, then a 3V3->1V8 translator." (exclude_from_sim no) (at 25.4 250.19 0)
     (effects (font (size 1.2 1.2)) (justify left bottom)) (uuid "d8d8d8d8-0000-4000-8028-000000002896"))
+  (wire
+    (pts
+      (xy 353.06 110.49) (xy 363.22 110.49)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000001")
+  )
+  (wire
+    (pts
+      (xy 363.22 110.49) (xy 363.22 134.62)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000002")
+  )
+  (wire
+    (pts
+      (xy 363.22 134.62) (xy 307.34 134.62)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000003")
+  )
+  (wire
+    (pts
+      (xy 307.34 134.62) (xy 307.34 149.86)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000004")
+  )
+  (wire
+    (pts
+      (xy 307.34 149.86) (xy 317.5 149.86)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000005")
+  )
+  (wire
+    (pts
+      (xy 353.06 154.94) (xy 363.22 154.94)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000006")
+  )
+  (wire
+    (pts
+      (xy 363.22 154.94) (xy 363.22 181.61)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000007")
+  )
+  (wire
+    (pts
+      (xy 363.22 181.61) (xy 307.34 181.61)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000008")
+  )
+  (wire
+    (pts
+      (xy 307.34 181.61) (xy 307.34 199.39)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000009")
+  )
+  (wire
+    (pts
+      (xy 307.34 199.39) (xy 317.5 199.39)
+    )
+    (stroke (width 0) (type default))
+    (uuid "1818f5f5-0518-4000-8000-000000000010")
+  )
   (sheet_instances (path "/" (page "6")))
 )
