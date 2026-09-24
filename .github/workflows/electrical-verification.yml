@@ -1,0 +1,73 @@
+name: revb-electrical-verification
+on:
+  push:
+    branches: [feat/revb-electrical-verification]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: edv-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  analytical-and-spice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ngspice
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ngspice
+          ngspice --version
+      - name: Record reproducible simulator runtime
+        run: |
+          mkdir -p build/edv/runtime
+          cp "$(command -v ngspice)" build/edv/runtime/ngspice
+          cp /usr/share/doc/ngspice/copyright build/edv/runtime/COPYRIGHT
+          ngspice --version > build/edv/runtime/version.txt
+          ldd "$(command -v ngspice)" > build/edv/runtime/ldd.txt
+          sha256sum build/edv/runtime/ngspice > build/edv/runtime/ngspice.sha256
+      - name: Electrical regressions
+        run: python -m unittest discover -s tests -p 'test_edv*.py' -v
+      - name: Native-bound analytical report
+        run: |
+          python sim/power/analysis.py --output build/edv/analytical
+          set +e
+          python sim/power/analysis.py --strict-design --output build/edv/analytical > build/edv/strict-design.log 2>&1
+          rc=$?
+          set -e
+          test "$rc" -eq 2
+          cat build/edv/strict-design.log
+      - name: Exact magnetic and MLCC candidate reports
+        run: |
+          python sim/power/qualification.py --output build/edv/components
+          python sim/power/capacitors.py --output build/edv/capacitors
+      - name: Execute switching stages and LDO envelopes
+        run: python sim/power/spice.py --output build/edv/spice
+      - name: Verify complete source-bound simulation evidence
+        run: python sim/power/evidence.py build/edv/spice --expected-source-commit "$(git rev-parse HEAD)" > build/edv/evidence-integrity.json
+      - name: Show raw simulator failure context
+        if: failure()
+        run: |
+          if test -d build/edv/spice; then
+            find build/edv/spice -name ngspice.log -print -exec tail -n 100 {} \;
+          fi
+      - name: Confirm native hardware and qualification gates unchanged
+        run: git diff --exit-code -- hardware archive
+      - name: Exact source and run identity
+        if: always()
+        run: |
+          mkdir -p build/edv
+          git rev-parse HEAD > build/edv/source_commit.txt
+          git rev-parse HEAD^{tree} > build/edv/source_tree.txt
+          git archive --format=zip -o build/edv/source.zip HEAD
+          sha256sum build/edv/source.zip > build/edv/source.zip.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: revb-electrical-verification
+          path: build/edv/
+          if-no-files-found: error

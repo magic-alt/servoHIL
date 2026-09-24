@@ -17,6 +17,15 @@ hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_pro
 
 当前原生工程包含 11 页：载板接口、输入保护、正电源、负电源/参考、电源监控、状态输出、外设边界、两页 DAC、模拟输出和顶层索引。输入/稳压/参考/电源判定有实际器件电路；**独立心跳 watchdog、AO disconnect、完整 DUT 硬件禁止、ADC/数字 PHY 仍未完成，不能称为可生产的完整 HIL 板。**
 
+## Electrical Design Verification
+
+当前开发先完成电气验证，不继续扩展 ADC/PHY 或 PCB Layout。
+[EDV 使用说明](sim/power/README.md) 包含原生器件驱动计算、25 工况 ngspice、
+LTspice 厂商模型准备、具体磁性器件/MLCC 候选及证据校验。
+[已复核结果与阻塞项](docs/review/revb-edv/README.md) 明确区分自动化通过与电气不合格：
+双模拟电源全条件裕量、Cuk 模型适用性、热、降容与实测仍需关闭。
+**仿真执行成功不授权布局；`--strict-design` 当前应返回 2。**
+
 ## 原理图编辑规则
 
 `.kicad_sch/.kicad_sym/.kicad_pro`、项目库表及封装库是活动设计源，可直接人工编辑。页内优先导线与标准电源符号；仅真正跨页的信号使用 global label，页内反馈等网络使用 local label。不要用同名 global/local 混合标签消除视觉重复。
