@@ -35,6 +35,12 @@ jobs:
           ngspice --version
       - name: Execute switching stages and LDO envelopes
         run: python sim/power/spice.py --output build/edv/spice
+      - name: Show raw simulator failure context
+        if: failure()
+        run: |
+          if test -d build/edv/spice; then
+            find build/edv/spice -name ngspice.log -print -exec tail -n 100 {} \;
+          fi
       - name: Confirm native hardware and qualification gates unchanged
         run: git diff --exit-code -- hardware archive
       - name: Exact source and run identity
