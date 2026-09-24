@@ -1,5 +1,5 @@
 name: reva-review-workbench
-# One-shot, branch-specific reviewed edit. Remove after the three review phases.
+# One-shot branch-specific reviewed edit; removed after the review phases.
 on:
   push:
     branches: [fix/reva-kicad-connectivity]
@@ -40,8 +40,23 @@ jobs:
           set -e
           test "$code" = 1
           grep -q 'test_digital_power_has_no_global_labels' build/reva-phase1/red.txt
-      - name: Apply phase 1 power hierarchy
-        run: python archive/revA/validation/_migrate_interfaces.py
+      - name: Apply phase 1 and native sheet-pin orientation correction
+        run: |
+          python archive/revA/validation/_migrate_interfaces.py
+          set +e
+          python archive/revA/validation/check_sheet_pin_sides.py > build/reva-phase1/sides-red.json
+          code=$?
+          set -e
+          test "$code" = 1
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('archive/revA/validation/_migrate_interfaces.py')
+          s=p.read_text();old="angle=180 if side=='right' else 0"
+          assert old in s
+          p.write_text(s.replace(old,"angle=0 if side=='right' else 180"))
+          PY
+          python archive/revA/validation/_migrate_interfaces.py
+          python archive/revA/validation/check_sheet_pin_sides.py | tee build/reva-phase1/sides-green.json
       - name: Read-only drawing and native electrical validation
         run: |
           native=archive/revA/snapshot/hardware/kicad/revA
@@ -61,7 +76,6 @@ jobs:
           print(result)
           PY
           kicad-cli sch erc --format json --severity-all -o build/reva-phase1/erc.json "$native/servohil_io_revA.kicad_sch"
-          kicad-cli sch export svg -o build/reva-phase1/svg/ "$native/servohil_io_revA.kicad_sch"
           python - <<'PY'
           import json,collections
           r=json.load(open('build/reva-phase1/erc.json'))
@@ -72,11 +86,15 @@ jobs:
           assert not [v for v in violations if v['severity']=='error']
           PY
           git diff --check
+      - name: Export eight pages even when a native check fails
+        if: always()
+        run: |
+          kicad-cli sch export svg -o build/reva-phase1/svg/ archive/revA/snapshot/hardware/kicad/revA/servohil_io_revA.kicad_sch
       - name: Commit phase 1 native files immediately
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add archive/revA/snapshot/hardware/kicad/revA/*.kicad_sch
+          git add archive/revA/snapshot/hardware/kicad/revA/*.kicad_sch archive/revA/validation/_migrate_interfaces.py
           git commit -m 'fix(revA): phase 1 replace digital power globals with explicit hierarchy'
           git push origin HEAD:fix/reva-kicad-connectivity
           git rev-parse HEAD > build/reva-phase1/source_commit.txt
