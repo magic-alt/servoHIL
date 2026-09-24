@@ -124,7 +124,7 @@ def draw_root():
         s[:]=[n for n in s if not (isinstance(n,list) and n and n[0]=='pin')]
         child=parse((NATIVE/filename).read_text())
         for n in items(child,'hierarchical_label'):
-            name=n[1];xx,yy,side=locations[(p,name)];angle=180 if side=='right' else 0
+            name=n[1];xx,yy,side=locations[(p,name)];angle=0 if side=='right' else 180
             s.append(expr(f'(pin "{name}" {shape(p,name)} (at {mm(xx)} {mm(yy)} {angle}) (effects (font (size 1.016 1.016))) (uuid "{uid("root/"+p+"/"+name)}"))'))
             ports[(p,name)]=(xx,yy)
         tree.append(s)

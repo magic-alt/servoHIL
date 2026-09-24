@@ -617,10 +617,13 @@
     (stroke (width 0.1524) (type solid))
     (uuid "872c6912-d214-415a-b6c9-34c03d23e2ba")
   )
-  (global_label "1V0_FPGA" (shape bidirectional) (at 186.69 60.96 180)
-    (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "d8d8d8d8-0000-4000-8027-0000000027d4") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 186.69 60.96 0)
-      (effects (font (size 1.27 1.27)) (hide yes))))
+  (hierarchical_label "1V0_FPGA"
+  (shape input)
+  (at 186.69 60.96 180)
+  (fields_autoplaced yes)
+  (effects (font (size 1.27 1.27)) (justify right))
+  (uuid "d8d8d8d8-0000-4000-8027-0000000027d4")
+)
   (wire
     (pts
       (xy 189.23 66.04) (xy 186.69 66.04)
@@ -628,10 +631,13 @@
     (stroke (width 0.1524) (type solid))
     (uuid "882c6aa5-f9e9-4c87-8d1f-9c71c30fad31")
   )
-  (global_label "1V8_D" (shape bidirectional) (at 186.69 66.04 180)
-    (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "d8d8d8d8-0000-4000-8027-0000000027d5") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 186.69 66.04 0)
-      (effects (font (size 1.27 1.27)) (hide yes))))
+  (hierarchical_label "1V8_D"
+  (shape input)
+  (at 186.69 66.04 180)
+  (fields_autoplaced yes)
+  (effects (font (size 1.27 1.27)) (justify right))
+  (uuid "d8d8d8d8-0000-4000-8027-0000000027d5")
+)
   (wire
     (pts
       (xy 189.23 71.12) (xy 186.69 71.12)
@@ -639,10 +645,13 @@
     (stroke (width 0.1524) (type solid))
     (uuid "852c65ec-826a-4b00-a376-0422314c4dcc")
   )
-  (global_label "3V3_D" (shape bidirectional) (at 186.69 71.12 180)
-    (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "d8d8d8d8-0000-4000-8027-0000000027d6") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 186.69 71.12 0)
-      (effects (font (size 1.27 1.27)) (hide yes))))
+  (hierarchical_label "3V3_D"
+  (shape input)
+  (at 186.69 71.12 180)
+  (fields_autoplaced yes)
+  (effects (font (size 1.27 1.27)) (justify right))
+  (uuid "d8d8d8d8-0000-4000-8027-0000000027d6")
+)
   (wire
     (pts
       (xy 189.23 76.2) (xy 186.69 76.2)
@@ -1744,10 +1753,13 @@
     (stroke (width 0.1524) (type solid))
     (uuid "8d9c04be-b7ff-4bec-bfd9-07e22c22f852")
   )
-  (global_label "3V3_AON" (shape bidirectional) (at 317.5 52.07 180)
-    (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "d8d8d8d8-0000-4000-8028-000000002864") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 317.5 52.07 0)
-      (effects (font (size 1.27 1.27)) (hide yes))))
+  (hierarchical_label "3V3_AON"
+  (shape input)
+  (at 317.5 52.07 180)
+  (fields_autoplaced yes)
+  (effects (font (size 1.27 1.27)) (justify right))
+  (uuid "d8d8d8d8-0000-4000-8028-000000002864")
+)
   (wire
     (pts
       (xy 320.04 59.69) (xy 317.5 59.69)
@@ -1842,10 +1854,13 @@
     (stroke (width 0.1524) (type solid))
     (uuid "fb9ef07f-8489-4e0d-8b91-e66328bcfba3")
   )
-  (global_label "SEQ_DONE" (shape bidirectional) (at 317.5 115.57 180)
-    (fields_autoplaced yes) (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "d8d8d8d8-0000-4000-8028-000000002874") (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 317.5 115.57 0)
-      (effects (font (size 1.27 1.27)) (hide yes))))
+  (hierarchical_label "SEQ_DONE"
+  (shape input)
+  (at 317.5 115.57 180)
+  (fields_autoplaced yes)
+  (effects (font (size 1.27 1.27)) (justify right))
+  (uuid "d8d8d8d8-0000-4000-8028-000000002874")
+)
   (wire
     (pts
       (xy 320.04 120.65) (xy 317.5 120.65)

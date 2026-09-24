@@ -658,13 +658,12 @@
     (pin "2" (uuid "e9e9e9e9-0000-4000-8030-000000003085"))
     (instances (project "servohil_io_revA" (path "/1f3c2e9d-402a-4939-add2-7a9add96aad6" (reference "C362") (unit 1))))
   )
-  (global_label "1V8_D"
-    (shape bidirectional)
-    (at 38.1 21.59 180)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "5bbf1bfe-5b8a-5bd3-8179-f488d407ce7d")
-    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 38.1 21.59 0) (effects (font (size 1.27 1.27)) (hide yes)))
-  )
+  (hierarchical_label "1V8_D"
+  (shape input)
+  (at 38.1 21.59 180)
+  (effects (font (size 1.27 1.27)) (justify right))
+  (uuid "5bbf1bfe-5b8a-5bd3-8179-f488d407ce7d")
+)
   (global_label "DAC_ALERT2_N"
     (shape bidirectional)
     (at 38.1 95.25 180)
