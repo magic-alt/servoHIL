@@ -1,5 +1,5 @@
 name: readability-apply
-# One-shot editor for the user-authorized repair branch; never runs on main or forks.
+# Temporary one-shot editor; restricted to the user-authorized repair branch.
 on:
   push:
     branches: [fix/revb-schematic-wiring-readability]
@@ -21,62 +21,13 @@ jobs:
           fetch-depth: 0
       - name: Install KiCad
         run: |
-          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints poppler-utils
+          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases >/tmp/ppa.log 2>&1
+          sudo apt-get update >/tmp/apt-update.log 2>&1
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints poppler-utils >/tmp/apt-install.log 2>&1
           mkdir -p build/readability-stage
-          kicad-cli version > build/readability-stage/kicad-version.txt
-      - name: Capture actual native baseline
-        run: |
-          kicad-cli sch export netlist --format kicadxml -o build/readability-stage/before.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
-          python tools/check_native_readability.py --audit-only > build/readability-stage/audit-before.json
-          if test "$(cat tools/migrations/readability-stage.txt)" = scope; then
-            if python tools/check_native_readability.py > build/readability-stage/red.txt 2>&1; then
-              echo 'Expected legacy label-scope regression did not reproduce'; exit 1
-            fi
-            grep 'page-only global' build/readability-stage/red.txt
-          fi
-      - name: Apply a single guarded source stage
-        run: python tools/migrations/revb_readability.py --stage "$(cat tools/migrations/readability-stage.txt)"
-      - name: Validate wiring and unchanged electrical circuit
-        run: |
-          native=hardware/kicad/revB/axu2cgb_expansion
-          kicad-cli sch export netlist --format kicadxml -o build/readability-stage/netlist.xml "$native/servohil_io_revB.kicad_sch"
-          python tools/check_native_readability.py --before build/readability-stage/before.xml --after build/readability-stage/netlist.xml | tee build/readability-stage/equivalence.json
-          python tools/check_native_readability.py > build/readability-stage/audit-after.json
-          python tools/check_native_readability.py --normalize build/readability-stage/netlist.xml --output build/readability-stage/canonical.xml
-          python tools/verify_native_all.py build/readability-stage/canonical.xml --stage supervision
-          python tools/check_revb_netlist.py build/readability-stage/canonical.xml "$native/expected_connections.json"
-          NATIVE_NETLIST=build/readability-stage/canonical.xml python -m unittest discover -s tests -p test_native_power_netlist.py -v
-          kicad-cli sch erc --format json --exit-code-violations -o build/readability-stage/erc.json "$native/servohil_io_revB.kicad_sch"
-          python tools/check_revb_erc.py build/readability-stage/erc.json
-      - name: Export native review and commit verified source
-        run: |
-          stage=$(cat tools/migrations/readability-stage.txt)
-          native=hardware/kicad/revB/axu2cgb_expansion
-          review=docs/review/revb-readability
-          mkdir -p "$review/$stage"
-          kicad-cli sch export pdf -o "$review/schematic-review.pdf" "$native/servohil_io_revB.kicad_sch"
-          cp build/readability-stage/audit-before.json build/readability-stage/audit-after.json build/readability-stage/equivalence.json "$review/$stage/"
-          git config user.name 'servoHIL schematic review'
-          git config user.email '59996146+magic-alt@users.noreply.github.com'
-          git add "$native" "$review"
-          git commit -m "fix(schematic): verified $stage native wiring and label cleanup"
-          git push origin HEAD:fix/revb-schematic-wiring-readability
-          git rev-parse HEAD > build/readability-stage/source_commit.txt
-          git archive --format=zip --output=build/readability-stage/native-source.zip HEAD hardware/kicad/revB/axu2cgb_expansion
-      - name: Diagnostics
-        if: always()
-        run: |
-          python - <<'PY'
-          import json,pathlib
-          p=pathlib.Path('build/readability-stage/erc.json')
-          if p.exists():
-              for s in json.loads(p.read_text()).get('sheets',[]):
-                  for v in s.get('violations',[]):
-                      print(v.get('type'),v.get('severity'),v.get('description'))
-                      for i in v.get('items',[]):print(i.get('description'))
-          PY
+          kicad-cli version | tee build/readability-stage/kicad-version.txt
+      - name: Edit and independently verify each part before its Git commit
+        run: python tools/migrations/readability_run.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
