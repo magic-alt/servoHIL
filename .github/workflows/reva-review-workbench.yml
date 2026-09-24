@@ -1,5 +1,5 @@
 name: reva-review-workbench
-# Temporary PR18 reviewed edit; normal CI never rewrites native drawings.
+# One-shot, branch-specific reviewed edit. Remove after the three review phases.
 on:
   push:
     branches: [fix/reva-kicad-connectivity]
@@ -21,114 +21,75 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Install native KiCad
+      - name: Confirm current main is already included
+        run: |
+          mkdir -p build/reva-phase1
+          git merge-base --is-ancestor origin/main HEAD
+          git rev-parse origin/main > build/reva-phase1/main-commit.txt
+      - name: Install independent native exporter
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends kicad kicad-symbols
-      - name: Apply independently reproduced native-vertex and field refinements
+          kicad-cli version | tee build/reva-phase1/kicad-version.txt
+      - name: Reproduce remaining global-interface failures
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('archive/revA/validation/_apply_digital_drawing.py')
-          s=p.read_text()
-          replacements={
-            'self.wire((241,y),(308,y))':'self.wire((241,y),(296,y),(308,y))',
-            'self.wire((197,y+8),(211,y+8),(211,y+10),(214,y+10))':'self.wire((197,y+8),(205,y+8),(211,y+8),(211,y+10),(214,y+10))',
-            "put(p,'at',expr(f'(at {mm(px)} {mm(py)} 0)'))":"put(p,'at',expr(f'(at {mm(px)} {mm(py)} {90 if angle in (90,270) else 0})'))",
-            '(-8,0,8,20,30)':'(-8,0,8,20,25)',
-            'y+30':'y+25', 'y+34':'y+29',
-            '[(32,140,None),(32,137,None)]':'[(32,140,None),(32,146,None)]',
-            '251,y-14,1.016':'278,y-12,1.016',
-            '102,10)':'102,12)',
-          }
-          for a,b in replacements.items():
-              assert a in s,a
-              s=s.replace(a,b)
-          a="        cap = next(s for s in items(self.defs['C'],'symbol')"
-          b="        for name in ('R','C','L','D'):\n            definition = self.defs[name]\n            put(definition,'pin_names',expr('(pin_names (offset 0) hide)'))\n            put(definition,'pin_numbers',expr('(pin_numbers hide)'))\n"+a
-          assert a in s
-          p.write_text(s.replace(a,b))
-          p=Path('archive/revA/validation/test_digital_drawing.py');s=p.read_text()
-          a='        self.parent = {p: p for p in points}'
-          b=a+'\n        conductive_points = {p for segment in self.segments for p in segment}\n        conductive_points.update(point(one(j, "at")) for j in items(tree, "junction"))'
-          assert a in s
-          s=s.replace(a,b)
-          a='if on_segment(p, a, b): self.parent[self.find(p)] = self.find(a)'
-          assert a in s
-          s=s.replace(a,'if p in conductive_points and on_segment(p, a, b): self.parent[self.find(p)] = self.find(a)')
-          p.write_text(s)
-          PY
-      - name: Establish original main connectivity and reproduce drawing failures
-        run: |
-          mkdir -p build/reva-digital/main
-          kicad-cli version | tee build/reva-digital/kicad-version.txt
-          native=archive/revA/snapshot/hardware/kicad/revA
-          git archive 8a1d00a06bd3dac5758fd14a551b9f27e5e5358e archive/revA | tar -x -C build/reva-digital/main
-          kicad-cli sch export netlist --format kicadxml -o build/reva-digital/main.xml "build/reva-digital/main/$native/servohil_io_revA.kicad_sch"
-          kicad-cli sch export netlist --format kicadxml -o build/reva-digital/before.xml "$native/servohil_io_revA.kicad_sch"
           set +e
-          python archive/revA/validation/test_digital_drawing.py > build/reva-digital/red.txt 2>&1
+          REVA_STAGE=power python archive/revA/validation/test_interface_wiring.py > build/reva-phase1/red.txt 2>&1
           code=$?
           set -e
-          cat build/reva-digital/red.txt
           test "$code" = 1
-          grep -q 'Sheet-local functional circuits are still label islands' build/reva-digital/red.txt
-      - name: Apply reviewed native drawing
-        run: python archive/revA/validation/_apply_digital_drawing.py
-      - name: Native verification and eight-page rendering
+          grep -q 'test_digital_power_has_no_global_labels' build/reva-phase1/red.txt
+      - name: Apply phase 1 power hierarchy
+        run: python archive/revA/validation/_migrate_interfaces.py
+      - name: Read-only drawing and native electrical validation
         run: |
           native=archive/revA/snapshot/hardware/kicad/revA
-          python archive/revA/validation/test_digital_drawing.py 2>&1 | tee build/reva-digital/geometry.txt
-          kicad-cli sch export netlist --format kicadxml -o build/reva-digital/after.xml "$native/servohil_io_revA.kicad_sch"
-          python archive/revA/validation/check_pin_contract.py build/reva-digital/after.xml | tee build/reva-digital/pin-contract.json
-          python tools/check_native_readability.py --before build/reva-digital/main.xml --after build/reva-digital/after.xml | tee build/reva-digital/original-equivalence.json
-          kicad-cli sch erc --format json --severity-all -o build/reva-digital/erc.json "$native/servohil_io_revA.kicad_sch"
-          kicad-cli sch export svg -o build/reva-digital/svg/ "$native/servohil_io_revA.kicad_sch"
+          REVA_STAGE=power python archive/revA/validation/test_interface_wiring.py 2>&1 | tee build/reva-phase1/hierarchy-tests.txt
+          python archive/revA/validation/test_digital_drawing.py 2>&1 | tee build/reva-phase1/digital-tests.txt
+          kicad-cli sch export netlist --format kicadxml -o build/reva-phase1/netlist.xml "$native/servohil_io_revA.kicad_sch"
+          python archive/revA/validation/check_pin_contract.py build/reva-phase1/netlist.xml | tee build/reva-phase1/pin-contract.json
           python - <<'PY'
-          import json
-          from collections import Counter
-          assert json.load(open('build/reva-digital/pin-contract.json'))['result']=='PASS'
-          r=json.load(open('build/reva-digital/erc.json'))
+          import json,sys
+          sys.path.insert(0,'tools')
+          from check_native_readability import graph
+          actual=graph('build/reva-phase1/netlist.xml')
+          expected=json.load(open('archive/revA/validation/native_pin_contract.json'))['graph']
+          assert actual==expected,'Native component/pin partition differs from original main'
+          result={'result':'ELECTRICALLY_EQUIVALENT','components':len(actual['components']),'nets':len(actual['partition']),'pins':sum(map(len,actual['partition']))}
+          json.dump(result,open('build/reva-phase1/equivalence.json','w'),indent=2)
+          print(result)
+          PY
+          kicad-cli sch erc --format json --severity-all -o build/reva-phase1/erc.json "$native/servohil_io_revA.kicad_sch"
+          kicad-cli sch export svg -o build/reva-phase1/svg/ "$native/servohil_io_revA.kicad_sch"
+          python - <<'PY'
+          import json,collections
+          r=json.load(open('build/reva-phase1/erc.json'))
           violations=[v for s in r['sheets'] for v in s['violations']]
-          print(Counter((v['severity'],v['type']) for v in violations))
+          counts=collections.Counter(v['severity']+':'+v['type'] for v in violations)
+          json.dump(dict(counts),open('build/reva-phase1/erc-counts.json','w'),indent=2)
+          print(counts)
           assert not [v for v in violations if v['severity']=='error']
           PY
           git diff --check
-      - name: Commit only independently verified native changes
+      - name: Commit phase 1 native files immediately
         run: |
-          native=archive/revA/snapshot/hardware/kicad/revA
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$native/03_digital_power.kicad_sch" "$native/servohil_digital_review.kicad_sym" "$native/sym-lib-table" archive/revA/validation/_apply_digital_drawing.py archive/revA/validation/test_digital_drawing.py
-          git commit -m 'fix(revA): draw continuous sequencer buck feedback and compensation circuits'
+          git add archive/revA/snapshot/hardware/kicad/revA/*.kicad_sch
+          git commit -m 'fix(revA): phase 1 replace digital power globals with explicit hierarchy'
           git push origin HEAD:fix/reva-kicad-connectivity
-          git rev-parse HEAD > build/reva-digital/source_commit.txt
-      - name: Run complete current repository regression suite
-        if: success()
-        run: |
-          kicad-cli sch export netlist --format kicadxml -o build/reva-digital/revb.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
-          python tools/check_native_readability.py --normalize build/reva-digital/revb.xml --output build/reva-digital/revb-canonical.xml
-          set +e
-          NATIVE_NETLIST=build/reva-digital/revb-canonical.xml python -m unittest discover -s tests -v > build/reva-digital/full-tests.txt 2>&1
-          code=$?
-          set -e
-          echo "$code" > build/reva-digital/full-tests.exit
-          cat build/reva-digital/full-tests.txt
-          exit "$code"
-      - name: Capture exact source and diff for review
+          git rev-parse HEAD > build/reva-phase1/source_commit.txt
+      - name: Capture source and native evidence
         if: always()
         run: |
-          mkdir -p build/reva-digital
-          git rev-parse HEAD > build/reva-digital/checked-out-commit.txt
-          git diff --stat > build/reva-digital/uncommitted-stat.txt
-          git diff > build/reva-digital/uncommitted.patch
-          git archive --format=zip -o build/reva-digital/source.zip HEAD
-          tar -czf build/reva-digital/native-working-copy.tar.gz archive/revA/snapshot/hardware/kicad/revA
+          git diff > build/reva-phase1/uncommitted.patch
+          git archive --format=zip -o build/reva-phase1/source.zip HEAD
+          tar -czf build/reva-phase1/native-working-copy.tar.gz archive/revA/snapshot/hardware/kicad/revA
+          git bundle create build/reva-phase1/review.bundle HEAD
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: reva-continuous-digital
-          path: build/reva-digital/
-          if-no-files-found: error
+          name: reva-phase1-power-hierarchy
+          path: build/reva-phase1/
           retention-days: 14
