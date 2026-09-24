@@ -19,11 +19,19 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Install KiCad
+      - name: Install KiCad with library license provenance
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases >/tmp/ppa.log 2>&1
           sudo apt-get update >/tmp/apt-update.log 2>&1
           sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints poppler-utils >/tmp/apt-install.log 2>&1
+          # Some PPA packages do not ship /usr/share/doc/<package>/copyright.
+          # Retain the official library license instead of skipping attribution.
+          if ! test -f /usr/share/doc/kicad-footprints/copyright; then
+            curl -fSsL --retry 3 https://raw.githubusercontent.com/KiCad/kicad-footprints/master/LICENSE.md -o /tmp/kicad-library-license
+            grep -q 'CC-BY-SA 4.0' /tmp/kicad-library-license
+            sudo mkdir -p /usr/share/doc/kicad-footprints
+            sudo cp /tmp/kicad-library-license /usr/share/doc/kicad-footprints/copyright
+          fi
           mkdir -p build/readability-stage
           kicad-cli version | tee build/readability-stage/kicad-version.txt
       - name: Edit and independently verify each part before its Git commit
