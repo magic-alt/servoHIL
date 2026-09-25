@@ -20,7 +20,7 @@ jobs:
         run: |
           sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases >/tmp/ppa.log 2>&1
           sudo apt-get update >/tmp/apt-update.log 2>&1
-          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints ngspice >/tmp/apt-install.log 2>&1
+          sudo apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints ngspice iverilog >/tmp/apt-install.log 2>&1
           mkdir -p build/readability
           kicad-cli version > build/readability/kicad-version.txt
           ngspice --version > build/readability/ngspice-version.txt

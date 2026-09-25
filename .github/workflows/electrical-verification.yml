@@ -41,6 +41,15 @@ jobs:
           set -e
           test "$rc" -eq 2
           cat build/edv/strict-design.log
+      - name: Native peripheral load and ADC RC screening
+        run: |
+          python -m unittest discover -s tests -p test_peripheral_screen.py -v
+          python sim/peripherals/screen.py --output build/edv/peripheral-screen.json
+          set +e
+          python sim/peripherals/screen.py --strict-design --output build/edv/peripheral-screen.json
+          rc=$?
+          set -e
+          test "$rc" -eq 2
       - name: Exact magnetic and MLCC candidate reports
         run: |
           python sim/power/qualification.py --output build/edv/components
@@ -65,6 +74,21 @@ jobs:
           git rev-parse HEAD^{tree} > build/edv/source_tree.txt
           git archive --format=zip -o build/edv/source.zip HEAD
           sha256sum build/edv/source.zip > build/edv/source.zip.sha256
+      - name: Retain compact source-bound report index
+        if: always()
+        run: |
+          mkdir -p build/edv-summary
+          cp build/edv/source_commit.txt build/edv/source_tree.txt build/edv/source.zip build/edv/source.zip.sha256 build/edv-summary/
+          for item in analytical peripheral-screen.json evidence-integrity.json strict-design.log; do
+            if test -e "build/edv/$item"; then cp -a "build/edv/$item" build/edv-summary/; fi
+          done
+          echo 'Compact report index only; raw SPICE waveforms remain in the full EDV artifact.' > build/edv-summary/SCOPE.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: revb-electrical-summary
+          path: build/edv-summary/
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: always()
         with:

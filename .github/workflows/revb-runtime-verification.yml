@@ -1,0 +1,51 @@
+name: revb-runtime-verification
+on:
+  pull_request:
+  push:
+    branches: [main, feat/revb-adc-phy-health]
+permissions:
+  contents: read
+concurrency:
+  group: revb-runtime-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  runtime-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install real numerical and RTL simulators
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends iverilog ngspice
+          mkdir -p build/runtime-review/runtime
+          iverilog -V > build/runtime-review/iverilog-version.txt 2>&1
+          ngspice --version > build/runtime-review/ngspice-version.txt
+      - name: Python and RTL regressions
+        run: |
+          python -m unittest discover -s tests -v > build/runtime-review/tests.log 2>&1
+          tail -20 build/runtime-review/tests.log
+      - name: Read-only source and simulator identity
+        if: always()
+        run: |
+          mkdir -p build/runtime-review/runtime
+          git diff --exit-code -- hardware rtl tests
+          git rev-parse HEAD > build/runtime-review/source_commit.txt
+          git archive --format=zip -o build/runtime-review/source.zip HEAD
+          cp /usr/bin/iverilog /usr/bin/vvp build/runtime-review/runtime/
+          ivl_dir=$(find /usr/lib -type d -name ivl -print -quit)
+          test -n "$ivl_dir"
+          cp -a "$ivl_dir" build/runtime-review/runtime/ivl
+          cp /usr/share/doc/iverilog/copyright build/runtime-review/runtime/COPYRIGHT
+          find build/runtime-review -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > build/runtime-review/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: revb-runtime-review
+          path: build/runtime-review/
+          if-no-files-found: error

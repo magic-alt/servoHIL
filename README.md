@@ -1,358 +1,172 @@
 # ServoHIL — Rev.B 单 SoC 实时 HIL 扩展板
 
-**一颗 ZU2CG 同时承担 Plant 与实时 I/O；自研扩展板不增加第二颗 FPGA。**
+**一颗 ZU2CG 同时承担 Plant 与实时 I/O，自研扩展板不增加第二颗 FPGA。**
 
-ServoHIL Rev.B 面向伺服驱动器 / 关节模组的实时 Hardware-in-the-Loop 验证。当前工作重点已经从“继续扩充原理图页面”转入 **Electrical Design Verification + Hardware Safety Qualification**：先把电源、参考、输出断开和 DUT 硬件禁止链闭合，再推进 ADC / 数字 PHY 和 PCB Layout。
+ServoHIL 面向伺服驱动器和关节模组的实时 Hardware-in-the-Loop 验证。
+当前原生 KiCad 已从接口占位推进到电源、DAC、安全链、ADC 与数字接口器件电路；
+**仍是工程开发版，不是可生产、可直接打板或通过功能安全认证的完整 HIL 板。**
+`hardware/revB/gates.json` 的 `layout_allowed=false` 保持不变。
 
-> **当前状态：工程可继续设计与验证，但尚未达到可生产、可打板或功能安全放行状态。**
->
-> `hardware/revB/gates.json` 中 `layout_allowed=false` 保持不变。
+## 当前实现与资格状态
 
-## Rev.B 当前状态
-
-| 项目 | 当前状态 | 说明 |
+| 模块 | 已实现 | 尚未完成 / 不能据此声称 |
 |---|---|---|
-| 单 ZU2CG 架构 | ✅ 已确定 | Plant + 实时 I/O 统一在 ZU2CG；不增加第二 FPGA |
-| 原生 KiCad 工程 | ✅ 13 页 | 可直接编辑，不依赖生成器重建 |
-| 输入保护 / 正负电源 / 基准 | ✅ 已有实际器件 | 仍需继续关闭 EDV、启动、热与器件资格问题 |
-| 电源监控 / ARM latch | ✅ 已实现 | 与新增 watchdog 资格链联动 |
-| 独立 heartbeat watchdog | ✅ 已实现原生电路 | TPS3430 + 两级 heartbeat qualification + TPS3808 delayed release |
-| AO hardware disconnect | ✅ 8 路已实现 | 2 × ADG5412F；DAC → DUT 无并行旁路 |
-| DUT hardware permit | ✅ 板级电路已实现 | AQY212GS 常开许可触点；**不是认证 STO** |
-| ADC 输入前端 | ⏳ 未完成 | 等电源 EDV / safety qualification 后推进 |
-| 数字 PHY | ⏳ 未完成 | EtherCAT/CAN/encoder 等板级 PHY 尚未完整落地 |
-| PCB Layout | ⛔ 未授权 | 必须先关闭 EDV、封装/BOM 和实物验证门禁 |
-| 生产资格 | ⛔ 未达到 | 无实板量测、EMC/热/掉电/故障注入完整证据 |
+| 单 ZU2CG / 原生工程 | 15 页，可直接编辑；载板分配保持 64 路信号 | 完整板级 bitstream、Vivado STA/IO DRC 未验收 |
+| 输入保护 / 正负电源 / 参考 | 实际器件、原生值驱动计算与 ngspice 矩阵 | DAC 电源跨度/输出裕量、热、厂家模型、MLCC、启动及反灌门禁未关闭 |
+| 独立 watchdog / AO disconnect / DUT permit | PR #21 的窗口 watchdog、八路 ADG5412F、常开 PhotoMOS 许可触点 | 实际 DUT 的安全偏置、漏电流、断线与最大关断时间未验收；不是 STO |
+| 有效进度心跳 RTL | Plant/I/O 序号、主机会话租约、超时锁存、显式恢复/重新 ARM | 独立核心已仿真；真实 Plant/主机、AXI/CDC、板级集成尚未完成 |
+| ADC 输入前端 | AD7606C-16、8 路单端低能量输入、RC、参考/去耦、1.8 V 八数据线连接 | 初始化/采样驱动、通道身份、精度、抗混叠、输入故障能量与实板时序未验收 |
+| 数字 PHY | 六路 PWM 缓冲、双 SSI/BiSS 差分接口、RS-485、辅助逻辑/I2C | 不代表任意编码器或工业 24 V 输入兼容；电缆/部分供电/协议实测未验收 |
+| EtherCAT / CAN | 本扩展板没有独立引脚分配或对应板载实现 | 不借用 AUX 来假装已实现；新增接口需独立分配、控制器和 PHY 审查 |
+| PCB Layout / 生产资格 | 门禁与验收路径保留 | 未授权 Layout/Gerber/采购/生产，无实板、EMC 或完整故障验证证据 |
 
-### PR #21 当前硬件检查点
+本轮 ADC/PHY 原生实现及验证在 [PR #22](https://github.com/magic-alt/servoHIL/pull/22)。
+PR #21 已合并，其 13 页 / 144 项测试属于历史检查点，不再冒充当前工程状态。
 
-[PR #21 — independent watchdog, AO disconnect and DUT hardware permit](https://github.com/magic-alt/servoHIL/pull/21) 已把此前缺失的三类安全相关电路落到原生 KiCad：
-
-- **13 个原生 schematic pages**
-- 原有 **216 个器件连接关系保持冻结**
-- 新增 **47 个物理器件**
-- 新增 **168 个独立 pin assertions**
-- 仅允许 **J5.1..8** 按预定方案从 DAC 直连改为经 AO disconnect 输出
-- KiCad **10.0.6** 实际导出 / ERC 检查
-- 当前已验证硬件检查点 `57b7747`：**144 / 144 tests PASS，0 skipped**
-- 13 页原理图：**0 ERC violations**
-- native pin contract、旧网络冻结、AO bypass 检查、permit contact isolation：PASS
-
-这些自动检查只证明**源码连接关系和验证流程满足当前契约**，不代表真实硬件在电气、模拟性能、故障反应或功能安全层面已经通过。
-
-## 直接打开当前原理图
-
-当前硬件源文件直接保存在 Git 中：
+## 打开工程与查阅证据
 
 ```text
 hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_pro
 ```
 
-相关入口：
+原生文件直接保存在 Git，无需运行生成器。
+[当前 ADC/PHY 接口、负载筛查和验收说明](docs/review/revb-peripherals/README.md)
+与 [安全链说明](docs/review/revb-safety/README.md) 分别记录设计和资格边界。
+[EDV 使用说明](sim/power/README.md) 及
+[历史 EDV 阻塞分析](docs/review/revb-edv/README.md) 保留原始背景。
 
-- [Rev.B 原生 KiCad 工程](hardware/kicad/revB/axu2cgb_expansion/)
-- [PR #21 safety-chain 设计、证据与实测计划](docs/review/revb-safety/README.md)
-- [Electrical Design Verification](docs/review/revb-edv/README.md)
-- [EDV 仿真与复现说明](sim/power/README.md)
-- [历史 11 页 schematic PDF（不是当前 13 页版本）](docs/review/revb-readability/schematic-review.pdf)
-- [历史原理图连线整理记录](docs/review/revb-readability/README.md)
+当前图纸包括顶层、载板接口、输入保护、正电源、负电源/参考、电源监控、
+状态输出、PWM/辅助/RS-485、两页 DAC、AO disconnect、watchdog、DUT permit、
+ADC 输入前端和双编码器 PHY。`70_adc_frontend`、`80_encoder_phy` 是新增页；
+`03_peripheral_boundaries` 已替换 J3/J4 预留模块接口，避免与板载器件并接。
 
-### 当前 13 页
+当前电路有 **409 个物理器件**：PR #21 的 263 个减去 2 个预留连接器，
+新增 148 个 ADC/PHY/无源/连接器器件。独立外设契约检查 461 个引脚，
+原有 47 个安全链器件 / 168 个引脚检查继续保留。
+实际 KiCad 10.0.6 的 15 页网表、ERC、PDF 与回归检查见 PR 的原生 CI artifact。
 
-1. 载板接口
-2. 输入保护
-3. 正电源
-4. 负电源 / 参考
-5. 电源监控
-6. 状态输出
-7. 外设边界
-8. DAC 0–3
-9. DAC 4–7
-10. 模拟输出 / AO disconnect
-11. 独立 heartbeat watchdog / interlock
-12. DUT hardware permit
-13. 顶层索引
+**当前 PDF 不在历史目录中。** 最新 `native-schematic-readability` artifact 包含
+原理图 PDF、原生 source ZIP、XML、ERC、测试日志与确切 source commit。
+[旧 11 页 PDF](docs/review/revb-readability/schematic-review.pdf) 只作历史参考。
 
-## Hardware Safety Chain
+## ADC 与数字接口范围
 
-### 1. Independent heartbeat watchdog
+### ADC：原生电路已实现，采样系统未验收
 
-`50_watchdog_interlock.kicad_sch` 使用独立器件构成硬件许可链：
+U801 为 **AD7606C-16BSTZ**，不是供电条件不同的旧 AD7606。
+AVCC 接 `+5V0_DAC`，VDRIVE 接 `1V8_D`；内部参考、两路独立 REGCAP、
+REFCAP 去耦、软件模式和串行模式固定脚都已画入。
+J801 提供 8 路单端输入及信号地，每路正/负腿 100 Ω、差分 1 nF。
+这是低能量实验室输入候选，不是承受 24 V 或长线浪涌的工业 AI 端口。
 
-```text
-HIL_WDI
-  ↓
-TPS3430 window watchdog
-  ↓
-heartbeat edge qualification
-  ↓
-TPS3808 delayed release
-  ↓
-RAILS_OK
-  ↓
-existing ARM latch
-  ↓
-SAFE_ENABLE
-```
+八条 DOUT 接线不等于上电后自动进入八线采样：初始化必须配置并读回
+`CONFIG[4:3]=11`，验证采样范围、内部滤波、过采样及通道身份。
+本 PR 没有把缺失的初始化/采样状态机标为已完成，也没有宣称实测 1 MSPS。
 
-设计要求：
+### 编码器、PWM 与 RS-485
 
-- TPS3430 使用 falling-edge heartbeat interval；
-- nominal heartbeat interval = **5 ms**，当前 contract = **4…6 ms**；
-- heartbeat 丢失、过快、过慢、AON/interlock/rail fault 都会使能链失效；
-- fault recovery **不能自动重新启动 DUT**；
-- 恢复资格后仍需要新的 `HIL_ARM` 上升沿；
-- watchdog 不提供 firmware-controlled bypass。
+双编码器各有时钟和数据两个差分对，使用 THVD1450，接收器持续开启。
+每对 `DE = SAFE_ENABLE AND DIR`；DIR、发送数据和 DE 都有默认下拉。
+`IO0/IO2` 固定为发送数据，`IO1/IO3` 固定为接收数据；通用载板契约中的
+inout 不意味着可以在本板上任意交换发送与接收。
+SSI/BiSS 主端发送时钟、接收数据；从端仿真角色相反。
+当前 PHY **不提供 ABZ 三对或任意四线/三线 SPI 的通用兼容承诺**。
 
-软件 / RTL 后续必须保证 heartbeat 代表**真实 Plant / I/O deadline + 有效 host/session lease**。无条件 free-running FPGA timer 不能作为最终健康证明。
+RS-485 同样经过安全许可门控；120 Ω 终端通过跳线接入，默认不装短接帽。
+六路 PWM 使用 SN74LVC541A 缓冲及输入默认下拉；AUX/I2C 为 3.3 V 逻辑接口。
+这些接口非隔离，不供应编码器电源，不直接接栅极功率、电机相线或 24 V PLC 信号。
 
-### 2. Eight-channel AO disconnect
+## 有效系统进度心跳
 
-`06_analog_outputs.kicad_sch` 使用 **2 × ADG5412F** 提供 8 路硬件断开：
+`rtl/revb/health_heartbeat.sv` 不是无条件自由运行计数器。
+只有已完成的 Plant/I/O 事务持续推进、主机租约有效，核心才持续输出 WDI。
+重复序号不续期；跳号/逆序、进度超时、租约过期或显式故障锁存禁止。
+默认 100 MHz 下下降沿间隔 5 ms，Plant/I/O 截止时间 100 µs，主机租约 10 ms。
+这些是可配置工程默认值，不是实板能力保证。
 
-```text
-DAC AOx → ADG5412F → DUT_AOx → J5
-                    ↑
-               SAFE_ENABLE
-```
+故障后 WDI 保持当前电平，不额外补发下降沿；ARM 被撤销。
+后续恢复流量不能自动重启，必须显式重建会话，并在健康状态观察到 ARM 低电平后
+再次上升。未 ARM 时仍输出健康心跳，以允许外部硬件 watchdog 完成资格判定。
+**不能用未 ARM 时本就有效的 HIL_FAULT_N 反向禁止心跳，否则会形成启动死锁。**
 
-关键规则：
+[RTL 接口与集成边界](rtl/revb/README.md) 说明同步事务、CDC、会话和 ARM 时序。
+真实 Plant/I/O completion、主机租约生产者、AXI/CDC、顶层/XDC、Vivado 与板测
+仍是下一阶段工作；独立核心仿真不能代替这些集成。
 
-- protected **S terminal 面向 DUT**
-- **D terminal 面向 DAC**
-- 所有 8 路 AO 都必须经过 disconnect switch
-- 不允许 DAC → DUT 的并行直通路径
-- switch enable 具有默认硬件下拉
-- FF 输出目前只作为本地诊断测试点
+## 电源 EDV 与新增负载
 
-**AO OFF = high impedance，不等于 DUT 的安全零电压。**
+[外设筛查](sim/peripherals/screen.py) 从实际原生器件值读取 ADC RC 和终端电阻，
+复用电源最差条件计算。不能用收发器空载静态电流代表带终端负载的驱动电流。
+本轮保留完整旧预算，再增加新外设压力工况和明确标注的动态储备：
 
-实际 DUT adapter 必须定义断开后的 neutral bias / safe state，并与独立 permit contact 配合使用。
+| 电源 | 原预算 | 新分析预算 |
+|---|---:|---:|
+| `3V3_D` | 0.30 A | 0.70 A |
+| `1V8_D` | 0.30 A | 0.32 A |
+| `6V2_PRE` | 0.50 A | 0.55 A |
+| `+5V0_DAC` | 0.20 A | 0.25 A |
 
-### 3. DUT hardware permit
+这不是额定电流认证或实际功耗量测。新的预算用于重跑原有 25 工况 ngspice 和
+热/磁性筛查；AON 安全链预算、同时短路、动态损耗和真实板级热仍开放。
+原 DAC 电源跨度/输出裕量、真实稳压器模型、MLCC 偏压曲线及输入保护能量问题未关闭。
 
-`60_dut_permit.kicad_sch` 使用 AQY212GS PhotoMOS 提供**常开、浮地的许可触点**：
+ADC 外部 RC 的简化计算也不等于完整抗混叠设计或 16 位精度证明。
+100 Ω 正腿和 1 MΩ 简化输入负载会引入约 100 ppm 的未校准增益误差，
+必须结合内部滤波、源阻抗、校准与实板精度预算处理。
 
-```text
-SAFE_ENABLE
-  ↓
-NPN / LED drive
-  ↓
-AQY212GS normally-open contact
-  ↓
-DUT permit input
-```
+`sim/power/analysis.py --strict-design` 与外设筛查的 strict 模式都应返回 **2**：
+**自动化执行通过 ≠ 电气设计合格 ≠ 制造放行。**
 
-当前建议接口仅作为低能量 SELV permit：
+## 本地验证
 
-- ≤ 24 V
-- ≤ 10 mA
-- contact side 不连接 ServoHIL board GND / supply
-
-它**不是电机动力切断器，不是冗余 STO，也没有功能安全认证**。实际 DUT 必须保证 open contact、线缆断开和规定范围内 leakage 都解释为 inhibited。
-
-## Electrical Design Verification
-
-当前 Rev.B 不应直接进入 PCB Layout。
-
-已有 EDV 工作包括：
-
-- native-value driven calculations
-- 25-condition ngspice regression matrix
-- worst-case / startup / load-transient 检查框架
-- LTspice vendor-model preparation
-- magnetic component screening
-- MLCC candidate / derating evidence
-- thermal / headroom / regulation checks
-- evidence manifest / source digest / failure artifact integrity
-
-但仍有真实设计阻塞项：
-
-- DAC 全条件供电跨度 / 输出 headroom
-- 负电源边界
-- Ćuk CCM 模型适用性
-- regulator vendor closed-loop model
-- startup / light-load / transient
-- thermal margin
-- MLCC DC-bias / temperature / aging evidence
-- magnetics L(I,T) / AC-core loss
-- 新增 safety chain 的 AON current / thermal budget
-- partial-power / backfeed
-- 实板 shutdown / fault-injection evidence
-
-因此：
-
-```text
-simulation execution PASS != electrical qualification PASS
-ERC PASS != fabrication release
-logic regression PASS != functional safety certification
-```
-
-`analysis.py --strict-design` 当前仍应返回 **2**。
-
-## 原生工程验证
-
-需要 Python 3.11+、KiCad CLI；ngspice 用于实际数值回归。
+需要 Python 3.11+、KiCad CLI、ngspice 和 Icarus Verilog。下面为 shell 命令：
 
 ```sh
 mkdir -p build/native
-
 python tools/check_native_readability.py
-
-kicad-cli sch export netlist \
-  --format kicadxml \
-  -o build/native/netlist.xml \
-  hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
-
-python tools/check_native_readability.py \
-  --normalize build/native/netlist.xml \
-  --output build/native/canonical.xml
-
-python tools/verify_native_all.py \
-  build/native/canonical.xml \
-  --stage supervision
-
-python tools/check_revb_netlist.py \
-  build/native/canonical.xml \
-  hardware/kicad/revB/axu2cgb_expansion/expected_connections.json
-
-python tools/check_native_safety.py \
-  build/native/canonical.xml
-
-kicad-cli sch erc \
-  --format json \
-  --exit-code-violations \
-  -o build/native/erc.json \
-  hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
-
+kicad-cli sch export netlist --format kicadxml -o build/native/netlist.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
+python tools/check_native_readability.py --normalize build/native/netlist.xml --output build/native/canonical.xml
+python tools/verify_native_all.py build/native/canonical.xml --stage supervision
+python tools/check_revb_netlist.py build/native/canonical.xml hardware/kicad/revB/axu2cgb_expansion/expected_connections.json
+python tools/check_native_safety.py build/native/canonical.xml
+kicad-cli sch erc --format json --exit-code-violations -o build/native/erc.json hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
 python tools/check_revb_erc.py build/native/erc.json
+NATIVE_NETLIST=build/native/canonical.xml python -m unittest discover -s tests -v
+python sim/peripherals/screen.py --output build/peripheral-screen.json
 ```
 
-Linux / macOS：
+PowerShell 中运行测试前设 `$env:NATIVE_NETLIST='build/native/canonical.xml'`，
+再运行 `python -m unittest discover -s tests -v`。
+没有原生 XML、ngspice 或 Icarus 时出现的 skipped 不能称为全量验证通过。
 
-```sh
-NATIVE_NETLIST=build/native/canonical.xml \
-python -m unittest discover -s tests -v
-```
+## 原生源码与载板边界
 
-PowerShell：
+原生 `.kicad_sch/.kicad_sym/.kicad_pro`、库表及本地封装是活动设计源。
+页内优先连续导线与标准供电符号，global label 只表达真实跨页信号。
+器件值必须保留可编辑属性，不用静态文本伪装。普通 CI 只读检查和导出；
+一次性绘图脚本、临时写入工作流已从活动树移除，历史实现保留在 Git。
 
-```powershell
-$env:NATIVE_NETLIST = 'build/native/canonical.xml'
-python -m unittest discover -s tests -v
-```
+独立检查保留原有电源/DAC/安全连接，只允许明确的 J5 AO 改接和 J3/J4 移除。
+历史 XML 基准未重写；新器件由独立 pin oracle 验证。
+`expected_connections.json` 本身不是独立设计正确性证据。
 
-### Native-source policy
+原版 AXU2CGB + 扩展板是当前活动实现；市售 ZU2CG SoM + 载板仍为型号未绑定的
+替代方案，不是再加一颗 SoC。SoM 的电压域、供电、启动和连接器必须单独绑定。
+`hardware/carriers/axu2cgb/`、`hardware/carriers/zu2cg_som/profile.json`
+与 `hardware/revB/io_contract.json` 分别记录物理事实、替代方案和逻辑分配。
 
-`.kicad_sch` / `.kicad_sym` / `.kicad_pro`、项目库表及本地 footprint library 是活动设计源，可直接人工编辑。
+`tools/revb.py generate` 只用于早期接口契约/载板工具回归，输出到独立 build 目录，
+不能覆盖当前原生工程。`archive/revA/snapshot/` 是历史双 FPGA 方案，原有归档冻结
+不变；其 FGG484/HIL-Link 门禁为 SUPERSEDED，不是 PASS。
+`hil_lab` 的 AN9767/AN706、AX7010 FPGA-Lite 和 Raspberry Pi IgH 不等于本板已实现的 PHY。
 
-规则：
+## 继续推进的顺序
 
-- 页内优先连续导线；
-- 标准供电使用 power symbols；
-- **只有真实跨页网络使用 global label**；
-- 页内反馈 / 配置网络优先 local label；
-- 不用同名 global/local label 混合方式掩盖零散连线；
-- ordinary CI 只能读取、导出、检查原生工程，不能自动重画并覆盖 source；
-- 一次性迁移 / authoring helper 只保留在 Git 历史，不属于当前活动工作流。
+先关闭电源/热/MLCC/磁性与新增负载问题，绑定实际 DUT adapter 的中性偏置、许可输入
+阈值/漏电、线缆失效和最大允许关断时间，再进行低能量夹具验证。
+同时完成 ADC 初始化/采样、真实 Plant/I/O 与租约集成、Vivado 时序及接口验证。
+最终原理图、完整 BOM/封装/连接器、部分供电与 DUT 禁止验证通过并获得工程审签后，
+才进入 Layout；样机完成后还需要真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
 
-原始 KiCad XML 保留 sheet path；`canonical.xml` 仅作为既有断言的检查副本。归一化过程遇到不同页面的同名本地网络不会静默合并。
-
-Safety gate 另外验证：
-
-- 冻结已有 216 个器件及其 pin partition；
-- 只允许 J5.1..8 的明确输出路径变更；
-- 独立检查 47 个新增器件 / 168 个 pins；
-- 检查八路 AO 无旁路；
-- 检查 permit contact 两侧保持 board-independent floating network。
-
-## 两种 ZU2CG 载板形式
-
-| 形式 | 当前状态 |
-|---|---|
-| 原版 AXU2CGB + expansion board | J12/J15 接口已建立当前活动 Rev.B 工程 |
-| 市售 ZU2CG SoM + carrier | 共用逻辑 I/O contract；具体厂商 / 型号 / revision 仍 UNBOUND |
-
-两种形式是**替代关系**，不是两颗 FPGA 同时使用。
-
-SoM 未绑定时：
-
-- 不生成声称可制造的物理 schematic / XDC；
-- 不把 HP-only 1.8 V bank 声称成 3.3 V compatible；
-- 电源、启动、connector、bank voltage 和 level shifting 必须重新审查。
-
-载板事实与逻辑分配：
-
-```text
-hardware/carriers/axu2cgb/physical_pinout.csv
-hardware/carriers/axu2cgb/assignments.csv
-hardware/carriers/zu2cg_som/profile.json
-hardware/revB/io_contract.json
-```
-
-## 下一阶段
-
-当前推荐顺序：
-
-```text
-Rev.B power EDV closure
-        ↓
-Safety-chain component / package / AON budget qualification
-        ↓
-Low-energy DUT adapter + watchdog / AO / permit physical acceptance
-        ↓
-ADC analog front-end
-        ↓
-Digital PHY
-        ↓
-Full native ERC / netlist / BOM / package review
-        ↓
-PCB Layout
-        ↓
-Prototype bring-up
-        ↓
-FOC HIL closed-loop acceptance
-```
-
-在开始 Layout 之前至少需要关闭：
-
-1. ±5 V / DAC headroom 和 regulator operating margin；
-2. worst-case startup / load transient / thermal；
-3. MLCC / magnetics / package / footprint / lifecycle；
-4. watchdog / ARM / partial-power / recovery 实测；
-5. AO disconnect 的 RON、settling、charge injection、off leakage 和 fault behaviour；
-6. 实际 DUT adapter 的 neutral state、permit leakage、cable removal 与 shutdown budget；
-7. 新增 AON 负载与失效场景；
-8. ADC / digital PHY 原理图和相应验证门禁。
-
-## 历史资料
-
-`tools/revb.py generate` 仍服务于 interface contract / carrier compatibility 等工具回归，输出到独立 `build/`。它生成的早期 review schematic **不是当前活动硬件源**，不能覆盖 native project。
-
-`archive/revA/snapshot/` 保存历史双 FPGA Rev.A，不参加当前 Rev.B 构建。PR #18 对归档原理图做过可读性 / 连线修复；repository guard 冻结的是该已经审查、已经合并的 archive snapshot，而不是修复前的旧文件。
-
-旧 FGG484 / HIL-Link 相关 release gates 为 **SUPERSEDED**，不是 PASS。
-
-`hil_lab` 中的 AN9767 / AN706、AX7010 FPGA-Lite、Raspberry Pi IgH 等属于其他验证平台，不在 ServoHIL Rev.B PCB 本体范围。
-
-## Release boundary
-
-当前自动化可以证明：
-
-- source structure 一致；
-- native connectivity 满足显式 contract；
-- 已知误接 mutation 能被 gate 捕获；
-- ERC / regression pipeline 可复现；
-- EDV 仿真与 evidence integrity 可运行。
-
-当前自动化**不能证明**：
-
-- 实际器件在所有 PVT 条件都满足要求；
-- assembled board 不存在 backfeed / transient / thermal / EMC 问题；
-- DUT 在任一单点故障下都安全；
-- permit contact 达到 STO / SIL / PL 等功能安全要求；
-- 当前设计已经适合 PCB fabrication。
-
-因此在所有 release blockers 明确关闭之前：
-
-> **Rev.B = engineering development / verification hardware, not production-qualified hardware.**
+**AO 断开为高阻而非安全零位；单个许可触点不是冗余 STO，元件额定值不是板级认证。
+没有匹配实际硬件和 DUT 的原始实测证据，就不把生产资格或安全门禁改成 PASS。**
