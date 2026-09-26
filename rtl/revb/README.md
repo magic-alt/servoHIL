@@ -93,3 +93,17 @@ new explicit initialization.
 The core follows the AD7606C-16 serial software-mode command framing, but it is
 not a calibration, anti-alias, 1 MSPS, CDC, top-level pin or Vivado timing proof.
 Those remain separate qualification gates.
+
+
+## Runtime completion integration
+
+`runtime_health_integration.sv` is the narrow accepted-event boundary feeding
+`health_heartbeat`. It accepts only completed Plant sequence events, completed
+ADC sample sequence events, and validated host-lease renewal sequence events.
+Duplicate or gapped sequences retain the existing fail-closed health behavior.
+
+AXI/CDC/top-level adapters are intentionally outside this module. They must
+convert their domain-specific acknowledgements into one-cycle accepted events in
+the reviewed health clock domain; merely submitting work is not evidence of
+completion. This wrapper therefore closes the semantic wiring seam, not the
+Vivado CDC/timing or software authentication qualification.
