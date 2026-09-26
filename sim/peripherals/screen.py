@@ -76,8 +76,18 @@ def build_report(root:Path=ROOT)->dict:
     if not budget_ok:blockers.add('PERIPHERAL_POWER_BUDGET_NOT_ALLOCATED')
     static_supply_ok=(4.75<=avcc[0]<=avcc[1]<=5.25 and 1.71<=vdrive[0]<=vdrive[1]<=5.25)
     if not static_supply_ok:blockers.add('ADC_STATIC_SUPPLY_OUT_OF_RANGE')
+    physical_required=[
+        'PARTIAL_POWER_AND_BACKFEED',
+        'PHY_LOADED_DYNAMIC_AND_FAULT_THERMAL',
+        'AON_SAFETY_LOAD_AND_THERMAL',
+        'ACTUAL_DUT_ADAPTER_INHIBIT',
+        'ADC_INPUT_ENERGY_AND_ESD',
+        'BOARD_MEASUREMENTS',
+    ]
     return {'scope':'NATIVE_VALUE_ANALYTICAL_SCREEN_ONLY','qualification':'BLOCKED',
-            'layout_allowed':False,'physical_tests':'NOT_RUN','source_digest':power.content_digest(root),
+            'layout_allowed':False,'physical_tests':'NOT_RUN',
+            'physical_evidence_required':physical_required,
+            'source_digest':power.content_digest(root),
             'adc':{'avcc_v':avcc,'vdrive_v':vdrive,'static_supply_screen_pass':static_supply_ok,
                    'max_avcc_operating_current_a':.050,'max_vdrive_operating_current_a':.0019,
                    'current_test_basis':'AD7606C-16 1MSPS datasheet table; not board measurement',

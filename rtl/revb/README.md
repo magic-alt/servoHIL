@@ -74,3 +74,36 @@ edge interval. Numerical simulation is not timing closure or hardware evidence.
 Still required: reviewed PS/AXI/CDC session integration; actual Plant and I/O
 completion producers; top-level/XDC binding; Vivado synthesis/STA/IO DRC; external
 watchdog startup and fault injection; measured hardware disable/DUT reaction.
+
+
+## AD7606C-16 digital initialization / acquisition core
+
+`ad7606c16_controller.sv` implements only the reviewed digital transaction
+boundary. After an explicit `start_init`, it pulses RESET, writes CONFIG
+address 0x02 with 0x18 (eight DOUT lanes), issues a serial register-read command,
+and requires the following DOUTA frame to read back 0x18 before `configured`
+can assert. The all-zero readback frame returns the device to ADC mode.
+
+A `sample_request` then produces CONVST, requires BUSY assertion and
+deassertion within the configured timeout, clocks exactly 16 bits from all eight
+DOUT lanes, and only then emits one-cycle `sample_valid` and increments
+`sample_seq`. CONFIG mismatch or BUSY timeout is latched fail-closed until a
+new explicit initialization.
+
+The core follows the AD7606C-16 serial software-mode command framing, but it is
+not a calibration, anti-alias, 1 MSPS, CDC, top-level pin or Vivado timing proof.
+Those remain separate qualification gates.
+
+
+## Runtime completion integration
+
+`runtime_health_integration.sv` is the narrow accepted-event boundary feeding
+`health_heartbeat`. It accepts only completed Plant sequence events, completed
+ADC sample sequence events, and validated host-lease renewal sequence events.
+Duplicate or gapped sequences retain the existing fail-closed health behavior.
+
+AXI/CDC/top-level adapters are intentionally outside this module. They must
+convert their domain-specific acknowledgements into one-cycle accepted events in
+the reviewed health clock domain; merely submitting work is not evidence of
+completion. This wrapper therefore closes the semantic wiring seam, not the
+Vivado CDC/timing or software authentication qualification.

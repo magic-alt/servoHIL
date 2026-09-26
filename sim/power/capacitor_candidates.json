@@ -1,37 +1,67 @@
 {
   "schema": 1,
-  "checked_on": "2026-09-24",
+  "checked_on": "2026-09-26",
   "status": "CANDIDATES_NOT_BOM_OR_LAYOUT_RELEASE",
-  "source_note": "Catalog pages checked; no original DC-bias CSV imported. Catalog characteristic curves are reference data, not guaranteed limits. Recheck lifecycle at purchasing. Native schematic and MPN properties are not modified.",
+  "source_note": "Catalog pages rechecked 2026-09-26. No original DC-bias CSV is archived; catalog curves remain reference-only. Candidate binding is not BOM/layout release.",
   "bias_reserve_v": 0.05,
   "bias_reserve_status": "Engineering screening reserve, NOT a measured startup/load-step/surge bound.",
   "parts": {
     "C3225X7R1C226M250AC": {
-      "manufacturer": "TDK", "capacitance_f": 0.000022,
-      "tolerance_loss": 0.20, "rated_voltage_v": 16,
-      "dielectric": "X7R", "temperature_loss": 0.15,
+      "manufacturer": "TDK",
+      "capacitance_f": 0.000022,
+      "tolerance_loss": 0.2,
+      "rated_voltage_v": 16,
+      "dielectric": "X7R",
+      "temperature_loss": 0.15,
       "footprint": "Capacitor_SMD:C_1210_3225Metric",
-      "height_max_mm": 2.80, "lifecycle": "PRODUCTION",
+      "height_max_mm": 2.8,
+      "lifecycle": "PRODUCTION",
       "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1C226M250AC",
       "note": "The M tolerance is +/-20%, NOT the generic analysis +/-10% scenario. Land pattern and height still need review."
     },
     "C3225X7R1E106K250AC": {
-      "manufacturer": "TDK", "capacitance_f": 0.000010,
-      "tolerance_loss": 0.10, "rated_voltage_v": 25,
-      "dielectric": "X7R", "temperature_loss": 0.15,
+      "manufacturer": "TDK",
+      "capacitance_f": 0.00001,
+      "tolerance_loss": 0.1,
+      "rated_voltage_v": 25,
+      "dielectric": "X7R",
+      "temperature_loss": 0.15,
       "footprint": "Capacitor_SMD:C_1210_3225Metric",
-      "height_max_mm": 2.80, "lifecycle": "PRODUCTION",
+      "height_max_mm": 2.8,
+      "lifecycle": "PRODUCTION",
       "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1E106K250AC",
       "note": "25V candidate exceeds native 16V rating; nominal capacitance and case match. This is not a declaration of interchangeability."
     },
     "C3225X7R1H105K160AA": {
-      "manufacturer": "TDK", "capacitance_f": 0.000001,
-      "tolerance_loss": 0.10, "rated_voltage_v": 50,
-      "dielectric": "X7R", "temperature_loss": 0.15,
+      "manufacturer": "TDK",
+      "capacitance_f": 0.000001,
+      "tolerance_loss": 0.1,
+      "rated_voltage_v": 50,
+      "dielectric": "X7R",
+      "temperature_loss": 0.15,
       "footprint": "Capacitor_SMD:C_1210_3225Metric",
-      "height_max_mm": 1.80, "lifecycle": "PRODUCTION_NRND",
+      "height_max_mm": 1.8,
+      "lifecycle": "PRODUCTION_NRND",
       "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1H105K160AA",
       "note": "NRND reference candidate only. Find a supported replacement before BOM freeze; validate transfer-capacitor RMS current/ESR/temperature."
+    },
+    "CGA6L2X7R1H105K160AA": {
+      "manufacturer": "TDK",
+      "capacitance_f": 0.000001,
+      "tolerance_loss": 0.1,
+      "rated_voltage_v": 50,
+      "dielectric": "X7R",
+      "temperature_loss": 0.15,
+      "footprint": "Capacitor_SMD:C_1210_3225Metric",
+      "height_max_mm": 1.6,
+      "lifecycle": "PRODUCTION",
+      "automotive_qualification": "AEC-Q200",
+      "operating_temperature_c": [
+        -55,
+        125
+      ],
+      "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA6L2X7R1H105K160AA",
+      "note": "Production automotive-grade replacement for the assigned NRND commercial 1uF/50V/1210 candidate. DC-bias/reference curves still require archived exact-MPN evidence."
     }
   },
   "bank_candidates": {
@@ -42,7 +72,7 @@
     "ldo_5v0": "C3225X7R1C226M250AC",
     "ldo_5v2": "C3225X7R1C226M250AC",
     "ldo_n5v2": "C3225X7R1C226M250AC",
-    "cuk_transfer": "C3225X7R1H105K160AA",
+    "cuk_transfer": "CGA6L2X7R1H105K160AA",
     "cuk_output": "C3225X7R1E106K250AC"
   }
 }

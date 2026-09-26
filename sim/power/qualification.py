@@ -63,7 +63,9 @@ def report(root=ROOT):
             'catalog_isat_to_peak_ratio':part['isat_typ_a_30pct_25c']/peak,
             'catalog_irms20_to_screen_ratio':part['irms_ref_a_20c_rise']/rms,
             'copper_loss_w_at125c':copper_loss(rms,part['dcr_max_ohm_25c'],125),
-            'qualification':'NOT_QUALIFIED','open':'L(I,T), AC/core loss, startup/short circuit, footprint and board heat',
+            'qualification':'NOT_QUALIFIED',
+            'required_evidence':['L_I_T_CURVE','AC_CORE_AND_WINDING_LOSS','STARTUP_SHORT_CURRENT','BOARD_TEMPERATURE_RISE'],
+            'open':'L(I,T), AC/core loss, startup/short circuit, footprint and board heat',
             'ratings_basis':'25C catalog typical/reference, NOT guaranteed actual-board current limits'})
     mlcc=[dict(bank=name,**row) for name,row in base['mlcc'].items()]
     return {'status':'SCREENED_NOT_QUALIFIED','layout_allowed':False,'source_digest':a.content_digest(root),

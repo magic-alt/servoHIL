@@ -47,10 +47,18 @@ class CapacitorEvidence(unittest.TestCase):
     def test_lifecycle_and_unknown_input_mpn_are_not_silent_approval(self):
         rows={x['bank']:x for x in self.m.report(ROOT)['banks']}
         self.assertEqual(rows['input_protected']['status'],'BLOCKED_MPN')
-        self.assertEqual(rows['cuk_transfer']['lifecycle'],'PRODUCTION_NRND')
+        self.assertEqual(rows['cuk_transfer']['part_number'],'CGA6L2X7R1H105K160AA')
+        self.assertEqual(rows['cuk_transfer']['lifecycle'],'PRODUCTION')
+        self.assertEqual(rows['cuk_transfer']['automotive_qualification'],'AEC-Q200')
         self.assertEqual(rows['cuk_output']['rated_voltage_v'],25)
         self.assertIsNone(rows['cuk_output']['target_f'])
         self.assertTrue(all(x['qualification']=='NOT_QUALIFIED' for x in rows.values()))
+
+    def test_no_assigned_bank_uses_nrnd_candidate(self):
+        catalog=json.loads((ROOT/'sim/power/capacitor_candidates.json').read_text())
+        assigned={mpn for mpn in catalog['bank_candidates'].values() if mpn}
+        self.assertTrue(assigned)
+        self.assertTrue(all('NRND' not in catalog['parts'][mpn]['lifecycle'] for mpn in assigned))
 
     def test_second_capacitor_nominal_change_rejects_stale_candidate(self):
         original=self.m.native_components(ROOT)

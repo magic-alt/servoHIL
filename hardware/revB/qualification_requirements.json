@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "release_policy": {
+    "layout_allowed": false,
+    "note": "This manifest is fail-closed. Analysis may close analytical subchecks but cannot substitute for physical or Vivado evidence."
+  },
+  "dut_profile": {
+    "path": "hardware/revB/dut_adapter_profile.json",
+    "required_evidence": [
+      "ao_disconnect",
+      "permit",
+      "cable_open",
+      "cable_short",
+      "shutdown_time"
+    ]
+  },
+  "analytical_required": [
+    "POWER_RAIL_MARGIN",
+    "THERMAL_SCREEN",
+    "MLCC_EFFECTIVE_CAPACITANCE",
+    "MAGNETICS_STRESS",
+    "PERIPHERAL_LOAD_BUDGET"
+  ],
+  "physical_required": [
+    "DUT_ADAPTER_INHIBIT",
+    "PARTIAL_POWER_AND_BACKFEED",
+    "BOARD_THERMAL",
+    "AO_DISCONNECT_REACTION",
+    "PERMIT_REACTION",
+    "CONNECTOR_ESD_REVIEW"
+  ],
+  "vivado_required": [
+    "VIVADO_IO_DRC",
+    "VIVADO_TIMING"
+  ]
+}
