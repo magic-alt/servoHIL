@@ -119,6 +119,7 @@ def report(root=ROOT,curve_dir=None):
                 raise ValueError(ref+': candidate voltage rating below native requirement')
         row.update({k:p[k] for k in ['source_url','rated_voltage_v','tolerance_loss','temperature_loss',
                                       'lifecycle','height_max_mm','note']})
+        row['automotive_qualification']=p.get('automotive_qualification')
         if curve_dir is not None and mpn not in curves:
             path=Path(curve_dir)/(mpn+'.json')
             if path.is_file():curves[mpn]=load_curve(path,mpn)
