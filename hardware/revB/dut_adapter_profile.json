@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "status": "UNBOUND",
+  "adapter_id": null,
+  "note": "Bind only to a reviewed physical DUT adapter and real measured evidence. Null is deliberate and blocks release.",
+  "ao_neutral": {
+    "target_v": null,
+    "min_v": null,
+    "max_v": null,
+    "source_impedance_ohm": null,
+    "max_residual_current_a": null
+  },
+  "permit_input": {
+    "asserted_min_v": null,
+    "inhibited_max_v": null,
+    "max_input_leakage_a": null
+  },
+  "cable_faults": {
+    "open_response": null,
+    "short_response": null
+  },
+  "max_end_to_end_disable_us": null,
+  "measured_at": {
+    "hw_revision": null,
+    "dut_revision": null,
+    "instrument_set": null
+  },
+  "evidence": {
+    "ao_disconnect": null,
+    "permit": null,
+    "cable_open": null,
+    "cable_short": null,
+    "shutdown_time": null
+  }
+}
