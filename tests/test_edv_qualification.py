@@ -18,6 +18,8 @@ class ComponentScreening(unittest.TestCase):
         self.assertEqual({x['reference'] for x in r['magnetics']},{'L201','L202','L203','L301','L302'})
         self.assertTrue(all(x['part_number'] and x['source_url'].startswith('https://www.coilcraft.com/') for x in r['magnetics']))
         self.assertTrue(all(x['qualification']=='NOT_QUALIFIED' for x in r['magnetics']))
+        required={'L_I_T_CURVE','AC_CORE_AND_WINDING_LOSS','STARTUP_SHORT_CURRENT','BOARD_TEMPERATURE_RISE'}
+        self.assertTrue(all(required.issubset(set(x['required_evidence'])) for x in r['magnetics']))
     def test_dcr_temperature_and_rms_loss(self):
         m=module('qualification')
         self.assertAlmostEqual(m.copper_loss(.5,.045,125),.5**2*.045*(1+.00393*100))

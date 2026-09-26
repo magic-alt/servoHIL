@@ -24,6 +24,9 @@ class PeripheralScreenTests(unittest.TestCase):
         self.assertFalse(r['layout_allowed'])
         self.assertIn('ACTUAL_DUT_ADAPTER_INHIBIT',r['blockers'])
         self.assertEqual(r['physical_tests'],'NOT_RUN')
+        self.assertIn('PARTIAL_POWER_AND_BACKFEED',r['physical_evidence_required'])
+        self.assertIn('PHY_LOADED_DYNAMIC_AND_FAULT_THERMAL',r['physical_evidence_required'])
+        self.assertIn('AON_SAFETY_LOAD_AND_THERMAL',r['physical_evidence_required'])
 
     def test_adc_supply_screen_uses_actual_regulator_values(self):
         r=self.s.build_report()
