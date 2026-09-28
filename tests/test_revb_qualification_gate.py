@@ -83,6 +83,32 @@ class DutProfileQualificationTests(unittest.TestCase):
         self.assertEqual(report["qualification"], "BLOCKED")
         self.assertIn("DUT_PROFILE_UNBOUND", report["blockers"])
 
+    def test_component_and_fixture_requirements_cannot_disappear_from_aggregate(self):
+        report = build_qualification_report(ROOT)
+        self.assertEqual(report["schema_version"], 2)
+        self.assertFalse(report["layout_allowed"])
+        self.assertIn("MAGNETICS_L_I_T_CURVES", report["component_evidence_required"])
+        self.assertIn("MAGNETICS_AC_CORE_AND_WINDING_LOSS", report["component_evidence_required"])
+        self.assertIn("MLCC_EXACT_MPN_DC_BIAS_CURVES", report["component_evidence_required"])
+        self.assertIn("MOUNTED_BOARD_TEMPERATURE_RISE", report["component_evidence_required"])
+        self.assertIn("LOW_ENERGY_FIXTURE_ACCEPTANCE", report["physical_required"])
+        self.assertIn("VIVADO_IO_DRC", report["vivado_required"])
+        self.assertIn("VIVADO_TIMING", report["vivado_required"])
+        self.assertIn("EMC", report["post_layout_release_required"])
+        self.assertIn("FOC_CLOSED_LOOP", report["post_layout_release_required"])
+        self.assertIn(
+            "COMPONENT_MAGNETICS_L_I_T_CURVES_REQUIRED",
+            report["blockers"],
+        )
+        self.assertIn(
+            "COMPONENT_MLCC_EXACT_MPN_DC_BIAS_CURVES_REQUIRED",
+            report["blockers"],
+        )
+        self.assertIn(
+            "PHYSICAL_LOW_ENERGY_FIXTURE_ACCEPTANCE_REQUIRED",
+            report["blockers"],
+        )
+
     def test_nonfinite_or_nonpositive_shutdown_budget_rejected(self):
         for value in (0, -1, float("inf"), float("nan")):
             with self.subTest(value=value):
