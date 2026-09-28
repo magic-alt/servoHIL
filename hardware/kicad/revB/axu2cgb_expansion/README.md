@@ -16,8 +16,9 @@ contracts. The current schematic-closure work adds deterministic package binding
 - 439 physical `in_bom=yes && on_board=yes` instances by source audit.
 - J12/J15 are purchased AXU2CGB host boundaries and are deliberately excluded from
   expansion-board BOM/placement.
-- 37 connector-protection devices cover AI0..7, DUT_AO0..7, six PWM inputs, AUX0..5,
-  I2C, four SSI/BiSS differential pairs, RS-485 and the dry-contact interlock cable.
+- 37 connector-protection devices are placed in their owning interface sheets and cover
+  AI0..7, DUT_AO0..7, six PWM inputs, AUX0..5, I2C, four SSI/BiSS differential pairs,
+  RS-485 and the dry-contact interlock cable.
 - `hardware/revB/schematic_open_items.json` contains the only 14 allowed blank
   footprints. `tools/check_revb_schematic_closure.py` fails if any unlisted blank
   footprint appears or an expected open item silently disappears.

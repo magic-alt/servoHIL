@@ -9,10 +9,10 @@ ROOT=Path(__file__).resolve().parents[1]
 NATIVE=ROOT/"hardware/kicad/revB/axu2cgb_expansion"
 MANIFEST=ROOT/"hardware/revB/schematic_open_items.json"
 
-REF_RE=re.compile(r'\\(property "Reference" "([^"]+)"')
-FP_RE=re.compile(r'\\(property "Footprint" "([^"]*)"')
-DS_RE=re.compile(r'\\(property "Datasheet" "([^"]*)"')
-VAL_RE=re.compile(r'\\(property "Value" "([^"]*)"')
+REF_RE=re.compile(r'\(property "Reference" "([^"]+)"')
+FP_RE=re.compile(r'\(property "Footprint" "([^"]*)"')
+DS_RE=re.compile(r'\(property "Datasheet" "([^"]*)"')
+VAL_RE=re.compile(r'\(property "Value" "([^"]*)"')
 
 def _field(rx,line,default=""):
     m=rx.search(line)

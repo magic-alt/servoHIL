@@ -7,7 +7,7 @@ board measurement, full DUT inhibition or functional-safety approval.**
 ## Source and implementation
 
 The native circuit commit is `90247a6df219d9f0e203d16366d70aad0cb9fd55`.
-The root project now has 15 sheets. J3/J4 remain removed; the new 接口页内 connector-side protection sheet adds 37 connector-side ESD/transient devices without changing the 64-signal carrier allocation. The current source audit counts 439 in-BOM/on-board physical instances after excluding purchased-host J12/J15 from expansion-board placement. The independent peripheral oracle now also asserts every protection-device pin/net/package identity. Existing power/DAC wiring remains frozen except explicitly reviewed safety/protection shunts.
+The root project now has 15 sheets. J3/J4 remain removed; 37 connector-side ESD/transient devices are placed directly in the owning 03/06/50/70/80 sheets without changing the 64-signal carrier allocation. The current source audit counts 439 in-BOM/on-board physical instances after excluding purchased-host J12/J15 from expansion-board placement. The independent peripheral oracle now also asserts every protection-device pin/net/package identity. Existing power/DAC wiring remains frozen except explicitly reviewed safety/protection shunts.
 
 | Sheet | Circuit | Deliberate limit |
 |---|---|---|

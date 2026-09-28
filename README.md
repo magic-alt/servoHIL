@@ -16,7 +16,7 @@ ServoHIL 面向伺服驱动器和关节模组的实时 Hardware-in-the-Loop 验�
 | 独立 watchdog / AO disconnect / DUT permit | PR #21 的窗口 watchdog、八路 ADG5412F、常开 PhotoMOS 许可触点 | 实际 DUT 的安全偏置、漏电流、断线与最大关断时间未验收；不是 STO |
 | 有效进度心跳 RTL | PR #23 已把完成的 Plant/ADC 序号与主机租约续期接入 completion-only health wrapper；超时锁存、显式恢复/重新 ARM 保留 | AXI/CDC/顶层/XDC 与实板故障注入尚未验收 |
 | ADC 输入前端 | AD7606C-16、8 路低能量输入；PR #23 已实现 CONFIG 0x02 八线模式写入/读回、BUSY 流程与 8×16-bit 完成采样序号 | 模拟精度、抗混叠、校准、CDC/板级时序和实测 1 MSPS 未验收 |
-| 数字 PHY / 外部保护 | 六路 PWM、双 SSI/BiSS、RS-485、AUX/I2C；新增 接口页内 connector-side protection，对 AI/AO/逻辑/差分口配置连接器侧 TVS | 保护拓扑不等于 IEC ESD/浪涌 PASS；不代表任意编码器或工业 24 V 输入兼容 |
+| 数字 PHY / 外部保护 | 六路 PWM、双 SSI/BiSS、RS-485、AUX/I2C；在对应接口页就地加入 AI/AO/逻辑/差分线 TVS | 保护拓扑不等于 IEC ESD/浪涌 PASS；不代表任意编码器或工业 24 V 输入兼容 |
 | EtherCAT / CAN | 本扩展板没有独立引脚分配或对应板载实现 | 不借用 AUX 来假装已实现；新增接口需独立分配、控制器和 PHY 审查 |
 | PCB Layout / 生产资格 | 门禁与验收路径保留 | 未授权 Layout/Gerber/采购/生产，无实板、EMC 或完整故障验证证据 |
 
@@ -70,7 +70,7 @@ SSI/BiSS 主端发送时钟、接收数据；从端仿真角色相反。
 
 RS-485 同样经过安全许可门控；120 Ω 终端通过跳线接入，默认不装短接帽。
 六路 PWM 使用 SN74LVC541A 缓冲及输入默认下拉；AUX/I2C 为 3.3 V 逻辑接口。
-这些接口非隔离，不供应编码器电源，不直接接栅极功率、电机相线或 24 V PLC 信号。接口页内 connector-side protection 增加的 TVS 只关闭“原理图缺少接口保护拓扑”这一项；器件到连接器的实际布局、回流路径、部分供电 backfeed 和 IEC ESD/浪涌仍需实板资格。
+这些接口非隔离，不供应编码器电源，不直接接栅极功率、电机相线或 24 V PLC 信号。接口页内就地增加的 TVS 只关闭“原理图缺少接口保护拓扑”这一项；器件到连接器的实际布局、回流路径、部分供电 backfeed 和 IEC ESD/浪涌仍需实板资格。
 
 ## 有效系统进度心跳
 
