@@ -13,6 +13,7 @@ SPEC = importlib.util.spec_from_file_location(
 MOD = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MOD)
 MANIFEST = ROOT / "hardware/revB/schematic_open_items.json"
+EVIDENCE = ROOT / "hardware/revB/ad3542r_footprint_evidence.json"
 
 
 class RevBSchematicClosureTests(unittest.TestCase):
@@ -26,6 +27,13 @@ class RevBSchematicClosureTests(unittest.TestCase):
             with mock.patch.object(MOD, "MANIFEST", path):
                 return MOD.check()
 
+    def check_with_evidence(self, data):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "ad3542r_footprint_evidence.json"
+            path.write_text(json.dumps(data), encoding="utf-8")
+            with mock.patch.object(MOD, "AD3542_EVIDENCE", path):
+                return MOD.check()
+
     def test_checked_in_native_source_matches_explicit_open_contract(self):
         report = MOD.check()
         self.assertEqual(report["status"], "PASS_SOURCE_CLOSURE_CONTRACT")
@@ -37,6 +45,14 @@ class RevBSchematicClosureTests(unittest.TestCase):
         self.assertEqual(report["land_pattern_blockers"], ["U20", "U21", "U22", "U23"])
         self.assertEqual(
             report["mechanical_blockers"], ["J101", "J5", "J501", "J701", "SW101"]
+        )
+        self.assertEqual(
+            report["ad3542r_footprint_evidence_status"],
+            "OFFICIAL_SOURCES_LOCATED_GERBER_AND_CAD_BYTES_NOT_ARCHIVED",
+        )
+        self.assertEqual(
+            report["ad3542r_exposed_pad_status"],
+            "UNRESOLVED_REQUIRES_CURRENT_CAD_OR_GERBER",
         )
         self.assertGreater(report["physical_components"], 350)
 
@@ -61,6 +77,45 @@ class RevBSchematicClosureTests(unittest.TestCase):
         self.assertIn("4 mm x 4 mm", base["package_description"])
         for ref in ("U21", "U22", "U23"):
             self.assertEqual(manifest["binding_requirements"][ref]["same_as"], "U20")
+
+    def test_ad3542r_evidence_binds_official_eval_sources(self):
+        evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
+        self.assertEqual(evidence["part"]["mpn"], "AD3542RBCPZ16")
+        self.assertEqual(evidence["part"]["package_option"], "CP-28-15")
+        self.assertEqual(evidence["part"]["pin_count"], 28)
+        self.assertEqual(evidence["part"]["lead_pitch_mm"], 0.4)
+        self.assertTrue(
+            evidence["official_sources"]["evaluation_gerber_zip"].endswith(
+                "/09-050892-01c.zip"
+            )
+        )
+        self.assertEqual(
+            evidence["official_sources"]["adi_documentation_source"]["repository"],
+            "analogdevicesinc/system-level",
+        )
+        self.assertEqual(
+            evidence["exposed_pad_review"]["status"],
+            "UNRESOLVED_REQUIRES_CURRENT_CAD_OR_GERBER",
+        )
+        self.assertIsNone(evidence["geometry_review"]["center_pad_present"])
+
+    def test_ad3542r_cannot_guess_center_pad_without_current_cad_or_gerber(self):
+        evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
+        evidence["geometry_review"]["center_pad_present"] = True
+        with self.assertRaisesRegex(ValueError, "center-pad geometry must not be guessed"):
+            self.check_with_evidence(evidence)
+
+    def test_ad3542r_cannot_claim_geometry_review_before_archive(self):
+        evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
+        evidence["geometry_review"]["status"] = "PASS"
+        with self.assertRaisesRegex(ValueError, "geometry review must remain NOT_RUN"):
+            self.check_with_evidence(evidence)
+
+    def test_ad3542r_official_gerber_source_cannot_drift(self):
+        evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
+        evidence["official_sources"]["evaluation_gerber_zip"] = "https://example.invalid/fake.zip"
+        with self.assertRaisesRegex(ValueError, "official EVAL Gerber source drift"):
+            self.check_with_evidence(evidence)
 
     def test_stale_open_count_is_rejected(self):
         manifest = self.manifest()
