@@ -2,15 +2,15 @@
 
 **Date:** 2026-09-28  
 **Scope:** U20..U23 exact land-pattern closure for Rev.B.  
-**Result:** **OPEN — official sources located; Gerber/exact-CAD bytes not yet archived and geometry not independently reviewed.**
+**Result:** **RESOLVED IN SOURCE — official EVAL Gerber/BOM and current package documentation reviewed; Layout remains blocked.**
 
-## Confirmed current manufacturer identity
+## Exact device and package identity
 
-The active DAC part is **Analog Devices AD3542RBCPZ16**. Analog Devices Rev.C
-documentation identifies the package as **CP-28-15**, a 28-lead LFCSP with a
-4 mm × 4 mm body, 0.95 mm nominal height and 0.40 mm BSC lead pitch.
+The active DAC is **Analog Devices AD3542RBCPZ16**. Current Rev.C documentation
+identifies package option **CP-28-15**, a 28-lead LFCSP with a 4 mm × 4 mm body,
+0.95 mm nominal height and 0.40 mm pitch.
 
-Manufacturer sources:
+Manufacturer sources remain:
 
 - product/CAD entry:
   https://www.analog.com/en/products/AD3542R.html
@@ -18,77 +18,126 @@ Manufacturer sources:
   https://www.analog.com/media/en/technical-documentation/data-sheets/ad3542r.pdf
 - CP-28-15 package drawing:
   https://www.analog.com/media/en/package-pcb-resources/package/pkg_pdf/lfcspcp/cp-28/cp-28-15.pdf
-
-The ADI product page exposes exact-part CAD through Ultra Librarian and SamacSys.
-Those links establish that manufacturer-linked CAD exists; they do not qualify a
-footprint until the downloaded bytes and geometry are reviewed.
-
-## Official evaluation-board cross-check
-
-Analog Devices' EVAL-AD3542RFMCZ schematic uses **AD3542RBCPZ16 as U1**.
-
-Official board files:
-
-- schematic:
-  https://wiki.analog.com/_media/resources/eval/user-guides/dac/eval-ad3542r/02_050892d_top.pdf
-- Gerber ZIP:
+- EVAL-AD3542RFMCZ Gerber:
   https://wiki.analog.com/_media/resources/eval/user-guides/dac/eval-ad3542r/09-050892-01c.zip
-- BOM:
+- EVAL-AD3542RFMCZ BOM:
   https://wiki.analog.com/_media/resources/eval/user-guides/dac/eval-ad3542r/05-050892-01-d.xlsx
 
-These URLs are also pinned by the current Analog Devices public documentation
-repository:
+The official EVAL files are also discoverable through the Analog Devices public
+documentation repository at
+`analogdevicesinc/system-level@76eb29d83e6eaca9ce4470921d315938b2b1aa17`.
 
-- repository: `analogdevicesinc/system-level`
-- commit: `76eb29d83e6eaca9ce4470921d315938b2b1aa17`
-- source: `docs/solutions/reference-designs/eval-ad35xxr/user-guide.rst`
-- source blob: `6327c05006caf900728a31445a3c4fdf3d31253a`
-- relevant source lines: 721–726.
+## Source artifacts reviewed
 
-This gives an independent manufacturer-maintained path to the exact evaluation-board
-Gerber archive instead of relying on an arbitrary third-party footprint.
+The review pins the exact downloaded artifacts by SHA-256 rather than redistributing
+manufacturer binary files:
 
-## Why the four blockers are not closed yet
+| Artifact | SHA-256 |
+| --- | --- |
+| `ad3542r.pdf` Rev.C | `a9536b981e1dc140082ddff947487faaaa47874cd8b648966ee9c6b92fa292fa` |
+| `cp-28-15.pdf` | `f6aab2aa746e79a01b4d9067bde56c886001a4cb1b7ed83e198d480ab0845b73` |
+| `eval-ad3542r-ug-2258.pdf` | `ed5afa177bce6c907a3981c71f49cc3964078a6b6ff79ecfd24ae78f6a1093b4` |
+| `09-050892-01c.zip` | `87eee7f3ed85e81798918b1977bc0b416d72699a39c771d95e9ea3839ef461e8` |
+| `05-050892-01-d.xlsx` | `4608d8884754e5768424832af2331fa0490ab90e05a990a1292bf8f7bab0f7df` |
 
-A generic KiCad footprint such as a nominal 28-pin 4 mm QFN with 0.40 mm pitch is not
-sufficient evidence. Body size, pin count and pitch do not uniquely determine:
+The deterministic review record is:
 
-- side-pad length/width and toe/heel allowance;
-- solder-mask expansion;
-- paste aperture strategy;
-- pin-1 orientation;
-- center/exposed-pad presence and size;
-- center-pad electrical treatment.
+`hardware/revB/evidence/ad3542r/u1_geometry_review.json`
 
-There is also a revision-history reason to fail closed. An early preliminary AD3542R
-document explicitly described an exposed pad connected to AGND, while the current
-Rev.C pin table enumerates pins 1..28 and does not independently define a numbered
-exposed-pad terminal. This is not evidence that the pad disappeared; it is evidence
-that package terminology alone must not be used to guess the PCB land pattern.
+It retains source/member hashes, all 28 U1 IPC-356 records, the exact Gerber U1
+flash coordinates/apertures, the EVAL BOM U1 identity and the canonical KiCad pad
+mapping.
 
-The current manufacturing decision therefore requires direct inspection of either:
+## Official EVAL U1 identity
 
-1. current exact-part CAD downloaded from the ADI-linked Ultra Librarian/SamacSys
-   entry, or
-2. the actual U1 copper/mask/paste geometry from the official EVAL-AD3542RFMCZ
-   Gerber archive,
+The EVAL BOM binds:
 
-preferably both.
+- reference: **U1**
+- manufacturer: **ANALOG DEVICES**
+- manufacturer part: **AD3542RBCPZ16**
+- JEDEC field: **QFN28_4X4**
 
-## Close criteria for U20..U23
+The IPC-356 file contains exactly U1 terminals **1 through 28**, with 0.40 mm pitch.
+There is no U1 terminal 29 or exposed-pad terminal.
 
-The four blockers may be removed only after all of the following are recorded:
+## Exact reviewed land pattern
 
-1. exact Gerber/CAD artifact bytes and SHA-256;
-2. 28-pin count and pin-1 orientation review;
-3. 0.40 mm pitch review;
-4. side-pad dimensions checked against the current package/CAD evidence;
-5. center/exposed-pad presence, dimensions and electrical treatment resolved;
-6. solder-mask and paste strategy reviewed;
-7. resulting KiCad footprint vendored locally with provenance;
-8. U20..U23 bound to that footprint;
-9. native netlist/ERC and source-closure regressions pass.
+The EVAL U1 pad-center offset from package center is **1.8933 mm**.
 
-Until then the correct state is **OPEN**, not PASS. Closing these four items is a
-physical-package binding action only and still does not authorize Layout or qualify
-the DAC electrically or thermally.
+Official Gerber apertures are:
+
+| Layer | Side pads | Top/bottom pads |
+| --- | --- | --- |
+| Top copper `L1_TOP.art` | 0.7366 × 0.2286 mm obround | 0.2286 × 0.7366 mm obround |
+| Top paste `PMT.art` | 0.7366 × 0.2286 mm obround | 0.2286 × 0.7366 mm obround |
+| Top solder mask `SMT.art` | 0.8382 × 0.2794 mm obround | 0.2794 × 0.8382 mm obround |
+
+All three layers resolve exactly 28 perimeter positions for U1.
+
+The local source footprint is:
+
+`Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R`
+
+at:
+
+`hardware/kicad/revB/axu2cgb_expansion/footprints/Package_DFN_QFN.pretty/AnalogDevices_CP-28-15_AD3542R.kicad_mod`
+
+Numbered pads reproduce the official EVAL copper/paste dimensions. Independent,
+unnumbered F.Mask aperture pads reproduce the asymmetric official solder-mask
+openings rather than approximating them with one isotropic mask expansion.
+
+## Center/exposed-pad decision
+
+The earlier preliminary-document ambiguity is now resolved for the current
+manufacturing decision.
+
+The following current evidence agrees:
+
+1. Rev.C pin configuration enumerates pins 1..28 without an exposed-pad terminal.
+2. CP-28-15 bottom view shows 28 perimeter terminals and no center pad.
+3. EVAL IPC-356 contains exactly U1 pins 1..28.
+4. EVAL top solder-mask and paste files contain 28 perimeter apertures and no center
+   aperture.
+
+Therefore the reviewed footprint **must not add a center/exposed pad**.
+
+Several unrelated small copper/via flashes exist under the 4 mm × 4 mm body
+projection on the EVAL PCB, but they have no matching U1 pin in IPC-356 and no
+center F.Mask/F.Paste aperture. They are board routing/via features, not an exposed
+package land.
+
+## Rev.B binding result
+
+U20, U21, U22 and U23 are now bound to the reviewed footprint and their displayed
+value is the exact `AD3542RBCPZ16`.
+
+`hardware/revB/schematic_open_items.json` records them under
+`resolved_bindings`, not `open_footprints`.
+
+The closure checker independently verifies:
+
+- the exact source artifact/member hashes;
+- EVAL BOM U1 identity;
+- all 28 IPC-356 pins and Gerber aperture groups;
+- no center pad/mask/paste aperture;
+- 28 numbered KiCad copper/paste pads;
+- 28 explicit KiCad F.Mask aperture pads;
+- exact coordinates and dimensions;
+- native U20..U23 value/footprint bindings.
+
+## Boundary of this closure
+
+This closes only the **exact physical package land-pattern blocker** for U20..U23.
+
+It does **not** establish:
+
+- DAC static/dynamic accuracy on the Rev.B board;
+- output stability with the real DUT/cable;
+- thermal qualification;
+- EMC;
+- manufacturing process qualification;
+- complete PCB placement/routing;
+- permission to enter Layout.
+
+`layout_allowed=false` remains invariant until the remaining pre-layout gates and
+engineering review are complete.
