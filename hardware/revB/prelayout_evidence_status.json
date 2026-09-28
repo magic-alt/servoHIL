@@ -72,6 +72,11 @@
       "gate": "prelayout_component_mounted_board_temperature_rise",
       "status": "NOT_RUN",
       "evidence": null
+    },
+    "MLCC_EXACT_LAND_PATTERN_HEIGHT_PLACEMENT": {
+      "gate": "prelayout_component_mlcc_exact_land_pattern_height_placement",
+      "status": "NOT_RUN",
+      "evidence": null
     }
   },
   "physical": {

@@ -10,7 +10,7 @@ from kicad_sexpr import parse, items, one, walk
 NATIVE = ROOT / 'hardware/kicad/revB/axu2cgb_expansion'
 
 class NativeSafetySourceTests(unittest.TestCase):
-    def test_reviewed_ad3542r_delta_is_exact_and_narrow(self):
+    def test_reviewed_component_deltas_are_exact_and_narrow(self):
         from check_native_safety import REVIEWED_COMPONENT_DELTAS
         expected = {
             ref: {
@@ -19,6 +19,7 @@ class NativeSafetySourceTests(unittest.TestCase):
             }
             for ref in ('U20', 'U21', 'U22', 'U23')
         }
+        expected['C105'] = {'value': '47uF / 35V X7R effective >=22uF'}
         self.assertEqual(REVIEWED_COMPONENT_DELTAS, expected)
 
     def test_real_watchdog_and_permit_sheets_exist(self):

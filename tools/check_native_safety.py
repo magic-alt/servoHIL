@@ -89,6 +89,11 @@ REVIEWED_COMPONENT_DELTAS = {
     }
     for ref in ('U20', 'U21', 'U22', 'U23')
 }
+# C105's X7R text is a reviewed value refinement for the exact screening
+# candidate; connectivity and the still-unqualified generic 2220 footprint do not change.
+REVIEWED_COMPONENT_DELTAS['C105'] = {
+    'value': '47uF / 35V X7R effective >=22uF',
+}
 
 REVIEWED_FOOTPRINT_DELTAS = {
     'F101':'Fuse:Fuse_Littelfuse-NANO2-451_453',

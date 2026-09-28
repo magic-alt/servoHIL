@@ -103,6 +103,7 @@ class DutProfileQualificationTests(unittest.TestCase):
         self.assertIn("MAGNETICS_L_I_T_CURVES", report["component_evidence_required"])
         self.assertIn("MAGNETICS_AC_CORE_AND_WINDING_LOSS", report["component_evidence_required"])
         self.assertIn("MLCC_EXACT_MPN_DC_BIAS_CURVES", report["component_evidence_required"])
+        self.assertIn("MLCC_EXACT_LAND_PATTERN_HEIGHT_PLACEMENT", report["component_evidence_required"])
         self.assertIn("MOUNTED_BOARD_TEMPERATURE_RISE", report["component_evidence_required"])
         self.assertIn("LOW_ENERGY_FIXTURE_ACCEPTANCE", report["physical_required"])
         self.assertIn("VIVADO_IO_DRC", report["vivado_required"])
@@ -136,6 +137,21 @@ class DutProfileQualificationTests(unittest.TestCase):
         self.assertEqual(result["carrier"], "axu2cgb")
         self.assertEqual(result["verified"], {})
         self.assertTrue(all(v == "NOT_RUN" for section in result["states"].values() for v in section.values()))
+
+    def test_prelayout_evidence_registry_does_not_change_design_source_digest(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            revb = root / "hardware" / "revB"
+            revb.mkdir(parents=True)
+            (revb / "io_contract.json").write_text('{"revision":"Rev.B"}\\n', encoding="utf-8")
+            registry = revb / "prelayout_evidence_status.json"
+            registry.write_text('{"status":"NOT_RUN"}\\n', encoding="utf-8")
+            before = source_digest(root)
+            registry.write_text(
+                '{"status":"PASS","vivado":{"VIVADO_IO_DRC":{"status":"PASS"}}}\\n',
+                encoding="utf-8",
+            )
+            self.assertEqual(source_digest(root), before)
 
     def test_missing_requirement_state_is_rejected(self):
         status = json.loads((ROOT / "hardware/revB/prelayout_evidence_status.json").read_text())
@@ -221,6 +237,26 @@ class GateEvidenceTests(unittest.TestCase):
             raw_path.write_bytes(b"changed\n")
             with self.assertRaisesRegex(ValueError, "raw report hash mismatch"):
                 _verified_gate_evidence(entry, root, "permit_reaction")
+
+    def test_raw_artifact_hash_mismatch_is_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            entry, report_path, _ = self.make_evidence(root)
+            artifact = root / "evidence" / "io_runtime.csv"
+            artifact.write_bytes(b"port,pin\n")
+            report = json.loads(report_path.read_text())
+            report["raw_artifacts"] = [{
+                "path": "evidence/io_runtime.csv",
+                "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+            }]
+            report_path.write_text(json.dumps(report))
+            self.assertIn(
+                "evidence/io_runtime.csv",
+                _verified_gate_evidence(entry, root, "permit_reaction", expected_carrier="axu2cgb"),
+            )
+            artifact.write_bytes(b"changed\n")
+            with self.assertRaisesRegex(ValueError, "raw artifact hash mismatch"):
+                _verified_gate_evidence(entry, root, "permit_reaction", expected_carrier="axu2cgb")
 
     def test_stale_source_digest_is_rejected(self):
         with tempfile.TemporaryDirectory() as td:

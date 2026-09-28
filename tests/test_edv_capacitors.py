@@ -48,9 +48,18 @@ class CapacitorEvidence(unittest.TestCase):
         self.assertTrue(row['characterization_sheet_url'].startswith('https://product.tdk.com/'))
         self.assertEqual(len(r['banks']),9)
 
-    def test_lifecycle_and_unknown_input_mpn_are_not_silent_approval(self):
+    def test_lifecycle_and_input_exact_mpn_do_not_silently_approve(self):
         rows={x['bank']:x for x in self.m.report(ROOT)['banks']}
-        self.assertEqual(rows['input_protected']['status'],'BLOCKED_MPN')
+        input_row=rows['input_protected']
+        self.assertEqual(input_row['part_number'],'C5750X7R1V476M230KC')
+        self.assertEqual(input_row['status'],'BLOCKED_MISSING_CURVE')
+        self.assertEqual(input_row['lifecycle'],'PRODUCTION')
+        self.assertEqual(input_row['rated_voltage_v'],35)
+        self.assertEqual(input_row['part_number'],'C5750X7R1V476M230KC')
+        self.assertIn('REVIEW_OPEN',json.loads((ROOT/'sim/power/capacitor_candidates.json').read_text())['parts']['C5750X7R1V476M230KC']['land_pattern_status'])
+        self.assertAlmostEqual(input_row['bias_screen_v'],15.05)
+        self.assertAlmostEqual(input_row['required_bias_retention'],22/(47*.8*.85*.97))
+        self.assertIn('NOT_HASH',input_row['manufacturer_curve_source_status'])
         self.assertEqual(rows['cuk_transfer']['part_number'],'CGA6L2X7R1H105K160AA')
         self.assertEqual(rows['cuk_transfer']['lifecycle'],'PRODUCTION')
         self.assertEqual(rows['cuk_transfer']['automotive_qualification'],'AEC-Q200')

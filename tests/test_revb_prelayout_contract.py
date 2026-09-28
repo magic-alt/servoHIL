@@ -30,10 +30,17 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         self.assertIn("BLOCKER", report["mechanical_fault_semantic_blockers"]["J501"])
         self.assertIn("BLOCKER", report["mechanical_fault_semantic_blockers"]["J701"])
         self.assertEqual(report["dut_adapter_status"], "UNBOUND")
-        self.assertEqual(report["vivado_status"], "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_XDC_CLOCKS_UNBOUND")
+        self.assertEqual(report["vivado_status"], "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED")
         self.assertEqual(report["vivado_input_contract"]["target_part"], "xczu2cg-sfvc784-1-e")
         self.assertEqual(report["vivado_input_contract"]["marketing_part"], "XCZU2CG-1SFVC784E")
-        self.assertEqual(report["active_vivado_inputs"], {"xdc": [], "project": []})
+        self.assertEqual(
+            report["active_vivado_inputs"],
+            {
+                "harness_xdc": ["fpga/revb/io_drc/axu2cgb_io_drc.xdc"],
+                "functional_xdc": [],
+                "project": [],
+            },
+        )
         self.assertGreaterEqual(report["template_count"], 4)
         self.assertEqual(report["verification_plan_count"], 5)
 
@@ -82,6 +89,26 @@ class RevBPrelayoutContractTests(unittest.TestCase):
                     _validate_mechanical(ROOT, contract, manifest, plan)
 
 
+    def test_two_wire_cable_short_architecture_remains_decision_required(self):
+        report = check(ROOT)
+        state = report["cable_fault_architecture"]
+        self.assertEqual(state["status"], "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS")
+        self.assertIn("NOT_DETECTABLE", state["J501"])
+        self.assertIn("NOT_DETECTABLE", state["J701"])
+        self.assertEqual(state["selected_resolutions"], {"J501": None, "J701": None})
+
+    def test_j701_cable_fault_contract_cannot_claim_sto(self):
+        from check_revb_prelayout_contract import _validate_cable_fault_architecture
+        contract = self.load("hardware/revB/prelayout_qualification_contract.json")
+        data = self.load("hardware/revB/cable_fault_architecture.json")
+        self.assertIn("STO", data["interfaces"]["J701"]["forbidden_claims"])
+        self.assertIn("redundant safety output", data["interfaces"]["J701"]["forbidden_claims"])
+        self.assertIsNone(data["interfaces"]["J701"]["selected_resolution"])
+        self.assertEqual(
+            _validate_cable_fault_architecture(ROOT, contract["mechanical_bindings"])["status"],
+            "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS",
+        )
+
     def test_template_can_never_be_promoted_to_pass(self):
         template = self.load("hardware/revB/evidence/templates/physical_measurement_record.json")
         template["status"] = "PASS"
@@ -99,11 +126,16 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "magnetic source set drift"):
             _validate_sources(contract, broken, components, capacitors)
 
-    def test_mlcc_input_bank_remains_blocked_on_exact_mpn(self):
+    def test_mlcc_input_bank_has_exact_mpn_but_curve_remains_blocked(self):
         report = check(ROOT)
+        self.assertEqual(report["component_source_state"]["unresolved_mlcc_banks"], [])
         self.assertEqual(
-            report["component_source_state"]["unresolved_mlcc_banks"],
-            ["input_protected"],
+            report["component_source_state"]["input_protected_exact_mpn"],
+            "C5750X7R1V476M230KC",
+        )
+        self.assertIn(
+            "NOT_HASH",
+            report["component_source_state"]["input_protected_curve_status"],
         )
 
     def test_checked_in_verification_plan_cannot_claim_pass_without_raw_evidence(self):
@@ -114,29 +146,15 @@ class RevBPrelayoutContractTests(unittest.TestCase):
             _validate_verification_plan(plan, "partial-power")
 
     def test_vivado_preview_cannot_be_promoted_to_active_constraint(self):
-        from check_revb_prelayout_contract import _validate_vivado_contract
-        contract = self.load("hardware/revB/prelayout_qualification_contract.json")
-        work = copy.deepcopy(contract["workstreams"]["VIVADO_IO_DRC_TIMING"])
         original = self.load("hardware/revB/vivado_input_contract.json")
-        original["io_constraint_preview"]["can_close_gate"] = True
-        import tempfile
-        with tempfile.TemporaryDirectory() as td:
-            root = Path(td)
-            # Build only the paths needed by the validator under a temp repo root.
-            for rel in [
-                "hardware/carriers/axu2cgb/profile.json",
-                "hardware/kicad/revB/axu2cgb_expansion/carrier.xdc.preview",
-            ]:
-                src = ROOT / rel
-                dst = root / rel
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                dst.write_bytes(src.read_bytes())
-            vpath = root / "hardware/revB/vivado_input_contract.json"
-            vpath.parent.mkdir(parents=True, exist_ok=True)
-            vpath.write_text(json.dumps(original), encoding="utf-8")
-            work["input_contract"] = "hardware/revB/vivado_input_contract.json"
-            with self.assertRaisesRegex(ValueError, "cannot close"):
-                _validate_vivado_contract(root, work)
+        self.assertFalse(original["io_constraint_preview"]["can_close_gate"])
+        self.assertEqual(
+            original["io_constraint_preview"]["status"],
+            "REVIEW_PREVIEW_ONLY_NOT_ACTIVE_XDC",
+        )
+        self.assertFalse(original["io_drc_harness"]["can_close_timing"])
+        self.assertIsNone(original["functional_timing"]["top_module"])
+        self.assertEqual(original["functional_timing"]["active_xdc_files"], [])
 
 
     def test_source_location_does_not_equal_qualification_pass(self):

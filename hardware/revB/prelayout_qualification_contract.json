@@ -15,7 +15,8 @@
       "J501",
       "J701"
     ],
-    "close_rule": "A reference may leave open_footprints only after an exact selected part, exact mating/cable contract, locally reviewable footprint/mechanical data and the ref-specific evidence pack are complete."
+    "close_rule": "A reference may leave open_footprints only after an exact selected part, exact mating/cable contract, locally reviewable footprint/mechanical data and the ref-specific evidence pack are complete.",
+    "cable_fault_architecture": "hardware/revB/cable_fault_architecture.json"
   },
   "component_evidence": {
     "source_registry": "hardware/revB/component_evidence_sources.json",
@@ -27,11 +28,10 @@
     "mlcc_assigned_exact_mpns": [
       "C3225X7R1C226M250AC",
       "C3225X7R1E106K250AC",
-      "CGA6L2X7R1H105K160AA"
+      "CGA6L2X7R1H105K160AA",
+      "C5750X7R1V476M230KC"
     ],
-    "unresolved_banks": [
-      "input_protected"
-    ],
+    "unresolved_banks": [],
     "policy": "Manufacturer characteristic sources may satisfy provenance/curve-source subchecks only after exact bytes/conditions are archived and reviewed. They do not replace startup/fault stress or mounted-board thermal evidence."
   },
   "workstreams": {
@@ -62,7 +62,7 @@
         "EXACT_MPN_DC_BIAS",
         "TEMPERATURE_AGING",
         "RMS_CURRENT_ESR",
-        "INPUT_PROTECTED_EXACT_MPN"
+        "EXACT_LAND_PATTERN_HEIGHT_PLACEMENT"
       ],
       "evidence_template": "hardware/revB/evidence/templates/manufacturer_curve_record.json"
     },
@@ -83,7 +83,7 @@
       "verification_plan": "hardware/revB/verification_plans/board_thermal.json"
     },
     "VIVADO_IO_DRC_TIMING": {
-      "status": "BLOCKED_TOP_XDC_CLOCKS_NOT_BOUND",
+      "status": "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED",
       "evidence_template": "hardware/revB/evidence/templates/vivado_report_record.json",
       "verification_plan": "hardware/revB/verification_plans/vivado_io_timing.json",
       "input_contract": "hardware/revB/vivado_input_contract.json"

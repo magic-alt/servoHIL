@@ -2,7 +2,7 @@
   "schema": 1,
   "checked_on": "2026-09-28",
   "status": "CANDIDATES_NOT_BOM_OR_LAYOUT_RELEASE",
-  "source_note": "TDK exact product pages and exact-MPN characterization sheets rechecked 2026-09-28. Characterization sheets expose DC-bias, impedance/ESR, capacitance/frequency, temperature and ripple-temperature-rise reference graphs, but original CSV/bytes are not yet archived in a reviewed evidence pack. Candidate binding is not BOM/layout release.",
+  "source_note": "TDK exact product pages and exact-MPN characterization sheets rechecked 2026-09-28. C105/input_protected is now bound for screening to production C5750X7R1V476M230KC (47uF, 35V, X7R, EIA 2220). Characterization sheets expose DC-bias, impedance/ESR, capacitance/frequency, temperature and ripple-temperature-rise reference graphs, but original CSV/bytes are not yet archived in a reviewed evidence pack. Candidate binding is not BOM/layout release.",
   "bias_reserve_v": 0.05,
   "bias_reserve_status": "Engineering screening reserve, NOT a measured startup/load-step/surge bound.",
   "parts": {
@@ -70,10 +70,30 @@
       "note": "Production automotive-grade replacement for the assigned NRND commercial 1uF/50V/1210 candidate. DC-bias/reference curves still require archived exact-MPN evidence.",
       "characterization_sheet_url": "https://product.tdk.com/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/cga6l2x7r1h105k160aa.pdf",
       "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED"
+    },
+    "C5750X7R1V476M230KC": {
+      "manufacturer": "TDK",
+      "capacitance_f": 0.000047,
+      "tolerance_loss": 0.2,
+      "rated_voltage_v": 35,
+      "dielectric": "X7R",
+      "temperature_loss": 0.15,
+      "footprint": "Capacitor_SMD:C_2220_5750Metric",
+      "height_max_mm": 2.5,
+      "lifecycle": "PRODUCTION",
+      "operating_temperature_c": [
+        -55,
+        125
+      ],
+      "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C5750X7R1V476M230KC",
+      "characterization_sheet_url": "https://product.tdk.com/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c5750x7r1v476m230kc_211008.pdf",
+      "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED",
+      "note": "Exact production screening candidate for C105/input_protected: 47uF +/-20%, 35V, X7R, EIA 2220. Native C105 now binds X7R, but the generic KiCad 2220 footprint is not accepted as TDK exact-part land-pattern qualification. Effective >=22uF at the 15.05V screening point remains unproven until exact hash-bound DC-bias data are imported; land pattern/height and RMS/ESR/temperature/aging remain open.",
+      "land_pattern_status": "MANUFACTURER_RECOMMENDATION_LOCATED_LOCAL_FOOTPRINT_REVIEW_OPEN"
     }
   },
   "bank_candidates": {
-    "input_protected": null,
+    "input_protected": "C5750X7R1V476M230KC",
     "buck_6v2": "C3225X7R1C226M250AC",
     "buck_3v3": "C3225X7R1C226M250AC",
     "buck_1v8": "C3225X7R1C226M250AC",

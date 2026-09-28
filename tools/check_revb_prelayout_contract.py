@@ -9,7 +9,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_MECHANICAL = {"J101", "SW101", "J5", "J501", "J701"}
 EXPECTED_MAGNETICS = {"XAL5050-103MEC", "XAL5050-682MEC", "XAL5030-472MEC"}
-EXPECTED_MLCC = {"C3225X7R1C226M250AC", "C3225X7R1E106K250AC", "CGA6L2X7R1H105K160AA"}
+EXPECTED_MLCC = {"C3225X7R1C226M250AC", "C3225X7R1E106K250AC", "CGA6L2X7R1H105K160AA", "C5750X7R1V476M230KC"}
 
 
 def _load(path: Path, name: str) -> dict[str, Any]:
@@ -134,6 +134,44 @@ def _validate_mechanical(root: Path, contract: dict[str, Any], manifest: dict[st
     return sorted(EXPECTED_MECHANICAL)
 
 
+def _validate_cable_fault_architecture(root: Path, mechanical: dict[str, Any]) -> dict[str, Any]:
+    path = mechanical.get("cable_fault_architecture")
+    data = _load(_repo_file(root, path, "cable-fault architecture"), "cable-fault architecture")
+    if data.get("schema_version") != 1 or data.get("layout_allowed") is not False:
+        raise ValueError("cable-fault architecture schema/layout policy drift")
+    if data.get("status") != "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS":
+        raise ValueError("cable-fault architecture must remain decision-required")
+    interfaces = data.get("interfaces")
+    if not isinstance(interfaces, dict) or set(interfaces) != {"J501", "J701"}:
+        raise ValueError("cable-fault architecture must cover exactly J501/J701")
+    expected_options = {
+        "J501": {"EOL_SUPERVISED_INPUT", "DUAL_CHANNEL_MONITORED", "ACCEPT_NON_SAFETY_RESIDUAL_RISK"},
+        "J701": {"DUT_SIDE_LINE_MONITORING", "DUAL_MONITORED_PERMIT", "ACCEPT_NON_SAFETY_RESIDUAL_RISK"},
+    }
+    for ref, options in expected_options.items():
+        item = interfaces[ref]
+        if item.get("selected_resolution") is not None:
+            raise ValueError(ref + ": cable-short resolution cannot be selected without design/evidence closure")
+        if set(item.get("allowed_resolutions", {})) != options:
+            raise ValueError(ref + ": cable-short resolution option drift")
+        if "NOT_DETECTABLE" not in str(item.get("cable_short_detectability", "")):
+            raise ValueError(ref + ": current two-wire cable-short limitation must remain explicit")
+        if "short" not in str(item.get("short_failure_semantics", "")).lower():
+            raise ValueError(ref + ": short-failure semantics missing")
+    forbidden = set(interfaces["J701"].get("forbidden_claims", []))
+    if "STO" not in forbidden or "redundant safety output" not in forbidden:
+        raise ValueError("J701 forbidden safety claims drift")
+    return {
+        "status": data["status"],
+        "J501": interfaces["J501"]["cable_short_detectability"],
+        "J701": interfaces["J701"]["cable_short_detectability"],
+        "selected_resolutions": {
+            "J501": interfaces["J501"]["selected_resolution"],
+            "J701": interfaces["J701"]["selected_resolution"],
+        },
+    }
+
+
 def _https(value: Any, name: str) -> str:
     if not isinstance(value, str) or not value.startswith("https://"):
         raise ValueError(name + ": HTTPS manufacturer source required")
@@ -189,21 +227,40 @@ def _validate_sources(
         if "NOT_HASH" not in str(candidate.get("curve_source_status", "")):
             raise ValueError(mpn + ": curve source must remain unqualified until hash-bound")
     unresolved = mlcc.get("unresolved", {})
-    if set(unresolved) != {"input_protected"} or unresolved["input_protected"].get("status") != "BLOCKED_EXACT_MPN_NOT_SELECTED":
-        raise ValueError("input_protected MLCC must remain blocked on exact MPN")
+    if unresolved != {}:
+        raise ValueError("all currently declared MLCC banks must have an exact screening MPN")
+    if capacitor_candidates.get("bank_candidates", {}).get("input_protected") != "C5750X7R1V476M230KC":
+        raise ValueError("input_protected exact MPN drift")
+    input_row = mlcc["exact_parts"].get("C5750X7R1V476M230KC", {})
+    if input_row.get("assigned_banks") != ["input_protected"]:
+        raise ValueError("input_protected source registry assignment drift")
+    if input_row.get("land_pattern_status") != "MANUFACTURER_RECOMMENDATION_LOCATED_LOCAL_FOOTPRINT_NOT_EXACTLY_QUALIFIED":
+        raise ValueError("input_protected exact land-pattern status drift")
+    if input_row.get("local_footprint") != "Capacitor_SMD:C_2220_5750Metric":
+        raise ValueError("input_protected local footprint binding drift")
+    requirement = input_row.get("screening_requirement", {})
+    if requirement.get("bias_screen_v") != 15.05 or requirement.get("minimum_effective_capacitance_uf") != 22:
+        raise ValueError("input_protected MLCC screening requirement drift")
+    retention = requirement.get("minimum_dc_bias_retention_after_tolerance_temperature_aging")
+    expected_retention = 22 / (47 * 0.8 * 0.85 * 0.97)
+    if not isinstance(retention, (int, float)) or abs(retention - expected_retention) > 1e-12:
+        raise ValueError("input_protected MLCC retention requirement drift")
     return {
         "registry_status": registry.get("status"),
         "magnetics_source_status": magnetics.get("source_status"),
         "mlcc_source_status": mlcc.get("source_status"),
         "magnetic_mpns": sorted(EXPECTED_MAGNETICS),
         "mlcc_mpns": sorted(EXPECTED_MLCC),
-        "unresolved_mlcc_banks": ["input_protected"],
+        "unresolved_mlcc_banks": [],
+        "input_protected_exact_mpn": "C5750X7R1V476M230KC",
+        "input_protected_curve_status": capacitor_candidates["parts"]["C5750X7R1V476M230KC"]["curve_source_status"],
     }
 
 
 
 def _validate_verification_plan(data: dict[str, Any], name: str) -> None:
-    if data.get("schema_version") != 1:
+    schema = data.get("schema_version")
+    if schema not in {1, 2}:
         raise ValueError(f"{name}: unsupported verification plan schema")
     if data.get("layout_allowed") is not False:
         raise ValueError(f"{name}: verification plan must not authorize Layout")
@@ -212,16 +269,20 @@ def _validate_verification_plan(data: dict[str, Any], name: str) -> None:
     status = str(data.get("status", ""))
     if not status or status == "PASS":
         raise ValueError(f"{name}: verification plan must remain explicitly blocked/not-run")
+    if schema == 2:
+        subresults = data.get("subresults")
+        if not isinstance(subresults, dict) or subresults != {"io_drc": "NOT_RUN", "timing": "NOT_RUN"}:
+            raise ValueError(f"{name}: schema-2 Vivado subresults must remain NOT_RUN")
 
 
 
 def _validate_vivado_contract(root: Path, work: dict[str, Any]) -> dict[str, Any]:
     raw = work.get("input_contract")
     contract = _load(_repo_file(root, raw, "Vivado input contract"), "Vivado input contract")
-    if contract.get("schema_version") != 1 or contract.get("layout_allowed") is not False:
+    if contract.get("schema_version") != 2 or contract.get("layout_allowed") is not False:
         raise ValueError("Vivado input contract schema/layout policy drift")
-    if contract.get("status") != "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_AND_CLOCKS_UNBOUND":
-        raise ValueError("Vivado input contract must remain preview-only until top/XDC/clocks are reviewed")
+    if contract.get("status") != "IO_DRC_HARNESS_BOUND_TIMING_UNBOUND":
+        raise ValueError("Vivado input contract status drift")
     carrier = _load(_repo_file(root, contract.get("carrier_profile"), "carrier profile"), "carrier profile")
     if carrier.get("id") != "axu2cgb" or carrier.get("board_variant") != "AXU2CGB-original":
         raise ValueError("Vivado carrier identity drift")
@@ -231,27 +292,48 @@ def _validate_vivado_contract(root: Path, work: dict[str, Any]) -> dict[str, Any
         raise ValueError("Vivado marketing part identity drift")
     preview = _repo_file(root, contract.get("io_constraint_preview", {}).get("path"), "XDC preview")
     if preview.suffix != ".preview" or contract.get("io_constraint_preview", {}).get("status") != "REVIEW_PREVIEW_ONLY_NOT_ACTIVE_XDC":
-        raise ValueError("carrier constraint preview must not masquerade as active XDC")
+        raise ValueError("carrier constraint preview must not masquerade as functional XDC")
     if contract.get("io_constraint_preview", {}).get("can_close_gate") is not False:
         raise ValueError("constraint preview cannot close a Vivado gate")
-    if contract.get("active_xdc_files") != []:
-        raise ValueError("active XDC list must remain empty until reviewed binding")
-    for field in ("io_drc_top_module", "timing_top_module"):
-        if contract.get(field) is not None:
-            raise ValueError(field + " must remain unbound in current contract")
-    if contract.get("clock_definitions") != [] or contract.get("timing_constraints") != []:
-        raise ValueError("Vivado clocks/timing constraints cannot be predeclared")
+
+    harness = contract.get("io_drc_harness")
+    if not isinstance(harness, dict) or harness.get("status") != "BOUND_NOT_RUN":
+        raise ValueError("Vivado I/O DRC harness must remain bound/not-run until raw evidence exists")
+    if harness.get("top_module") != "servohil_io_drc_top":
+        raise ValueError("Vivado I/O DRC harness top drift")
+    if harness.get("xdc_files") != ["fpga/revb/io_drc/axu2cgb_io_drc.xdc"]:
+        raise ValueError("Vivado I/O DRC harness XDC drift")
+    if harness.get("rtl_sources") != ["fpga/revb/io_drc/servohil_io_drc_top.sv"]:
+        raise ValueError("Vivado I/O DRC harness RTL drift")
+    for path in harness["xdc_files"] + harness["rtl_sources"] + [harness.get("runner")]:
+        _repo_file(root, path, "Vivado I/O DRC harness input")
+    if harness.get("can_close_timing") is not False:
+        raise ValueError("Vivado I/O DRC harness cannot close timing")
+
+    timing = contract.get("functional_timing")
+    if not isinstance(timing, dict):
+        raise ValueError("Vivado functional timing contract missing")
+    if timing.get("top_module") is not None or timing.get("active_xdc_files") != []:
+        raise ValueError("functional timing top/XDC must remain unbound")
+    if timing.get("clock_definitions") != [] or timing.get("timing_constraints") != []:
+        raise ValueError("functional timing clocks/constraints cannot be predeclared")
+
+    from check_revb_vivado_io_drc import check as check_io_drc_harness
+    harness_report = check_io_drc_harness(root)
     return {
         "target_part": contract["target_part"]["vivado_part"],
         "marketing_part": contract["target_part"]["marketing_part"],
         "constraint_preview": contract["io_constraint_preview"]["path"],
         "status": contract["status"],
+        "io_drc_harness": harness_report,
+        "functional_timing_status": timing.get("status"),
     }
 
 
-def _active_vivado_inputs(root: Path) -> dict[str, list[str]]:
+def _active_vivado_inputs(root: Path, harness_xdc: set[str]) -> dict[str, list[str]]:
     root = root.resolve()
-    xdc: list[str] = []
+    harness: list[str] = []
+    functional_xdc: list[str] = []
     project: list[str] = []
     for path in root.rglob("*"):
         if not path.is_file():
@@ -259,12 +341,17 @@ def _active_vivado_inputs(root: Path) -> dict[str, list[str]]:
         rel = path.relative_to(root)
         if rel.parts and rel.parts[0] in {"archive", "build", ".git"}:
             continue
+        rel_text = rel.as_posix()
         suffix = path.suffix.lower()
         if suffix == ".xdc":
-            xdc.append(rel.as_posix())
+            (harness if rel_text in harness_xdc else functional_xdc).append(rel_text)
         elif suffix == ".xpr":
-            project.append(rel.as_posix())
-    return {"xdc": sorted(xdc), "project": sorted(project)}
+            project.append(rel_text)
+    return {
+        "harness_xdc": sorted(harness),
+        "functional_xdc": sorted(functional_xdc),
+        "project": sorted(project),
+    }
 
 
 def check(root: str | Path = ROOT) -> dict[str, Any]:
@@ -296,6 +383,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
     manifest = _load(_repo_file(root, mech_req["manifest"], "mechanical manifest"), "mechanical manifest")
     plan = _load(_repo_file(root, mech_req["plan"], "mechanical plan"), "mechanical plan")
     mechanical_open = _validate_mechanical(root, contract, manifest, plan)
+    cable_fault_state = _validate_cable_fault_architecture(root, contract["mechanical_bindings"])
 
     registry = _load(_repo_file(root, registry_path, "component source registry"), "component source registry")
     component_candidates = _load(root / "sim/power/component_candidates.json", "component candidates")
@@ -334,15 +422,18 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
     if gates.get("layout_allowed") is not False:
         raise ValueError("Rev.B gates must preserve layout_allowed=false")
 
-    vivado = _active_vivado_inputs(root)
     work = contract.get("workstreams", {}).get("VIVADO_IO_DRC_TIMING", {})
     vivado_contract = _validate_vivado_contract(root, work)
-    if not vivado["xdc"] and not vivado["project"]:
-        if work.get("status") != "BLOCKED_TOP_XDC_CLOCKS_NOT_BOUND":
-            raise ValueError("Vivado workstream must remain blocked while top/XDC/clocks are unbound")
-        vivado_status = "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_XDC_CLOCKS_UNBOUND"
+    harness_paths = {vivado_contract["io_drc_harness"]["harness_xdc"]}
+    vivado = _active_vivado_inputs(root, harness_paths)
+    if vivado["harness_xdc"] != ["fpga/revb/io_drc/axu2cgb_io_drc.xdc"]:
+        raise ValueError("expected exactly the reviewed I/O DRC harness XDC")
+    if not vivado["functional_xdc"] and not vivado["project"]:
+        if work.get("status") != "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED":
+            raise ValueError("Vivado workstream must reflect bound I/O DRC harness and blocked timing")
+        vivado_status = "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED"
     else:
-        vivado_status = "ACTIVE_INPUTS_PRESENT_REQUIRE_EXACT_BINDING_REVIEW"
+        vivado_status = "FUNCTIONAL_INPUTS_PRESENT_REQUIRE_EXACT_BINDING_REVIEW"
 
     return {
         "schema_version": 1,
@@ -354,6 +445,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
             "J501": plan["interfaces"]["J501"]["cable_short_behavior"],
             "J701": plan["interfaces"]["J701"]["cable_short_behavior"],
         },
+        "cable_fault_architecture": cable_fault_state,
         "component_source_state": source_state,
         "template_count": len(template_paths),
         "verification_plan_count": len(plan_paths),

@@ -1,8 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "record_type": "VIVADO_REPORT_TEMPLATE_ONLY",
   "status": "TEMPLATE_ONLY_NOT_EVIDENCE",
   "gate": null,
+  "carrier": null,
+  "scope": null,
   "vivado_version": null,
   "target_part": null,
   "top_module": null,
@@ -10,11 +12,14 @@
   "source_files": [],
   "source_commit": null,
   "source_digest": null,
+  "source_artifacts": [],
   "command_or_run": null,
   "raw_report": null,
   "raw_sha256": null,
+  "raw_artifacts": [],
   "result": "NOT_RUN",
+  "timing_result": "NOT_RUN",
   "reviewed_on": null,
   "reviewer": null,
-  "note": "A PASS must bind the exact part/top/XDC/source revision and raw Vivado report bytes. A screenshot or hand-entered timing number is insufficient."
+  "note": "A PASS must bind the exact part/top/XDC/source revision and raw Vivado report bytes. Multiple raw artifacts are independently SHA-256 checked. A screenshot or hand-entered timing number is insufficient."
 }

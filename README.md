@@ -129,7 +129,7 @@ RS-485 同样经过安全许可门控；120 Ω 终端通过跳线接入，默认
 
 这不是额定电流认证或实际功耗量测。新的预算用于重跑原有 25 工况 ngspice 和
 热/磁性筛查；AON 安全链预算、同时短路、动态损耗和真实板级热仍开放。
-原 DAC 电源跨度/输出裕量、真实稳压器模型及输入保护能量问题仍未关闭。XAL50xx 与已分配 TDK MLCC 的精确原厂资料入口已经登记，但曲线原始文件尚未 hash-import；C105 / `input_protected` 仍缺 exact production MPN，因此磁性、MLCC 和实板 thermal 资格均保持 BLOCKED。
+原 DAC 电源跨度/输出裕量、真实稳压器模型及输入保护能量问题仍未关闭。XAL50xx 与已分配 TDK MLCC 的精确原厂资料入口已经登记，但曲线原始文件尚未 hash-import；C105 / `input_protected` 已绑定 TDK C5750X7R1V476M230KC 作为 47 uF / 35 V / X7R / 2220 精确筛选候选，native C105 已明确 X7R；但通用 KiCad 2220 footprint 尚未完成 TDK exact land-pattern/高度复核，且 >=22 uF effective@15.05 V 尚未由 hash-bound DC-bias 数据证明，因此磁性、MLCC 和实板 thermal 资格仍保持 BLOCKED。
 
 ADC 外部 RC 的简化计算也不等于完整抗混叠设计或 16 位精度证明。
 100 Ω 正腿和 1 MΩ 简化输入负载会引入约 100 ppm 的未校准增益误差，
@@ -186,7 +186,7 @@ PowerShell 中运行测试前设 `$env:NATIVE_NETLIST='build/native/canonical.xm
 
 ## 继续推进的顺序
 
-原理图功能拓扑已经收口到 15 页，U20~U23 exact AD3542R footprint 已关闭；当前 source-level 只剩 **5 个真实机械/接口 blocker**：J101、SW101、J5、J501、J701。下一步优先绑定实际连接器/开关/机箱/线束并处理 J501/J701 两线短路语义，同时把 Coilcraft/TDK 原厂曲线做成 hash-bound evidence，选定 C105 exact MPN，完成实板 thermal、真实 DUT adapter、partial-power/backfeed、Vivado active XDC/top/clocks + STA/IO DRC 和低能量夹具实测。只有这些 pre-layout gate 和工程审签通过后才进入 Layout；样机后仍需真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
+原理图功能拓扑已经收口到 15 页，U20~U23 exact AD3542R footprint 已关闭；当前 source-level 只剩 **5 个真实机械/接口 blocker**：J101、SW101、J5、J501、J701。下一步优先绑定实际连接器/开关/机箱/线束并处理 J501/J701 两线短路语义，同时把 Coilcraft/TDK 原厂曲线做成 hash-bound evidence；C105 exact MPN 已选为 TDK C5750X7R1V476M230KC，但其有效电容/RMS/ESR 资格仍待原厂曲线证据。随后完成实板 thermal、真实 DUT adapter、partial-power/backfeed、Vivado functional active XDC/top/clocks + STA（独立 I/O DRC harness 另行验证）和低能量夹具实测。只有这些 pre-layout gate 和工程审签通过后才进入 Layout；样机后仍需真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
 
 **AO 断开为高阻而非安全零位；单个许可触点不是冗余 STO，元件额定值不是板级认证。
 没有匹配实际硬件和 DUT 的原始实测证据，就不把生产资格或安全门禁改成 PASS。**

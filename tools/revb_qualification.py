@@ -117,7 +117,33 @@ def _verified_gate_evidence(
     if actual != raw_sha:
         raise ValueError(f"{gate_name}: raw report hash mismatch")
 
-    return [evidence, raw_name]
+    verified = [evidence, raw_name]
+    artifacts = report.get("raw_artifacts", [])
+    if artifacts:
+        if not isinstance(artifacts, list):
+            raise ValueError(f"{gate_name}: raw_artifacts must be a list")
+        seen: set[str] = set()
+        for artifact in artifacts:
+            if not isinstance(artifact, dict) or set(artifact) != {"path", "sha256"}:
+                raise ValueError(f"{gate_name}: invalid raw_artifacts record")
+            raw_artifact = artifact["path"]
+            raw_artifact_sha = artifact["sha256"]
+            if not isinstance(raw_artifact, str) or not raw_artifact.strip() or raw_artifact in seen:
+                raise ValueError(f"{gate_name}: invalid/duplicate raw artifact path")
+            artifact_rel = Path(raw_artifact)
+            if artifact_rel.is_absolute() or ".." in artifact_rel.parts:
+                raise ValueError(f"{gate_name}: raw artifact path escapes repository")
+            artifact_path = (root / artifact_rel).resolve()
+            if not artifact_path.is_relative_to(root) or not artifact_path.is_file():
+                raise ValueError(f"{gate_name}: raw artifact missing")
+            if not isinstance(raw_artifact_sha, str) or len(raw_artifact_sha) != 64:
+                raise ValueError(f"{gate_name}: raw artifact SHA-256 missing/invalid")
+            if hashlib.sha256(artifact_path.read_bytes()).hexdigest() != raw_artifact_sha:
+                raise ValueError(f"{gate_name}: raw artifact hash mismatch")
+            seen.add(raw_artifact)
+            verified.append(raw_artifact)
+
+    return verified
 
 
 def _qualification_evidence_state(

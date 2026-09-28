@@ -96,7 +96,7 @@ before freezing parts. Cuk candidate rows expose the invalid-CCM screening statu
 | Six 2x22 uF banks | TDK C3225X7R1C226M250AC, 16 V X7R 1210 | Production catalog part is **+/-20%**, max height 2.8 mm; do not apply generic +/-10% tolerance |
 | C414/C415 | TDK C3225X7R1E106K250AC, 10 uF 25 V X7R 1210 | Higher voltage rating is not proof of interchangeability; effective-capacitance target still open |
 | C410 | TDK CGA6L2X7R1H105K160AA, 1 uF 50 V X7R 1210 | Production automotive AEC-Q200 candidate; DC-bias, RMS-current/ESR and effective-C qualification remain open |
-| C105 | No exact MPN bound | 47 uF / 35 V, native 2220; MPN and bias evidence remain blocked |
+| C105 | TDK C5750X7R1V476M230KC, 47 uF 35 V X7R 2220 | Production exact-MPN screening candidate; native C105 now binds X7R, but the generic KiCad 2220 footprint still requires TDK exact land-pattern/height review; >=22 uF effective at 15.05 V still requires hash-bound DC-bias data plus temperature/aging and RMS/ESR review |
 
 Exact manufacturer source discovery is now also centralized in
 `hardware/revB/component_evidence_sources.json`. The Coilcraft XAL50xx document
@@ -114,6 +114,39 @@ named generic 10%-tolerance sensitivity. With the 20%-tolerance 22 uF candidate,
 20 uF effective requires at least 68.91% bias retention under the assumed 15%
 temperature and 3% aging losses. That is a **requirement**, not imported data.
 The 3% aging and 50 mV voltage reserve are still engineering assumptions.
+
+### Coilcraft XAL L-vs-current evidence import
+
+XAL L-vs-current evidence uses the same fail-closed pattern as MLCC curves. The
+checked-in report without a curve pack remains `BLOCKED_MISSING_CURVE`:
+
+```sh
+python sim/power/magnetics.py --output build/edv/magnetics
+```
+
+After an engineer obtains the reviewed Coilcraft source bytes, create one pack
+per exact MPN (`XAL5050-103MEC.json`, `XAL5050-682MEC.json`,
+`XAL5030-472MEC.json`) with:
+
+- `schema: 1`, `manufacturer: "Coilcraft"`, exact `part_number`;
+- `characteristic: "L_VS_CURRENT_REFERENCE"`;
+- the reviewed HTTPS `source_url`, retrieval date, reviewer and normalization note;
+- conditions including `temperature_c` and a nonempty `curve_basis`;
+- an `original` file + SHA-256 and reviewer-normalized CSV + SHA-256.
+
+The normalized CSV columns are exactly `current_a,inductance_uh`, begin at 0 A,
+remain strictly increasing in current, and are never extrapolated.
+
+```sh
+python sim/power/magnetics.py \
+  --curve-dir /path/to/reviewed-xal-packs \
+  --output build/edv/magnetics-with-curves
+```
+
+Even a byte-valid exact-MPN curve can only produce
+`SCREEN_ONLY_REFERENCE_CURVE`; Coilcraft L(I) graphs are treated as
+typical/reference evidence. AC/core+winding loss, startup/short saturation and
+mounted-board thermal evidence remain separate blockers.
 
 No actual manufacturer curve CSV has been imported. To import reviewed evidence:
 

@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "status": "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS",
+  "layout_allowed": false,
+  "safety_boundary": "These interfaces are lab inhibit/permit mechanisms, not certified functional safety. Selecting an option below does not create an STO claim.",
+  "interfaces": {
+    "J501": {
+      "role": "3.3 V dry-contact service/interlock input",
+      "current_topology": "Two-wire remote contact between INTERLOCK_FEED and INTERLOCK_RAW.",
+      "intended_open_behavior": "INHIBIT",
+      "intended_closed_behavior": "INTERLOCK_OK",
+      "cable_open_detectability": "DETECTABLE_AS_OPEN_CONTACT_BY_CURRENT_DESIGN",
+      "cable_short_detectability": "NOT_DETECTABLE_BY_CURRENT_TWO_WIRE_TOPOLOGY",
+      "short_failure_semantics": "A short across J501 pins 1-2 is electrically indistinguishable from a closed/healthy remote contact.",
+      "selected_resolution": null,
+      "allowed_resolutions": {
+        "EOL_SUPERVISED_INPUT": {
+          "description": "Place a reviewed end-of-line resistance/network at the remote contact and measure a window rather than only binary closure.",
+          "required_design_changes": [
+            "defined remote EOL network",
+            "window comparator or ADC measurement path",
+            "open/normal/short thresholds",
+            "tolerance/leakage/ESD analysis"
+          ],
+          "required_evidence": [
+            "measured open/normal/short windows over voltage/temperature/tolerance",
+            "cable open/short fault injection"
+          ]
+        },
+        "DUAL_CHANNEL_MONITORED": {
+          "description": "Use two independently routed/monitored channels with discrepancy diagnostics.",
+          "required_design_changes": [
+            "second independent loop",
+            "independent sensing path",
+            "discrepancy logic",
+            "wiring segregation review"
+          ],
+          "required_evidence": [
+            "single-fault injection",
+            "cross-short/discrepancy test",
+            "timing/reaction measurement"
+          ]
+        },
+        "ACCEPT_NON_SAFETY_RESIDUAL_RISK": {
+          "description": "Retain the two-wire contact as a non-safety service interlock and explicitly accept that pair-short can look healthy.",
+          "required_design_changes": [
+            "none"
+          ],
+          "required_evidence": [
+            "requirements signoff that cable-short fail-safe behavior is not claimed",
+            "documentation of residual risk"
+          ]
+        }
+      },
+      "close_rule": "selected_resolution and its design/evidence contract must be reviewed before the cable-short semantic blocker can leave pre-layout review"
+    },
+    "J701": {
+      "role": "floating normally-open DUT permit contact",
+      "current_topology": "Single floating two-wire PhotoMOS contact presented as DUT_PERMIT_A/B.",
+      "intended_open_behavior": "DUT_INHIBITED_REQUIRES_REAL_DUT_CONTRACT",
+      "intended_closed_behavior": "DUT_PERMIT_ASSERTED_REQUIRES_REAL_DUT_CONTRACT",
+      "cable_open_detectability": "DUT_DEPENDENT",
+      "cable_short_detectability": "NOT_DETECTABLE_BY_HIL_CURRENT_TWO_WIRE_CONTACT",
+      "short_failure_semantics": "A short across DUT_PERMIT_A/B can bypass the HIL open-contact inhibit; whether the DUT detects that short is entirely DUT-interface dependent.",
+      "selected_resolution": null,
+      "allowed_resolutions": {
+        "DUT_SIDE_LINE_MONITORING": {
+          "description": "Bind a real DUT input that independently diagnoses line short/open or uses a coded/test-pulse permit input.",
+          "required_design_changes": [
+            "reviewed DUT adapter/input contract"
+          ],
+          "required_evidence": [
+            "DUT input threshold/leakage characterization",
+            "open/short fault injection",
+            "end-to-end inhibit timing"
+          ]
+        },
+        "DUAL_MONITORED_PERMIT": {
+          "description": "Redesign to two independent permit channels consumed by a DUT that performs discrepancy/line diagnostics.",
+          "required_design_changes": [
+            "second independent contact/path",
+            "DUT dual-channel acceptance contract",
+            "diagnostic/discrepancy semantics"
+          ],
+          "required_evidence": [
+            "single-channel stuck/short/open fault injection",
+            "cross-short analysis",
+            "reaction timing"
+          ]
+        },
+        "ACCEPT_NON_SAFETY_RESIDUAL_RISK": {
+          "description": "Retain one floating permit as a non-safety lab inhibit and explicitly state that pair-short can force permit.",
+          "required_design_changes": [
+            "none"
+          ],
+          "required_evidence": [
+            "DUT/test-plan signoff of residual risk",
+            "operator/fixture documentation preventing safety reliance"
+          ]
+        }
+      },
+      "forbidden_claims": [
+        "STO",
+        "redundant safety output",
+        "cable-short fail-safe without external monitoring"
+      ],
+      "close_rule": "selected_resolution must be consistent with the real DUT adapter and measured cable-fault behavior before the cable-short semantic blocker can leave pre-layout review"
+    }
+  }
+}

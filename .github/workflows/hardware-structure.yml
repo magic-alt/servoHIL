@@ -30,6 +30,8 @@ jobs:
           # Reproduce this exact review offline; include tracked files only, never credentials.
           git archive --format=zip --output=build/revB/source.zip HEAD
           (cd build/revB && sha256sum source.zip > source.zip.sha256)
+      - name: Static Vivado IO DRC harness contract
+        run: python tools/check_revb_vivado_io_drc.py | tee build/revB/vivado-io-drc-static.json
       - name: Prove unbound SoM and fabrication gates fail closed
         shell: bash
         run: |
