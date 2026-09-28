@@ -88,7 +88,8 @@
       "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C5750X7R1V476M230KC",
       "characterization_sheet_url": "https://product.tdk.com/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c5750x7r1v476m230kc_211008.pdf",
       "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED",
-      "note": "Exact production screening candidate for C105/input_protected: 47uF +/-20%, 35V, X7R, EIA 2220. TDK recommended land pattern and max body thickness are recorded from the product page. Effective >=22uF at the 15.05V screening point is NOT established until exact hash-bound DC-bias data are imported; RMS/ESR/temperature/aging remain open."
+      "note": "Exact production screening candidate for C105/input_protected: 47uF +/-20%, 35V, X7R, EIA 2220. Native C105 now binds X7R, but the generic KiCad 2220 footprint is not accepted as TDK exact-part land-pattern qualification. Effective >=22uF at the 15.05V screening point remains unproven until exact hash-bound DC-bias data are imported; land pattern/height and RMS/ESR/temperature/aging remain open.",
+      "land_pattern_status": "MANUFACTURER_RECOMMENDATION_LOCATED_LOCAL_FOOTPRINT_REVIEW_OPEN"
     }
   },
   "bank_candidates": {
