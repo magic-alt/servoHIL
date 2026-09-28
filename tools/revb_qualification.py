@@ -237,7 +237,7 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
     requirements = json.loads(
         (root / "hardware/revB/qualification_requirements.json").read_text(encoding="utf-8")
     )
-    if requirements.get("schema_version") != 2:
+    if requirements.get("schema_version") != 3:
         raise ValueError("unsupported qualification requirements schema")
     if requirements.get("release_policy", {}).get("layout_allowed") is not False:
         raise ValueError("qualification requirements must preserve layout_allowed=false")
