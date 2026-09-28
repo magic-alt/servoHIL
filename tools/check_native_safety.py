@@ -112,7 +112,7 @@ def check(source: str | Path, baseline: str | Path = BASELINE) -> dict:
     if extra:raise ValueError('unexpected safety physical pin: '+str(sorted(extra)))
     for ch,(dp,sp) in enumerate(((2,3),(15,14),(10,11),(7,6))*2):
         switch='U601' if ch<4 else 'U602'
-        if members[f'DUT_AO{ch}'] != {f'J5.{ch+1}',f'{switch}.{sp}'}:
+        if members[f'DUT_AO{ch}'] != {f'J5.{ch+1}',f'{switch}.{sp}',f'D{1211+ch}.1'}:
             raise ValueError('DUT AO parallel path or load: '+str(ch))
     for n,net in enumerate(('DUT_PERMIT_A','DUT_PERMIT_B')):
         if members[net] != {f'U701.{3+n}',f'J701.{1+n}'}:
