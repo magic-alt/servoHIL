@@ -1,4 +1,4 @@
-# Rev.B ADC / PHY / health implementation — PR #22
+# Rev.B ADC / PHY / health / connector-protection implementation — PR #22 + PR #23 + schematic closure
 
 Engineering continuation from main `37a4463dbf956cdefe1d55922078de9e327a287b`
 after merged PR #21. **Non-release native circuit implementation. No fabrication,
@@ -7,24 +7,17 @@ board measurement, full DUT inhibition or functional-safety approval.**
 ## Source and implementation
 
 The native circuit commit is `90247a6df219d9f0e203d16366d70aad0cb9fd55`.
-The root project now has 15 sheets. The two reserved module headers J3/J4 are
-removed so their external devices cannot contend with the new on-board circuits.
-All original carrier signal names, pin allocation and voltage domains remain.
-409 physical components = 263 previous - 2 reserved headers + 148 peripheral
-parts. Existing safety checks (47 parts/168 pins) remain; the independent
-peripheral oracle checks 148 parts/461 pins. Existing power/DAC wiring is frozen.
+The root project now has 16 sheets. J3/J4 remain removed; the new `90_connector_protection` sheet adds 37 connector-side ESD/transient devices without changing the 64-signal carrier allocation. The current source audit counts 439 in-BOM/on-board physical instances after excluding purchased-host J12/J15 from expansion-board placement. The independent peripheral oracle now also asserts every protection-device pin/net/package identity. Existing power/DAC wiring remains frozen except explicitly reviewed safety/protection shunts.
 
 | Sheet | Circuit | Deliberate limit |
 |---|---|---|
 | 70_adc_frontend | U801 AD7606C-16BSTZ; eight single-ended inputs; two 100-ohm series legs and a 1nF differential capacitor each; explicit supply/reference/regulator capacitors; eight DOUT lanes and host controls | Low-energy candidate, not field-input surge protection or qualified 16-bit acquisition |
 | 80_encoder_phy | Four THVD1450 half-duplex pairs for two clock/data ports; four safety-gated DE controls; pull defaults and selectable termination | SSI/BiSS directional profile, not arbitrary ABZ or SPI compatibility; non-isolated, no encoder supply |
 | 03_peripheral_boundaries | Six SN74LVC541A PWM receive paths; gated THVD1450 RS485; six AUX logic pins and I2C | 3.3V laboratory logic, not a 24V PLC/gate-drive input |
-| rtl/revb/health_heartbeat.sv | Sequence/deadline/lease-qualified WDI and ARM state | Standalone synchronous core; real Plant/host/CDC/top-level/Vivado integration remains open |
+| rtl/revb/health_heartbeat.sv + runtime_health_integration.sv | Sequence/deadline/lease-qualified WDI/ARM fed only by completed Plant, ADC sample and lease-renew events | AXI/CDC/top-level/Vivado and physical fault-injection integration remain open |
+| 90_connector_protection | PESD15VL1BA on AI/AO, PESD5V0S1BA on low-voltage logic, SM712 on differential cable pairs | Schematic protection only; IEC ESD/surge, return path/layout and powered-off backfeed remain NOT_RUN |
 
-All newly added components have explicit footprint identifiers backed by the
-project-local official KiCad library snapshot. That is **not** final land-pattern,
-MPN, tolerance, rating or component-lifecycle sign-off. Earlier unbound safety
-packages and connector/ESD details are still blockers.
+Most physical components now have explicit footprint identifiers backed by project-local KiCad snapshots. `hardware/revB/schematic_open_items.json` intentionally retains 14 blank-footprint blockers for exact vendor land patterns or real mechanical/connector choices; CI rejects any unlisted blank footprint. This is still **not** production package/MPN/lifecycle or board-level qualification.
 
 ## ADC configuration and electrical interface
 
@@ -36,13 +29,7 @@ mode; SER/PAR is strapped serial, STBY is inactive and WR high. Unused parallel
 pins are grounded per serial-interface guidance. RESET and CS have pullups;
 CONVST/SCLK/SDI have pulldowns. Controls and return data have series resistors.
 
-An eight-lane connection does not select eight-lane mode by itself. Initialization
-must configure and read back CONFIG register 0x02 bits [4:3]=11 before using all
-DOUT lanes. Keep range, bandwidth, oversampling and diagnostics under explicit
-configuration control. Tie each accepted I/O-completion acknowledgement to actual
-valid data, never a requested conversion. Verify channel identity using distinct
-bounded DC inputs/diagnostic patterns. No production initialization/acquisition
-state machine, sample-rate qualification or ADC-to-Plant integration is claimed.
+An eight-lane connection does not select eight-lane mode by itself. PR #23 adds `ad7606c16_controller.sv`: initialization writes CONFIG register 0x02 for eight DOUT lanes, verifies readback before `configured`, then sequences CONVST/BUSY and captures eight 16-bit lanes before asserting `sample_valid` and advancing `sample_seq`. `runtime_health_integration.sv` consumes that completed sequence rather than a conversion request. Analog calibration, sample-rate/settling qualification, CDC/top-level binding and real ADC-to-Plant hardware integration are still open.
 
 J801 is paired single-ended input/GND. Nominal intended range is +/-10V only for
 a reviewed low-energy source. The IC's clamp and absolute-maximum specifications
@@ -67,8 +54,7 @@ supported by this physical profile. No encoder power is sourced on J901/J902.
 J1004 is RS485 A/B/GND; transmit request similarly requires SAFE_ENABLE.
 All 120-ohm termination jumpers ship unshunted in this design. Install only for
 the reviewed role/cable ends; receiver always-on may see local transmit echo.
-Non-isolated buses, host-off backfeed through receiver/AUX/I2C paths, DE ramps,
-ESD/surge, common mode, line length and turn-around delays still require review.
+Non-isolated buses, host-off backfeed through receiver/AUX/I2C paths, DE ramps, common mode, line length and turn-around delays still require review. The new TVS sheet addresses the missing schematic clamp topology but does not convert ESD/surge or partial-power gates into PASS.
 SAFE_ENABLE gating alone is not a partial-power or single-fault safety proof.
 
 The fixed 64-signal carrier contract contains no independent CAN controller or
@@ -124,7 +110,7 @@ never redraws or overwrites the source.
 - ZIP SHA256 c51a666311c14577a89300f967e87d62e93c2c9e94f02386cf8378beb9fe27c6.
 - Scope is explicitly PRECOMMIT_SCRATCH_NOT_HEAD_EVIDENCE. It is **not** proof that
   the unmodified input HEAD already contained the new native circuit files.
-- Actual KiCad 10.0.6, 15 pages, 0 ERC violations, no exclusions added.
+- Historical PR #22 checkpoint: KiCad 10.0.6, 15 pages, 0 ERC violations. Current 16-page closure must use the latest branch/PR artifact; do not reuse this old count as current evidence.
 - 20 native/checker/library objects checked against both Git blob SHA and SHA256;
   downloaded native bytes match the locally inspected files.
 - 166 regression tests passed, 0 skipped, including actual Icarus and ngspice.
