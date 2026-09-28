@@ -11,7 +11,7 @@ ServoHIL 面向伺服驱动器和关节模组的实时 Hardware-in-the-Loop 验�
 
 | 模块 | 已实现 | 尚未完成 / 不能据此声称 |
 |---|---|---|
-| 单 ZU2CG / 原生工程 | 15 页原生 KiCad，可直接编辑；载板分配保持 64 路信号 | 10 个精确封装/机械绑定项仍显式 OPEN；完整板级 bitstream、Vivado STA/IO DRC 未验收 |
+| 单 ZU2CG / 原生工程 | 15 页原生 KiCad，可直接编辑；载板分配保持 64 路信号 | 9 个精确封装/机械绑定项仍显式 OPEN；完整板级 bitstream、Vivado STA/IO DRC 未验收 |
 | 输入保护 / 正负电源 / 参考 | 实际器件、原生值驱动计算与 ngspice 矩阵 | DAC 电源跨度/输出裕量、热、厂家模型、MLCC、启动及反灌门禁未关闭 |
 | 独立 watchdog / AO disconnect / DUT permit | PR #21 的窗口 watchdog、八路 ADG5412F、常开 PhotoMOS 许可触点 | 实际 DUT 的安全偏置、漏电流、断线与最大关断时间未验收；不是 STO |
 | 有效进度心跳 RTL | PR #23 已把完成的 Plant/ADC 序号与主机租约续期接入 completion-only health wrapper；超时锁存、显式恢复/重新 ARM 保留 | AXI/CDC/顶层/XDC 与实板故障注入尚未验收 |
@@ -157,7 +157,7 @@ PowerShell 中运行测试前设 `$env:NATIVE_NETLIST='build/native/canonical.xm
 
 ## 继续推进的顺序
 
-原理图功能拓扑已经收口到 15 页；下一步不再继续盲目扩页，而是关闭 `schematic_open_items.json` 的 10 个精确封装/机械绑定项，并完成电源/热/MLCC/XAL5050 磁性资格。随后绑定真实 DUT adapter 的中性偏置、许可阈值/漏电、线缆失效和最大关断时间，执行部分供电/backfeed、Vivado STA/IO DRC 与低能量夹具验证。只有这些门禁和工程审签通过后才进入 Layout；样机后仍需真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
+原理图功能拓扑已经收口到 15 页；下一步不再继续盲目扩页，而是关闭 `schematic_open_items.json` 的 9 个精确封装/机械绑定项，并完成电源/热/MLCC/XAL5050 磁性资格。随后绑定真实 DUT adapter 的中性偏置、许可阈值/漏电、线缆失效和最大关断时间，执行部分供电/backfeed、Vivado STA/IO DRC 与低能量夹具验证。只有这些门禁和工程审签通过后才进入 Layout；样机后仍需真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
 
 **AO 断开为高阻而非安全零位；单个许可触点不是冗余 STO，元件额定值不是板级认证。
 没有匹配实际硬件和 DUT 的原始实测证据，就不把生产资格或安全门禁改成 PASS。**

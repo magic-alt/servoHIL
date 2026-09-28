@@ -2,12 +2,11 @@
   "schema_version": 1,
   "revision": "Rev.B",
   "checked_on": "2026-09-28",
-  "status": "SCHEMATIC_FUNCTION_COMPLETE_10_PHYSICAL_BINDINGS_OPEN",
+  "status": "SCHEMATIC_FUNCTION_COMPLETE_9_PHYSICAL_BINDINGS_OPEN",
   "layout_allowed": false,
   "policy": "A blank physical footprint is allowed only when it is listed here with an unresolved exact land-pattern or mechanical contract. This manifest is a blocker list, not a fabrication waiver.",
   "open_footprints": {
     "J101": "12 V field connector mechanical/keying/current-rating selection not bound",
-    "U101": "TPS259474LRPWR uses TI RPW 10-pin VQFN-HR; exact HotRod land pattern/vendor CAD is not yet vendored",
     "SW101": "power-reset switch mechanical actuator/footprint not bound",
     "U20": "AD3542RBCPZ16 CP-28-15 exact land pattern/vendor CAD not yet vendored",
     "U21": "AD3542RBCPZ16 CP-28-15 exact land pattern/vendor CAD not yet vendored",
@@ -35,6 +34,7 @@
     "L201": "Inductor_SMD:L_Coilcraft_XAL5050-XXX",
     "L202": "Inductor_SMD:L_Coilcraft_XAL5050-XXX",
     "L301": "Inductor_SMD:L_Coilcraft_XAL5050-XXX",
-    "L302": "Inductor_SMD:L_Coilcraft_XAL5050-XXX"
+    "L302": "Inductor_SMD:L_Coilcraft_XAL5050-XXX",
+    "U101": "Package_DFN_QFN:TI_RPW0010A"
   }
 }

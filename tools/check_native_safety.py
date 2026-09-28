@@ -81,6 +81,7 @@ passive('R703','10k','PERMIT_BASE',GND)
 # Values and pin partitions remain frozen; only these exact footprint assignments may differ.
 REVIEWED_FOOTPRINT_DELTAS = {
     'F101':'Fuse:Fuse_Littelfuse-NANO2-451_453',
+    'U101':'Package_DFN_QFN:TI_RPW0010A',
     'L203':'Inductor_SMD:L_Coilcraft_XAL5030',
     'L201':'Inductor_SMD:L_Coilcraft_XAL5050-XXX',
     'L202':'Inductor_SMD:L_Coilcraft_XAL5050-XXX',
