@@ -6,8 +6,10 @@ ratings, ERC, or a component datasheet into physical hardware qualification.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
+import re
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +57,46 @@ def _string_list(data: dict[str, Any], name: str, *, minimum: int = 1) -> list[s
     if len(set(value)) != len(value):
         raise ValueError(f"{name} must not contain duplicates")
     return value
+
+
+def _verified_gate_evidence(entry: dict[str, Any], root: Path, gate_name: str) -> list[str]:
+    """PASS requires repository-bound raw evidence with byte identity."""
+    if entry.get("status") != "PASS":
+        return []
+    evidence = entry.get("evidence")
+    if isinstance(evidence, dict):
+        records = [evidence]
+    elif isinstance(evidence, list):
+        records = evidence
+    else:
+        raise ValueError(f"{gate_name}: PASS requires hashed evidence records")
+    if not records:
+        raise ValueError(f"{gate_name}: PASS requires at least one evidence record")
+
+    root = root.resolve()
+    verified: list[str] = []
+    for index, record in enumerate(records):
+        if not isinstance(record, dict):
+            raise ValueError(f"{gate_name}: evidence[{index}] must be an object")
+        raw_path = record.get("path")
+        digest = record.get("sha256")
+        if not isinstance(raw_path, str) or not raw_path.strip():
+            raise ValueError(f"{gate_name}: evidence[{index}].path must be nonempty")
+        rel = Path(raw_path)
+        if rel.is_absolute() or ".." in rel.parts:
+            raise ValueError(f"{gate_name}: evidence path escapes repository")
+        path = (root / rel).resolve()
+        if not path.is_relative_to(root):
+            raise ValueError(f"{gate_name}: evidence path escapes repository")
+        if not path.is_file():
+            raise ValueError(f"{gate_name}: evidence file missing: {raw_path}")
+        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+            raise ValueError(f"{gate_name}: evidence[{index}].sha256 must be lowercase SHA-256")
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual != digest:
+            raise ValueError(f"{gate_name}: evidence hash mismatch: {raw_path}")
+        verified.append(raw_path)
+    return verified
 
 
 def _profile_is_unbound(profile: dict[str, Any]) -> bool:
@@ -215,8 +257,14 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
     active_gates = gates.get("gates", {})
     if not isinstance(active_gates, dict):
         raise ValueError("gates.gates must be an object")
+    verified_gate_evidence: dict[str, list[str]] = {}
     for name, entry in sorted(active_gates.items()):
-        if not isinstance(entry, dict) or entry.get("status") != "PASS":
+        if not isinstance(entry, dict):
+            blockers.append(f"GATE_{name.upper()}_NOT_PASS")
+            continue
+        if entry.get("status") == "PASS":
+            verified_gate_evidence[name] = _verified_gate_evidence(entry, root, name)
+        else:
             blockers.append(f"GATE_{name.upper()}_NOT_PASS")
 
     # Component evidence remains explicit even if an analytical report becomes
@@ -240,6 +288,7 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
         "physical_required": physical_required,
         "vivado_required": vivado_required,
         "post_layout_release_required": post_layout_required,
+        "verified_gate_evidence": verified_gate_evidence,
         "blockers": sorted(set(blockers)),
         "note": (
             "Evidence aggregation only; analytical screens and catalog ratings cannot "
