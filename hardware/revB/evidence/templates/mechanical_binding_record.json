@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "record_type": "MECHANICAL_BINDING_TEMPLATE_ONLY",
+  "status": "TEMPLATE_ONLY_NOT_EVIDENCE",
+  "reference": null,
+  "manufacturer": null,
+  "exact_part_number": null,
+  "mating_part_number": null,
+  "manufacturer_source_url": null,
+  "manufacturer_source_sha256": null,
+  "reviewed_on": null,
+  "reviewer": null,
+  "footprint_or_mechanical_model": null,
+  "pinout_or_terminal_map": null,
+  "cable_assembly": null,
+  "enclosure_fit_review": null,
+  "rating_derating_review": null,
+  "creepage_clearance_review": null,
+  "raw_evidence": [],
+  "note": "Copy this template into a ref-specific evidence directory only after a real part/cable/enclosure selection. The template itself can never close a blocker."
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "record_type": "PHYSICAL_MEASUREMENT_TEMPLATE_ONLY",
+  "status": "TEMPLATE_ONLY_NOT_EVIDENCE",
+  "gate": null,
+  "hw_revision": null,
+  "dut_or_fixture_revision": null,
+  "test_case": null,
+  "energized_domains": [],
+  "unpowered_domains": [],
+  "instrument_set": [],
+  "ambient_c": null,
+  "setup_description": null,
+  "measured_values": {},
+  "acceptance_limits": {},
+  "result": "NOT_RUN",
+  "raw_report": null,
+  "raw_sha256": null,
+  "measured_at": null,
+  "reviewer": null,
+  "note": "Real raw data tied to exact hardware and setup is mandatory for PASS."
+}
