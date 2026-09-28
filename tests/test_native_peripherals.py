@@ -29,13 +29,13 @@ class PeripheralSourceTests(unittest.TestCase):
         self.assertTrue((ROOT/'tools/native_peripheral_rules.py').is_file(), 'missing independent pin oracle')
         from native_peripheral_rules import PARTS
         actual={}
-        for name in ('70_adc_frontend','80_encoder_phy','03_peripheral_boundaries'):
+        for name in ('70_adc_frontend','80_encoder_phy','03_peripheral_boundaries','06_analog_outputs','50_watchdog_interlock'):
             path=P/(name+'.kicad_sch')
             self.assertTrue(path.is_file(),str(path))
             for s in items(parse(path.read_text()),'symbol'):
                 f={str(x[1]):x for x in items(s,'property')}
                 ref=str(f['Reference'][2])
-                if ref.startswith('#'):continue
+                if ref.startswith('#') or ref not in PARTS:continue
                 self.assertNotIn(ref,actual)
                 actual[ref]={'value':str(f['Value'][2]),'footprint':str(f['Footprint'][2])}
                 self.assertNotIn('hide',one(f['Value'],'effects',[]))

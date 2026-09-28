@@ -11,4 +11,5 @@
   (lib (name "Package_SON") (type "KiCad") (uri "${KIPRJMOD}/footprints/Package_SON.pretty") (options "") (descr "KiCad installed footprint snapshot; see COPYRIGHT"))
   (lib (name "Fuse") (type "KiCad") (uri "${KIPRJMOD}/footprints/Fuse.pretty") (options "") (descr "KiCad installed footprint snapshot; see COPYRIGHT"))
   (lib (name "Inductor_SMD") (type "KiCad") (uri "${KIPRJMOD}/footprints/Inductor_SMD.pretty") (options "") (descr "KiCad installed footprint snapshot; see COPYRIGHT"))
+  (lib (name "Package_DFN_QFN") (type "KiCad") (uri "${KIPRJMOD}/footprints/Package_DFN_QFN.pretty") (options "") (descr "Project-local reviewed DFN/QFN land patterns"))
 )
