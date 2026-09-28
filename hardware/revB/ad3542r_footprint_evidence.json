@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "revision": "Rev.B",
   "checked_on": "2026-09-28",
   "part": {
@@ -10,8 +10,8 @@
     "pin_count": 28,
     "lead_pitch_mm": 0.4
   },
-  "status": "OFFICIAL_SOURCES_LOCATED_GERBER_AND_CAD_BYTES_NOT_ARCHIVED",
-  "release_effect": "BLOCKER_REMAINS_OPEN",
+  "status": "REVIEWED_OFFICIAL_EVAL_GERBER_FOOTPRINT_VENDORED",
+  "release_effect": "U20_U23_PACKAGE_BLOCKERS_CLOSED_LAYOUT_STILL_BLOCKED",
   "official_sources": {
     "product_page": "https://www.analog.com/en/products/AD3542R.html",
     "datasheet_rev_c": "https://www.analog.com/media/en/technical-documentation/data-sheets/ad3542r.pdf",
@@ -25,54 +25,89 @@
       "commit": "76eb29d83e6eaca9ce4470921d315938b2b1aa17",
       "path": "docs/solutions/reference-designs/eval-ad35xxr/user-guide.rst",
       "blob_sha": "6327c05006caf900728a31445a3c4fdf3d31253a",
-      "source_lines": [721, 722, 723, 724, 725, 726]
+      "source_lines": [
+        721,
+        722,
+        723,
+        724,
+        725,
+        726
+      ]
     }
   },
   "confirmed_facts": [
     "AD3542RBCPZ16 ordering guide package option is CP-28-15",
-    "CP-28-15 body is 4 mm x 4 mm with 0.95 mm nominal package height",
-    "CP-28-15 lead pitch is 0.40 mm BSC",
-    "official EVAL-AD3542RFMCZ schematic uses AD3542RBCPZ16 as U1",
-    "Analog Devices publishes EVAL-AD3542RFMCZ schematic, Gerber ZIP and BOM downloads",
-    "Analog Devices product page links exact-part CAD through Ultra Librarian and SamacSys"
+    "CP-28-15 is a 28-lead 4 mm x 4 mm LFCSP with 0.40 mm pitch",
+    "official EVAL-AD3542RFMCZ BOM binds U1 to AD3542RBCPZ16",
+    "official EVAL IPC-356 contains exactly U1 pins 1..28",
+    "official EVAL top copper, solder-mask and paste geometry resolves a 28-pad perimeter land pattern",
+    "current Rev.C pinout, CP-28-15 bottom view and official EVAL assembly land pattern contain no center/exposed pad"
   ],
-  "exposed_pad_review": {
-    "status": "UNRESOLVED_REQUIRES_CURRENT_CAD_OR_GERBER",
-    "reason": "An early preliminary AD3542R document explicitly instructed connecting an exposed pad to AGND, while current Rev.C pin tables enumerate pins 1..28 and do not independently define a numbered exposed-pad terminal. Do not infer the manufacturing land pattern from either wording alone.",
-    "required_resolution": [
-      "inspect current exact-part vendor CAD land pattern",
-      "inspect actual U1 copper/mask geometry in official EVAL-AD3542RFMCZ Gerber",
-      "record whether a center pad exists and its electrical/net assignment",
-      "cross-check against current CP-28-15 package drawing and Rev.C pinout"
-    ]
+  "source_artifact_hashes": {
+    "datasheet_rev_c_sha256": "a9536b981e1dc140082ddff947487faaaa47874cd8b648966ee9c6b92fa292fa",
+    "package_drawing_sha256": "f6aab2aa746e79a01b4d9067bde56c886001a4cb1b7ed83e198d480ab0845b73",
+    "evaluation_user_guide_sha256": "ed5afa177bce6c907a3981c71f49cc3964078a6b6ff79ecfd24ae78f6a1093b4",
+    "evaluation_gerber_zip_sha256": "87eee7f3ed85e81798918b1977bc0b416d72699a39c771d95e9ea3839ef461e8",
+    "evaluation_bom_sha256": "4608d8884754e5768424832af2331fa0490ab90e05a990a1292bf8f7bab0f7df"
   },
-  "retrieved_artifacts": {
-    "package_drawing_sha256": null,
-    "evaluation_schematic_sha256": null,
-    "evaluation_gerber_zip_sha256": null,
-    "evaluation_bom_sha256": null,
-    "ultra_librarian_archive_sha256": null,
-    "samacsys_archive_sha256": null
+  "geometry_evidence": "hardware/revB/evidence/ad3542r/u1_geometry_review.json",
+  "footprint": {
+    "library_id": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
+    "path": "hardware/kicad/revB/axu2cgb_expansion/footprints/Package_DFN_QFN.pretty/AnalogDevices_CP-28-15_AD3542R.kicad_mod",
+    "source": "official EVAL-AD3542RFMCZ Gerber U1 land pattern",
+    "center_exposed_pad": false
+  },
+  "exposed_pad_review": {
+    "status": "RESOLVED_NO_CENTER_EXPOSED_PAD_CURRENT_SOURCES",
+    "decision": "Do not add a center/exposed pad.",
+    "basis": [
+      "current Rev.C AD3542R pin configuration enumerates pins 1..28 without an exposed-pad terminal",
+      "current CP-28-15 bottom-view drawing shows 28 perimeter terminals and no center pad",
+      "official EVAL IPC-356 contains exactly U1 pins 1..28",
+      "official EVAL SMT and PMT layers contain exactly 28 U1 perimeter apertures and no center aperture"
+    ],
+    "note": "Earlier preliminary wording is superseded for this manufacturing decision by the current Rev.C/package drawing plus the exact official EVAL land pattern."
   },
   "geometry_review": {
-    "status": "NOT_RUN_BYTES_NOT_ARCHIVED",
-    "pad_count": null,
-    "pin1_orientation": null,
-    "pitch_mm": null,
-    "side_pad_size_mm": null,
-    "center_pad_present": null,
-    "center_pad_size_mm": null,
-    "solder_mask_strategy": null,
-    "paste_strategy": null
+    "status": "PASS_OFFICIAL_EVAL_GERBER",
+    "pad_count": 28,
+    "pin1_orientation": "canonical top view: left side nearest top-left; eval board instance is rotated relative to canonical footprint",
+    "pitch_mm": 0.4,
+    "perimeter_pad_center_offset_mm": 1.8933,
+    "side_copper_paste_size_mm": [
+      0.7366,
+      0.2286
+    ],
+    "top_bottom_copper_paste_size_mm": [
+      0.2286,
+      0.7366
+    ],
+    "side_mask_opening_size_mm": [
+      0.8382,
+      0.2794
+    ],
+    "top_bottom_mask_opening_size_mm": [
+      0.2794,
+      0.8382
+    ],
+    "center_pad_present": false,
+    "solder_mask_strategy": "explicit unnumbered F.Mask aperture pads reproduce official EVAL mask openings",
+    "paste_strategy": "numbered pads use official EVAL copper/paste dimensions; paste equals copper"
   },
-  "close_criteria": [
-    "official Gerber ZIP or exact-part CAD bytes archived with SHA-256",
-    "current exact-part pad count and pin-1 orientation independently checked",
-    "0.40 mm pitch and terminal geometry independently checked",
-    "exposed/center-pad presence and electrical treatment resolved from current evidence",
-    "KiCad footprint vendored locally with provenance",
-    "U20..U23 bound to the reviewed footprint",
-    "native KiCad netlist and ERC regressions pass",
-    "source closure checker confirms the four blockers are removed for evidence-backed reasons"
+  "raw_evidence_policy": {
+    "raw_binary_files_committed": false,
+    "reason": "manufacturer-distributed binary files are not redistributed in this repository",
+    "retained": "source/member SHA-256 plus exact U1 IPC-356 and Gerber aperture/flash records",
+    "reverify": "re-download official Analog Devices artifacts, verify SHA-256, and compare hardware/revB/evidence/ad3542r/u1_geometry_review.json"
+  },
+  "close_criteria_satisfied": [
+    "official Gerber ZIP and BOM source artifacts are SHA-256 pinned",
+    "exact U1 IPC-356 pins 1..28 retained and reviewed",
+    "28-pad pin-1 orientation and 0.40 mm pitch independently checked",
+    "side copper/paste and solder-mask dimensions retained from official Gerber",
+    "center/exposed-pad absence resolved from current package drawing and EVAL mask/paste evidence",
+    "KiCad footprint vendored locally with source provenance",
+    "U20..U23 bound to the reviewed local footprint",
+    "native netlist/ERC/source-closure regressions required before PR readiness"
   ]
 }
