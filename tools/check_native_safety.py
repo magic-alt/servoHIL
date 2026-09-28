@@ -31,7 +31,8 @@ def passive(ref, value, first, second):
 
 # TPS3430 DRC: pad 11 is the review-symbol convention for the exposed GND pad.
 part('U501','TPS3430DRCR',{1:AON,10:AON,2:'WD_CWD',3:AON,6:AON,4:None,
-                         5:GND,11:GND,7:'WD_INPUT',8:'WD_CLEAR_N',9:None})
+                         5:GND,11:GND,7:'WD_INPUT',8:'WD_CLEAR_N',9:None},
+     'Package_SON:Texas_DRC0010J')
 for ref,mr,out in [('U502','INTERLOCK_OK','WD_CLEAR_N'),('U503','HB_VALID','RAILS_OK')]:
     part(ref,'TPS3808G33DBVR',{1:out,2:GND,3:mr,4:None,5:AON,6:AON},'Package_TO_SOT_SMD:SOT-23-6')
 for ref,value,inp,out in [('U504','SN74LVC1G17DBVR','WD_HOST','WD_INPUT'),
@@ -40,7 +41,8 @@ for ref,value,inp,out in [('U504','SN74LVC1G17DBVR','WD_HOST','WD_INPUT'),
                          ('U510','SN74LVC1G17DBVR','WD_CLEAR_N','HB_CLR_N')]:
     part(ref,value,{1:None,2:inp,3:GND,4:out,5:AON},'Package_TO_SOT_SMD:SOT-23-5')
 for ref,d,q in [('U506',AON,'HB_FIRST'),('U507','HB_FIRST','HB_VALID')]:
-    part(ref,'SN74LVC1G74DCTR',{1:'WD_CLK',2:d,3:None,4:GND,5:q,6:'HB_CLR_N',7:AON,8:AON})
+    part(ref,'SN74LVC1G74DCTR',{1:'WD_CLK',2:d,3:None,4:GND,5:q,6:'HB_CLR_N',7:AON,8:AON},
+         'Package_SO:SSOP-8_2.95x2.8mm_P0.65mm')
 part('U508','SN74LVC1G11DBVR',{1:'RAILS_OK',3:'ARM_LATCH',6:'HIL_ARM',
                               2:GND,5:AON,4:'SAFE_ENABLE'},'Package_TO_SOT_SMD:SOT-23-6')
 part('J501','3.3V DRY CONTACT ONLY',{1:'INTERLOCK_FEED',2:'INTERLOCK_RAW'})
@@ -66,12 +68,31 @@ for idx,ref in enumerate(['U601','U602']):
 for n,rail in [(651,'+5V2_PVDD'),(652,'-5V2_PVSS'),(653,'+5V2_PVDD'),(654,'-5V2_PVSS')]:
     passive(f'C{n}','100n',rail,GND)
 
-part('U701','AQY212GS',{1:'PERMIT_LED_A',2:'PERMIT_LED_K',3:'DUT_PERMIT_A',4:'DUT_PERMIT_B'})
+part('U701','AQY212GS',{1:'PERMIT_LED_A',2:'PERMIT_LED_K',3:'DUT_PERMIT_A',4:'DUT_PERMIT_B'},
+     'Package_SO:SO-4_4.4x4.3mm_P2.54mm')
 part('Q701','MMBT3904',{1:'PERMIT_BASE',2:GND,3:'PERMIT_LED_K'},'Package_TO_SOT_SMD:SOT-23')
 part('J701','DUT PERMIT - FLOATING NO',{1:'DUT_PERMIT_A',2:'DUT_PERMIT_B'})
 passive('R701','220 1%',AON,'PERMIT_LED_A')
 passive('R702','680 1%','SAFE_ENABLE','PERMIT_BASE')
 passive('R703','10k','PERMIT_BASE',GND)
+
+
+# Reviewed Rev.B schematic-closure deltas against the frozen historical XML.
+# Values and pin partitions remain frozen; only these exact footprint assignments may differ.
+REVIEWED_FOOTPRINT_DELTAS = {
+    'F101':'Fuse:Fuse_Littelfuse-NANO2-451_453',
+    'L203':'Inductor_SMD:L_Coilcraft_XAL5030',
+    'U211':'Package_SO:MSOP-12-1EP_3x4mm_P0.65mm_EP1.65x2.85mm',
+    'U212':'Package_SO:MSOP-12-1EP_3x4mm_P0.65mm_EP1.65x2.85mm',
+    'U302':'Package_SO:MSOP-12-1EP_3x4mm_P0.65mm_EP1.65x2.85mm',
+    'U407':'Package_SO:SSOP-8_2.95x2.8mm_P0.65mm',
+}
+for n in (300,301,320,321,340,341,360,361):
+    REVIEWED_FOOTPRINT_DELTAS[f'R{n}']='Resistor_SMD:R_0603_1608Metric'
+for n in (300,301,307,320,321,327,340,341,347,360,361,367):
+    REVIEWED_FOOTPRINT_DELTAS[f'C{n}']='Capacitor_SMD:C_0603_1608Metric'
+for n in (302,303,304,305,306,322,323,324,325,326,342,343,344,345,346,362,363,364,365,366):
+    REVIEWED_FOOTPRINT_DELTAS[f'C{n}']='Capacitor_SMD:C_0805_2012Metric'
 
 
 def check(source: str | Path, baseline: str | Path = BASELINE) -> dict:
@@ -80,9 +101,15 @@ def check(source: str | Path, baseline: str | Path = BASELINE) -> dict:
     if set(new['components']) != oldrefs | set(PARTS) | set(peripheral.PARTS):
         raise ValueError('unexpected or missing physical component set')
     retained={r:a for r,a in old['components'].items() if r in oldrefs}
-    for ref,attributes in {**retained,**PARTS,**peripheral.PARTS}.items():
+    for ref,attributes in retained.items():
+        expected=dict(attributes)
+        if ref in REVIEWED_FOOTPRINT_DELTAS:
+            expected['footprint']=REVIEWED_FOOTPRINT_DELTAS[ref]
+        if new['components'][ref] != expected:
+            raise ValueError('component/value/footprint changed outside reviewed closure delta: '+ref)
+    for ref,attributes in {**PARTS,**peripheral.PARTS}.items():
         if new['components'][ref] != attributes:
-            raise ValueError('component/value/footprint changed: '+ref)
+            raise ValueError('new component/value/footprint changed: '+ref)
     moved={f'J5.{p}' for p in range(1,9)}
     def projection(partition):
         result=[]

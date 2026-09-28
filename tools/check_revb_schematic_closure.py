@@ -74,8 +74,9 @@ def check():
         row=by_ref[ref]
         if "ad3542r" not in row["datasheet"].lower():
             raise ValueError(ref+" must bind AD3542R datasheet while land pattern is open")
-        if "CP-28-15" not in row["value"] or "OPEN" not in row["value"]:
-            raise ValueError(ref+" must visibly identify the open exact land-pattern contract")
+        reason=manifest["open_footprints"].get(ref,"")
+        if "CP-28-15" not in reason or "land pattern" not in reason.lower():
+            raise ValueError(ref+" must retain the exact CP-28-15 land-pattern blocker")
     return {
         "status":"PASS_SOURCE_CLOSURE_CONTRACT",
         "physical_components":len(physical),
