@@ -1,17 +1,89 @@
-# Shared I/O contract / native KiCad design source
+# Rev.B hardware contract and release boundary
 
-Generate: `python tools/revb.py generate --carrier axu2cgb --output build/revB`.
-Open `build/revB/servohil_io_revB.kicad_pro`.
+Rev.B is a **single-ZU2CG** HIL architecture. The active editable native KiCad source is:
 
-The checked-in design sources are the common signal contract, carrier tables and
-`tools/revb_schematic.py`; the generated `.kicad_sch` and `.kicad_sym` files are real
-native KiCad documents, reproducible without editing opaque embedded text blobs.
-Do not edit build outputs as the source of truth.
+```text
+hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_pro
+```
 
-The initial native project is interface-plus-DAC review only. Onboard I/O power,
-ADC/PHY and independent safety implementation remain open. Gate status is NOT_RUN;
-ERC can check the modeled connector/circuit boundaries, not prove the missing
-hardware. All PCB layout/fabrication is blocked.
+The current functional schematic topology is closed at **15 pages**. It includes the
+AXU2CGB carrier boundary, power/protection, DAC and physical AO disconnect, hardware
+watchdog/interlock, floating DUT permit, ADC frontend, PWM/AUX/RS-485 boundaries and
+SSI/BiSS PHY. This is not equivalent to a production-qualified PCB.
 
-Neither common logical net names nor Plant equations contain carrier-specific
-J12/J15 pins. Changing to a qualified SoM changes its binding, not the Plant API.
+## Source and generated review kits
+
+The checked-in native KiCad files under
+`hardware/kicad/revB/axu2cgb_expansion/` are the active schematic design source.
+`tools/revb.py generate` remains useful for carrier-contract review fixtures and
+compatibility regressions; generated build directories are not the manufacturing
+source of truth.
+
+Example non-release review generation:
+
+```sh
+python tools/revb.py validate --carrier axu2cgb
+python tools/revb.py generate --carrier axu2cgb --output build/revB
+```
+
+The alternative ZU2CG SoM profile remains vendor/model **UNBOUND**. Synthetic SoM
+fixtures only test tooling compatibility and do not establish product compatibility.
+
+## Physical binding state
+
+`hardware/revB/schematic_open_items.json` is the fail-closed source for unresolved
+blank footprints. It currently contains **9** blockers:
+
+- U20..U23: exact AD3542RBCPZ16 **CP-28-15** land pattern/vendor CAD;
+- J101: 12 V field connector mechanical/cable contract;
+- SW101: reset switch actuator/mechanical contract;
+- J5: AO connector and DUT cable contract;
+- J501: dry-contact service/interlock connector contract;
+- J701: floating DUT-permit connector, actual DUT voltage/current/leakage/isolation and cable contract.
+
+U101 and L201/L202/L301/L302/L203 already have source-level package/footprint
+bindings. Those bindings do **not** constitute electrical, thermal, magnetic,
+mechanical or production qualification.
+
+Run:
+
+```sh
+python tools/check_revb_schematic_closure.py
+```
+
+A passing source-closure report only proves that the checked-in schematic matches the
+explicit binding contract. It does not authorize Layout.
+
+## Qualification state
+
+`hardware/revB/qualification_requirements.json`,
+`hardware/revB/dut_adapter_profile.json` and `hardware/revB/gates.json` are
+fail-closed. At this checkpoint `layout_allowed=false`.
+
+Before Layout, the project still requires:
+
+1. exact physical closure of the 9 open package/mechanical items;
+2. power margin, thermal, MLCC and magnetic evidence, including XAL5050 L(I,T),
+   AC/core/winding losses, startup/short-circuit saturation and mounted-board
+   temperature rise;
+3. exact-MPN MLCC DC-bias curves plus temperature/aging and applicable ESR/RMS-current
+   evidence;
+4. a real DUT adapter profile binding AO neutral behavior, permit thresholds/leakage,
+   cable open/short response and maximum end-to-end disable time to raw measurements;
+5. partial-power/backfeed testing with relevant interfaces energized while other
+   domains are unpowered;
+6. Vivado IO DRC and STA reports bound to the exact part/top/XDC/source revision;
+7. low-energy fixture acceptance and engineering review.
+
+Post-layout/sample qualification still requires real EMC, board thermal,
+power-down, fault injection and FOC closed-loop evidence.
+
+## Safety semantics
+
+- AO disconnect is **high impedance**, not a guaranteed safe zero-voltage output.
+- The single floating DUT permit contact is **not redundant STO** and must not be
+  represented as certified functional safety.
+- Catalog ratings, exact footprints, ERC, SPICE and RTL simulation are design
+  evidence; none is a board-level safety or production certificate.
+- A gate must not be changed to PASS without raw evidence tied to the exact hardware,
+  DUT, tool inputs and revision that were actually tested.
