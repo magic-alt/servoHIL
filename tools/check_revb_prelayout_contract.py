@@ -46,7 +46,7 @@ def _validate_template(data: dict[str, Any], name: str) -> None:
         raise ValueError(f"{name}: record_type must remain template-only")
 
 
-def _validate_mechanical(contract: dict[str, Any], manifest: dict[str, Any], plan: dict[str, Any]) -> list[str]:
+def _validate_mechanical(root: Path, contract: dict[str, Any], manifest: dict[str, Any], plan: dict[str, Any]) -> list[str]:
     mechanical = contract.get("mechanical_bindings")
     if not isinstance(mechanical, dict):
         raise ValueError("prelayout mechanical_bindings missing")
@@ -59,7 +59,7 @@ def _validate_mechanical(contract: dict[str, Any], manifest: dict[str, Any], pla
         raise ValueError("schematic mechanical binding requirements drift")
     if manifest.get("layout_allowed") is not False:
         raise ValueError("schematic manifest must not authorize Layout")
-    if plan.get("schema_version") != 1 or plan.get("layout_allowed") is not False:
+    if plan.get("schema_version") != 2 or plan.get("layout_allowed") is not False:
         raise ValueError("mechanical plan schema/layout policy drift")
     interfaces = plan.get("interfaces")
     if not isinstance(interfaces, dict) or set(interfaces) != EXPECTED_MECHANICAL:
@@ -73,6 +73,60 @@ def _validate_mechanical(contract: dict[str, Any], manifest: dict[str, Any], pla
             raise ValueError(ref + ": selected_part cannot be populated without closing workflow")
         if item.get("evidence_pack") is not None:
             raise ValueError(ref + ": evidence_pack cannot be declared before a real selection")
+    expected_connections = _load(
+        _repo_file(root, plan.get("native_sources", {}).get("expected_connections"), "native expected connections"),
+        "native expected connections",
+    )
+    expected_pinouts = {
+        "J101": {"1": "VIN_RAW", "2": "GND"},
+        "SW101": {"1": "UVLO_IN", "2": "GND"},
+        "J5": {
+            "1": "DUT_AO0", "2": "DUT_AO1", "3": "DUT_AO2", "4": "DUT_AO3",
+            "5": "DUT_AO4", "6": "DUT_AO5", "7": "DUT_AO6", "8": "DUT_AO7",
+            "9": "GND", "10": "GND",
+        },
+    }
+    for ref, pinout in expected_pinouts.items():
+        actual = {pin: expected_connections.get(f"{ref}.{pin}") for pin in pinout}
+        if actual != pinout:
+            raise ValueError(ref + ": mechanical pinout no longer matches native expected connections")
+        if plan["interfaces"][ref].get("pinout") != pinout:
+            raise ValueError(ref + ": mechanical plan pinout drift")
+        if plan["interfaces"][ref].get("pin_count") != len(pinout):
+            raise ValueError(ref + ": mechanical plan pin count drift")
+
+    from check_native_safety import PINS
+    for ref, pinout in {
+        "J501": {"1": "INTERLOCK_FEED", "2": "INTERLOCK_RAW"},
+        "J701": {"1": "DUT_PERMIT_A", "2": "DUT_PERMIT_B"},
+    }.items():
+        actual = {pin: PINS.get(f"{ref}.{pin}") for pin in pinout}
+        if actual != pinout or plan["interfaces"][ref].get("pinout") != pinout:
+            raise ValueError(ref + ": mechanical plan no longer matches native safety pin oracle")
+        if plan["interfaces"][ref].get("pin_count") != 2:
+            raise ValueError(ref + ": mechanical plan pin count drift")
+
+    if plan["interfaces"]["J101"].get("input_operating_range_v") != [9, 15]:
+        raise ValueError("J101 input range must remain bound to native 9-15 V contract")
+    if plan["interfaces"]["J101"].get("upstream_fuse_nominal_a") != 2:
+        raise ValueError("J101 current-rating basis must retain the native 2 A fuse")
+    if plan["interfaces"]["SW101"].get("switch_function") != "MOMENTARY_NORMALLY_OPEN_RESET_CONTACT":
+        raise ValueError("SW101 must remain a normally-open reset/control contact")
+    j5 = plan["interfaces"]["J5"]
+    if j5.get("pin_count") != 10 or j5.get("signal_pin_count") != 8 or j5.get("ground_pins") != [9, 10]:
+        raise ValueError("J5 must retain 8 AO signals plus two ground contacts")
+    if j5.get("disconnect_state") != "HIGH_IMPEDANCE_NOT_GUARANTEED_ZERO":
+        raise ValueError("J5 disconnect semantics must remain high-impedance, not safe zero")
+    j501 = plan["interfaces"]["J501"]
+    if "BLOCKER" not in str(j501.get("cable_short_behavior", "")):
+        raise ValueError("J501 cable-short semantics must remain an explicit blocker")
+    j701 = plan["interfaces"]["J701"]
+    if "BLOCKER" not in str(j701.get("cable_short_behavior", "")):
+        raise ValueError("J701 cable-short semantics must remain an explicit blocker")
+    if j701.get("lab_interface_envelope") != {"max_voltage_v": 24, "max_current_a": 0.01}:
+        raise ValueError("J701 lab envelope drift")
+    if j701.get("optorelay_off_state_leakage_component_limit_a") != 0.000001:
+        raise ValueError("J701 component leakage limit drift")
     close_rule = str(mechanical.get("close_rule", ""))
     for term in ("exact selected part", "mating/cable", "evidence pack"):
         if term not in close_rule:
@@ -241,7 +295,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
 
     manifest = _load(_repo_file(root, mech_req["manifest"], "mechanical manifest"), "mechanical manifest")
     plan = _load(_repo_file(root, mech_req["plan"], "mechanical plan"), "mechanical plan")
-    mechanical_open = _validate_mechanical(contract, manifest, plan)
+    mechanical_open = _validate_mechanical(root, contract, manifest, plan)
 
     registry = _load(_repo_file(root, registry_path, "component source registry"), "component source registry")
     component_candidates = _load(root / "sim/power/component_candidates.json", "component candidates")
@@ -296,6 +350,10 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
         "layout_allowed": False,
         "mechanical_open_refs": mechanical_open,
         "mechanical_open_count": len(mechanical_open),
+        "mechanical_fault_semantic_blockers": {
+            "J501": plan["interfaces"]["J501"]["cable_short_behavior"],
+            "J701": plan["interfaces"]["J701"]["cable_short_behavior"],
+        },
         "component_source_state": source_state,
         "template_count": len(template_paths),
         "verification_plan_count": len(plan_paths),

@@ -27,6 +27,8 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         self.assertFalse(report["layout_allowed"])
         self.assertEqual(set(report["mechanical_open_refs"]), EXPECTED_MECHANICAL)
         self.assertEqual(report["mechanical_open_count"], 5)
+        self.assertIn("BLOCKER", report["mechanical_fault_semantic_blockers"]["J501"])
+        self.assertIn("BLOCKER", report["mechanical_fault_semantic_blockers"]["J701"])
         self.assertEqual(report["dut_adapter_status"], "UNBOUND")
         self.assertEqual(report["vivado_status"], "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_XDC_CLOCKS_UNBOUND")
         self.assertEqual(report["vivado_input_contract"]["target_part"], "xczu2cg-sfvc784-1-e")
@@ -41,7 +43,7 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         plan = self.load("hardware/revB/mechanical_binding_plan.json")
         del plan["interfaces"]["J701"]
         with self.assertRaisesRegex(ValueError, "exactly five interfaces"):
-            _validate_mechanical(contract, manifest, plan)
+            _validate_mechanical(ROOT, contract, manifest, plan)
 
     def test_mechanical_plan_cannot_pretend_a_part_is_selected(self):
         contract = self.load("hardware/revB/prelayout_qualification_contract.json")
@@ -49,7 +51,36 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         plan = self.load("hardware/revB/mechanical_binding_plan.json")
         plan["interfaces"]["J5"]["selected_part"] = "UNREVIEWED-PART"
         with self.assertRaisesRegex(ValueError, "selected_part"):
-            _validate_mechanical(contract, manifest, plan)
+            _validate_mechanical(ROOT, contract, manifest, plan)
+
+    def test_native_mechanical_pinouts_are_bound_without_fake_part_selection(self):
+        plan = self.load("hardware/revB/mechanical_binding_plan.json")
+        self.assertEqual(plan["interfaces"]["J101"]["pinout"], {"1": "VIN_RAW", "2": "GND"})
+        self.assertEqual(plan["interfaces"]["J5"]["pin_count"], 10)
+        self.assertEqual(plan["interfaces"]["J5"]["pinout"]["9"], "GND")
+        self.assertEqual(plan["interfaces"]["J5"]["pinout"]["10"], "GND")
+        self.assertEqual(plan["interfaces"]["J501"]["pinout"], {"1": "INTERLOCK_FEED", "2": "INTERLOCK_RAW"})
+        self.assertEqual(plan["interfaces"]["J701"]["pinout"], {"1": "DUT_PERMIT_A", "2": "DUT_PERMIT_B"})
+        self.assertTrue(all(plan["interfaces"][ref]["selected_part"] is None for ref in EXPECTED_MECHANICAL))
+
+    def test_j5_stale_eight_pin_metadata_is_rejected(self):
+        contract = self.load("hardware/revB/prelayout_qualification_contract.json")
+        manifest = self.load("hardware/revB/schematic_open_items.json")
+        plan = self.load("hardware/revB/mechanical_binding_plan.json")
+        plan["interfaces"]["J5"]["pin_count"] = 8
+        with self.assertRaisesRegex(ValueError, "J5: mechanical plan pin count drift"):
+            _validate_mechanical(ROOT, contract, manifest, plan)
+
+    def test_two_wire_short_cannot_be_silently_declared_fail_safe(self):
+        contract = self.load("hardware/revB/prelayout_qualification_contract.json")
+        manifest = self.load("hardware/revB/schematic_open_items.json")
+        for ref in ("J501", "J701"):
+            with self.subTest(ref=ref):
+                plan = self.load("hardware/revB/mechanical_binding_plan.json")
+                plan["interfaces"][ref]["cable_short_behavior"] = "INHIBIT_REQUIRED"
+                with self.assertRaisesRegex(ValueError, ref + " cable-short semantics"):
+                    _validate_mechanical(ROOT, contract, manifest, plan)
+
 
     def test_template_can_never_be_promoted_to_pass(self):
         template = self.load("hardware/revB/evidence/templates/physical_measurement_record.json")
