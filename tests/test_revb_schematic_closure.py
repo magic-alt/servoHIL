@@ -1,4 +1,3 @@
-import copy
 import importlib.util
 import json
 from pathlib import Path
@@ -14,11 +13,23 @@ MOD = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MOD)
 MANIFEST = ROOT / "hardware/revB/schematic_open_items.json"
 EVIDENCE = ROOT / "hardware/revB/ad3542r_footprint_evidence.json"
+GEOMETRY = ROOT / "hardware/revB/evidence/ad3542r/u1_geometry_review.json"
+FOOTPRINT = (
+    ROOT
+    / "hardware/kicad/revB/axu2cgb_expansion/footprints/"
+    "Package_DFN_QFN.pretty/AnalogDevices_CP-28-15_AD3542R.kicad_mod"
+)
 
 
 class RevBSchematicClosureTests(unittest.TestCase):
     def manifest(self):
         return json.loads(MANIFEST.read_text(encoding="utf-8"))
+
+    def evidence(self):
+        return json.loads(EVIDENCE.read_text(encoding="utf-8"))
+
+    def geometry(self):
+        return json.loads(GEOMETRY.read_text(encoding="utf-8"))
 
     def check_with_manifest(self, data):
         with tempfile.TemporaryDirectory() as td:
@@ -27,112 +38,170 @@ class RevBSchematicClosureTests(unittest.TestCase):
             with mock.patch.object(MOD, "MANIFEST", path):
                 return MOD.check()
 
-    def check_with_evidence(self, data):
+    def check_with_geometry(self, data):
         with tempfile.TemporaryDirectory() as td:
-            path = Path(td) / "ad3542r_footprint_evidence.json"
+            path = Path(td) / "u1_geometry_review.json"
             path.write_text(json.dumps(data), encoding="utf-8")
-            with mock.patch.object(MOD, "AD3542_EVIDENCE", path):
+            with mock.patch.object(MOD, "AD3542_GEOMETRY", path):
                 return MOD.check()
 
-    def test_checked_in_native_source_matches_explicit_open_contract(self):
+    def check_with_footprint_text(self, text):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "AD3542R.kicad_mod"
+            path.write_text(text, encoding="utf-8")
+            with mock.patch.object(MOD, "AD3542_FOOTPRINT", path):
+                return MOD.check()
+
+    def test_checked_in_native_source_matches_five_open_mechanical_contracts(self):
         report = MOD.check()
         self.assertEqual(report["status"], "PASS_SOURCE_CLOSURE_CONTRACT")
         self.assertFalse(report["layout_allowed"])
-        manifest = self.manifest()
-        self.assertEqual(set(report["blank_footprints"]), set(manifest["open_footprints"]))
-        self.assertEqual(report["blank_footprint_count"], 9)
-        self.assertEqual(report["binding_requirement_count"], 9)
-        self.assertEqual(report["land_pattern_blockers"], ["U20", "U21", "U22", "U23"])
+        self.assertEqual(report["blank_footprint_count"], 5)
+        self.assertEqual(report["binding_requirement_count"], 5)
+        self.assertEqual(report["land_pattern_blockers"], [])
+        self.assertEqual(
+            report["resolved_land_patterns"], ["U20", "U21", "U22", "U23"]
+        )
         self.assertEqual(
             report["mechanical_blockers"], ["J101", "J5", "J501", "J701", "SW101"]
         )
         self.assertEqual(
             report["ad3542r_footprint_evidence_status"],
-            "OFFICIAL_SOURCES_LOCATED_GERBER_AND_CAD_BYTES_NOT_ARCHIVED",
+            "REVIEWED_OFFICIAL_EVAL_GERBER_FOOTPRINT_VENDORED",
         )
         self.assertEqual(
-            report["ad3542r_exposed_pad_status"],
-            "UNRESOLVED_REQUIRES_CURRENT_CAD_OR_GERBER",
+            report["ad3542r_geometry_conclusion"],
+            "PASS_EXACT_OFFICIAL_EVAL_LAND_PATTERN",
         )
+        self.assertEqual(report["ad3542r_electrical_pad_count"], 28)
+        self.assertEqual(report["ad3542r_mask_aperture_count"], 28)
         self.assertGreater(report["physical_components"], 350)
 
-    def test_manifest_contract_keys_exactly_match_open_footprints(self):
+    def test_manifest_open_contract_is_exactly_five_mechanical_interfaces(self):
         manifest = self.manifest()
+        self.assertEqual(manifest["schema_version"], 3)
+        self.assertEqual(
+            set(manifest["open_footprints"]), {"J101", "SW101", "J5", "J501", "J701"}
+        )
         self.assertEqual(
             set(manifest["binding_requirements"]), set(manifest["open_footprints"])
         )
         self.assertEqual(
-            manifest["status"],
-            "SCHEMATIC_FUNCTION_COMPLETE_9_PHYSICAL_BINDINGS_OPEN",
+            manifest["status"], "SCHEMATIC_FUNCTION_COMPLETE_5_PHYSICAL_BINDINGS_OPEN"
         )
         self.assertFalse(manifest["layout_allowed"])
 
-    def test_ad3542r_blocker_identity_is_exact_and_not_generic_qfn(self):
+    def test_ad3542r_resolved_binding_is_exact_and_source_bound(self):
         manifest = self.manifest()
-        base = manifest["binding_requirements"]["U20"]
+        bindings = manifest["resolved_bindings"]
+        self.assertEqual(set(bindings), {"U20", "U21", "U22", "U23"})
+        base = bindings["U20"]
         self.assertEqual(base["manufacturer"], "Analog Devices")
         self.assertEqual(base["mpn"], "AD3542RBCPZ16")
         self.assertEqual(base["package_option"], "CP-28-15")
-        self.assertIn("cp-28-15", base["package_drawing_url"].lower())
-        self.assertIn("4 mm x 4 mm", base["package_description"])
-        for ref in ("U21", "U22", "U23"):
-            self.assertEqual(manifest["binding_requirements"][ref]["same_as"], "U20")
-
-    def test_ad3542r_evidence_binds_official_eval_sources(self):
-        evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
-        self.assertEqual(evidence["part"]["mpn"], "AD3542RBCPZ16")
-        self.assertEqual(evidence["part"]["package_option"], "CP-28-15")
-        self.assertEqual(evidence["part"]["pin_count"], 28)
-        self.assertEqual(evidence["part"]["lead_pitch_mm"], 0.4)
-        self.assertTrue(
-            evidence["official_sources"]["evaluation_gerber_zip"].endswith(
-                "/09-050892-01c.zip"
-            )
+        self.assertEqual(
+            base["footprint"], "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R"
         )
         self.assertEqual(
-            evidence["official_sources"]["adi_documentation_source"]["repository"],
-            "analogdevicesinc/system-level",
+            base["geometry_evidence"],
+            "hardware/revB/evidence/ad3542r/u1_geometry_review.json",
         )
+        for ref in ("U21", "U22", "U23"):
+            self.assertEqual(bindings[ref]["same_as"], "U20")
+            self.assertEqual(
+                manifest["bound_packages"][ref],
+                "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
+            )
+
+    def test_ad3542r_official_artifact_hashes_and_bom_are_pinned(self):
+        evidence = self.evidence()
+        hashes = evidence["source_artifact_hashes"]
+        self.assertEqual(
+            hashes["evaluation_gerber_zip_sha256"],
+            "87eee7f3ed85e81798918b1977bc0b416d72699a39c771d95e9ea3839ef461e8",
+        )
+        self.assertEqual(
+            hashes["evaluation_bom_sha256"],
+            "4608d8884754e5768424832af2331fa0490ab90e05a990a1292bf8f7bab0f7df",
+        )
+        geometry = self.geometry()
+        self.assertEqual(geometry["bom_u1"]["location"], "U1")
+        self.assertEqual(
+            geometry["bom_u1"]["manufacturer_part_number"], "AD3542RBCPZ16"
+        )
+        self.assertEqual(geometry["bom_u1"]["jedec_type"], "QFN28_4X4")
+
+    def test_ad3542r_current_sources_resolve_no_center_exposed_pad(self):
+        evidence = self.evidence()
         self.assertEqual(
             evidence["exposed_pad_review"]["status"],
-            "UNRESOLVED_REQUIRES_CURRENT_CAD_OR_GERBER",
+            "RESOLVED_NO_CENTER_EXPOSED_PAD_CURRENT_SOURCES",
         )
-        self.assertIsNone(evidence["geometry_review"]["center_pad_present"])
+        self.assertFalse(evidence["geometry_review"]["center_pad_present"])
+        geometry = self.geometry()
+        self.assertFalse(geometry["package_cross_check"]["center_exposed_pad"])
+        self.assertFalse(
+            geometry["center_region_review"]["center_exposed_pad_present"]
+        )
+        self.assertFalse(
+            geometry["center_region_review"]["top_solder_mask_center_aperture"]
+        )
+        self.assertFalse(geometry["center_region_review"]["top_paste_center_aperture"])
 
-    def test_ad3542r_cannot_guess_center_pad_without_current_cad_or_gerber(self):
-        evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
-        evidence["geometry_review"]["center_pad_present"] = True
-        with self.assertRaisesRegex(ValueError, "center-pad geometry must not be guessed"):
-            self.check_with_evidence(evidence)
+    def test_ad3542r_geometry_must_keep_exact_28_ipc_pins(self):
+        geometry = self.geometry()
+        geometry["eval_u1_ipc356_records"].pop()
+        with self.assertRaisesRegex(ValueError, "IPC-356 must contain exactly pins 1..28"):
+            self.check_with_geometry(geometry)
 
-    def test_ad3542r_cannot_claim_geometry_review_before_archive(self):
-        evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
-        evidence["geometry_review"]["status"] = "PASS"
-        with self.assertRaisesRegex(ValueError, "geometry review must remain NOT_RUN"):
-            self.check_with_evidence(evidence)
+    def test_ad3542r_geometry_cannot_reintroduce_center_pad(self):
+        geometry = self.geometry()
+        geometry["center_region_review"]["center_exposed_pad_present"] = True
+        with self.assertRaisesRegex(ValueError, "center/exposed pad must remain absent"):
+            self.check_with_geometry(geometry)
 
-    def test_ad3542r_official_gerber_source_cannot_drift(self):
-        evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
-        evidence["official_sources"]["evaluation_gerber_zip"] = "https://example.invalid/fake.zip"
-        with self.assertRaisesRegex(ValueError, "official EVAL Gerber source drift"):
-            self.check_with_evidence(evidence)
+    def test_ad3542r_official_source_hash_drift_is_rejected(self):
+        geometry = self.geometry()
+        geometry["source_artifacts"]["evaluation_gerber_zip"]["sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "source artifact hash drift"):
+            self.check_with_geometry(geometry)
 
-    def test_stale_open_count_is_rejected(self):
+    def test_ad3542r_footprint_copper_geometry_drift_is_rejected(self):
+        text = FOOTPRINT.read_text(encoding="utf-8")
+        text = text.replace(
+            "(pad 1 smd oval (at -1.8933 -1.2000) (size 0.7366 0.2286)",
+            "(pad 1 smd oval (at -1.8933 -1.2000) (size 0.7000 0.2286)",
+            1,
+        )
+        with self.assertRaisesRegex(ValueError, "pin 1 size-x drift"):
+            self.check_with_footprint_text(text)
+
+    def test_ad3542r_footprint_mask_aperture_drift_is_rejected(self):
+        text = FOOTPRINT.read_text(encoding="utf-8")
+        text = text.replace(
+            '(pad "" smd oval (at -1.8933 -1.2000) (size 0.8382 0.2794)',
+            '(pad "" smd oval (at -1.8933 -1.2000) (size 0.8000 0.2794)',
+            1,
+        )
+        with self.assertRaisesRegex(ValueError, "missing exact official solder-mask aperture"):
+            self.check_with_footprint_text(text)
+
+    def test_stale_nine_open_count_is_rejected(self):
         manifest = self.manifest()
-        manifest["status"] = "SCHEMATIC_FUNCTION_COMPLETE_14_PHYSICAL_BINDINGS_OPEN"
+        manifest["status"] = "SCHEMATIC_FUNCTION_COMPLETE_9_PHYSICAL_BINDINGS_OPEN"
         with self.assertRaisesRegex(ValueError, "status/count drift"):
             self.check_with_manifest(manifest)
 
-    def test_missing_binding_requirement_is_rejected(self):
+    def test_missing_mechanical_binding_requirement_is_rejected(self):
         manifest = self.manifest()
         del manifest["binding_requirements"]["J5"]
         with self.assertRaisesRegex(ValueError, "binding requirement set changed"):
             self.check_with_manifest(manifest)
 
-    def test_ad3542r_false_pass_is_rejected(self):
+    def test_ad3542r_resolved_binding_cannot_be_weakened_to_generic_pass(self):
         manifest = self.manifest()
-        manifest["binding_requirements"]["U20"]["status"] = "PASS"
-        with self.assertRaisesRegex(ValueError, "U20.status drift"):
+        manifest["resolved_bindings"]["U20"]["status"] = "PASS"
+        with self.assertRaisesRegex(ValueError, "U20 resolved binding drift"):
             self.check_with_manifest(manifest)
 
     def test_dut_permit_contract_cannot_drop_leakage_or_isolation(self):
