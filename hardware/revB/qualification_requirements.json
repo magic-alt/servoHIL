@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "revision": "Rev.B",
   "release_policy": {
     "layout_allowed": false,
@@ -51,5 +51,22 @@
     "POWER_DOWN",
     "FAULT_INJECTION",
     "FOC_CLOSED_LOOP"
-  ]
+  ],
+  "prelayout_contract": {
+    "path": "hardware/revB/prelayout_qualification_contract.json"
+  },
+  "mechanical_bindings": {
+    "manifest": "hardware/revB/schematic_open_items.json",
+    "plan": "hardware/revB/mechanical_binding_plan.json",
+    "required_refs": [
+      "J101",
+      "SW101",
+      "J5",
+      "J501",
+      "J701"
+    ]
+  },
+  "component_source_registry": {
+    "path": "hardware/revB/component_evidence_sources.json"
+  }
 }

@@ -92,8 +92,11 @@ class DutProfileQualificationTests(unittest.TestCase):
 
     def test_component_and_fixture_requirements_cannot_disappear_from_aggregate(self):
         report = build_qualification_report(ROOT)
-        self.assertEqual(report["schema_version"], 2)
+        self.assertEqual(report["schema_version"], 3)
         self.assertFalse(report["layout_allowed"])
+        self.assertEqual(set(report["mechanical_required"]), {"J101", "SW101", "J5", "J501", "J701"})
+        self.assertIn("MECHANICAL_J701_REQUIRED", report["blockers"])
+        self.assertEqual(report["prelayout_contract"]["status"], "PASS_CONTRACT_BLOCKED_EVIDENCE")
         self.assertIn("MAGNETICS_L_I_T_CURVES", report["component_evidence_required"])
         self.assertIn("MAGNETICS_AC_CORE_AND_WINDING_LOSS", report["component_evidence_required"])
         self.assertIn("MLCC_EXACT_MPN_DC_BIAS_CURVES", report["component_evidence_required"])

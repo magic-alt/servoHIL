@@ -263,6 +263,10 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
 
     dut = evaluate_dut_profile(load_profile(root / dut_section["path"]), root=root)
 
+    from check_revb_prelayout_contract import check as check_prelayout_contract
+    prelayout = check_prelayout_contract(root)
+    mechanical_required = list(prelayout["mechanical_open_refs"])
+
     if gates.get("layout_allowed") is not False:
         raise ValueError("qualification branch must preserve layout_allowed=false")
 
@@ -280,6 +284,9 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
         else:
             blockers.append(f"GATE_{name.upper()}_NOT_PASS")
 
+    for ref in mechanical_required:
+        blockers.append(f"MECHANICAL_{ref}_REQUIRED")
+
     # Component evidence remains explicit even if an analytical report becomes
     # green. These items require manufacturer curves and/or physical evidence.
     for name in component_required:
@@ -292,11 +299,13 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
         blockers.append(f"TOOL_{name}_REQUIRED")
 
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "revision": gates.get("revision", "Rev.B"),
         "qualification": "BLOCKED" if blockers else "READY_FOR_ENGINEERING_REVIEW",
         "layout_allowed": False,
         "dut_adapter": dut,
+        "prelayout_contract": prelayout,
+        "mechanical_required": mechanical_required,
         "component_evidence_required": component_required,
         "physical_required": physical_required,
         "vivado_required": vivado_required,
