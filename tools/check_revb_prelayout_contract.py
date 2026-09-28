@@ -134,6 +134,44 @@ def _validate_mechanical(root: Path, contract: dict[str, Any], manifest: dict[st
     return sorted(EXPECTED_MECHANICAL)
 
 
+def _validate_cable_fault_architecture(root: Path, mechanical: dict[str, Any]) -> dict[str, Any]:
+    path = mechanical.get("cable_fault_architecture")
+    data = _load(_repo_file(root, path, "cable-fault architecture"), "cable-fault architecture")
+    if data.get("schema_version") != 1 or data.get("layout_allowed") is not False:
+        raise ValueError("cable-fault architecture schema/layout policy drift")
+    if data.get("status") != "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS":
+        raise ValueError("cable-fault architecture must remain decision-required")
+    interfaces = data.get("interfaces")
+    if not isinstance(interfaces, dict) or set(interfaces) != {"J501", "J701"}:
+        raise ValueError("cable-fault architecture must cover exactly J501/J701")
+    expected_options = {
+        "J501": {"EOL_SUPERVISED_INPUT", "DUAL_CHANNEL_MONITORED", "ACCEPT_NON_SAFETY_RESIDUAL_RISK"},
+        "J701": {"DUT_SIDE_LINE_MONITORING", "DUAL_MONITORED_PERMIT", "ACCEPT_NON_SAFETY_RESIDUAL_RISK"},
+    }
+    for ref, options in expected_options.items():
+        item = interfaces[ref]
+        if item.get("selected_resolution") is not None:
+            raise ValueError(ref + ": cable-short resolution cannot be selected without design/evidence closure")
+        if set(item.get("allowed_resolutions", {})) != options:
+            raise ValueError(ref + ": cable-short resolution option drift")
+        if "NOT_DETECTABLE" not in str(item.get("cable_short_detectability", "")):
+            raise ValueError(ref + ": current two-wire cable-short limitation must remain explicit")
+        if "short" not in str(item.get("short_failure_semantics", "")).lower():
+            raise ValueError(ref + ": short-failure semantics missing")
+    forbidden = set(interfaces["J701"].get("forbidden_claims", []))
+    if "STO" not in forbidden or "redundant safety output" not in forbidden:
+        raise ValueError("J701 forbidden safety claims drift")
+    return {
+        "status": data["status"],
+        "J501": interfaces["J501"]["cable_short_detectability"],
+        "J701": interfaces["J701"]["cable_short_detectability"],
+        "selected_resolutions": {
+            "J501": interfaces["J501"]["selected_resolution"],
+            "J701": interfaces["J701"]["selected_resolution"],
+        },
+    }
+
+
 def _https(value: Any, name: str) -> str:
     if not isinstance(value, str) or not value.startswith("https://"):
         raise ValueError(name + ": HTTPS manufacturer source required")
@@ -345,6 +383,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
     manifest = _load(_repo_file(root, mech_req["manifest"], "mechanical manifest"), "mechanical manifest")
     plan = _load(_repo_file(root, mech_req["plan"], "mechanical plan"), "mechanical plan")
     mechanical_open = _validate_mechanical(root, contract, manifest, plan)
+    cable_fault_state = _validate_cable_fault_architecture(root, contract["mechanical_bindings"])
 
     registry = _load(_repo_file(root, registry_path, "component source registry"), "component source registry")
     component_candidates = _load(root / "sim/power/component_candidates.json", "component candidates")
@@ -406,6 +445,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
             "J501": plan["interfaces"]["J501"]["cable_short_behavior"],
             "J701": plan["interfaces"]["J701"]["cable_short_behavior"],
         },
+        "cable_fault_architecture": cable_fault_state,
         "component_source_state": source_state,
         "template_count": len(template_paths),
         "verification_plan_count": len(plan_paths),
