@@ -79,6 +79,17 @@ passive('R703','10k','PERMIT_BASE',GND)
 
 # Reviewed Rev.B schematic-closure deltas against the frozen historical XML.
 # Values and pin partitions remain frozen; only these exact footprint assignments may differ.
+# U20..U23 are a reviewed value+footprint transition, not a generic baseline exception.
+# The exact value/footprint pair is source-bound by check_revb_schematic_closure.py to
+# the official ADI EVAL-AD3542RFMCZ BOM/IPC-356/Gerber evidence.
+REVIEWED_COMPONENT_DELTAS = {
+    ref: {
+        'value': 'AD3542RBCPZ16',
+        'footprint': 'Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R',
+    }
+    for ref in ('U20', 'U21', 'U22', 'U23')
+}
+
 REVIEWED_FOOTPRINT_DELTAS = {
     'F101':'Fuse:Fuse_Littelfuse-NANO2-451_453',
     'U101':'Package_DFN_QFN:TI_RPW0010A',
@@ -110,6 +121,8 @@ def check(source: str | Path, baseline: str | Path = BASELINE) -> dict:
         expected=dict(attributes)
         if ref in REVIEWED_FOOTPRINT_DELTAS:
             expected['footprint']=REVIEWED_FOOTPRINT_DELTAS[ref]
+        if ref in REVIEWED_COMPONENT_DELTAS:
+            expected.update(REVIEWED_COMPONENT_DELTAS[ref])
         if new['components'][ref] != expected:
             raise ValueError('component/value/footprint changed outside reviewed closure delta: '+ref)
     for ref,attributes in {**PARTS,**peripheral.PARTS}.items():
