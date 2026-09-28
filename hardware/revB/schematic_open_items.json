@@ -2,7 +2,7 @@
   "schema_version": 1,
   "revision": "Rev.B",
   "checked_on": "2026-09-28",
-  "status": "SCHEMATIC_FUNCTION_COMPLETE_PHYSICAL_BINDINGS_OPEN",
+  "status": "SCHEMATIC_FUNCTION_COMPLETE_14_PHYSICAL_BINDINGS_OPEN",
   "layout_allowed": false,
   "policy": "A blank physical footprint is allowed only when it is listed here with an unresolved exact land-pattern or mechanical contract. This manifest is a blocker list, not a fabrication waiver.",
   "open_footprints": {
@@ -11,7 +11,6 @@
     "SW101": "power-reset switch mechanical actuator/footprint not bound",
     "L201": "XAL5050-103MEC candidate; footprint binding waits for magnetics/layout qualification",
     "L202": "XAL5050-682MEC candidate; footprint binding waits for magnetics/layout qualification",
-    "L203": "XAL5030-472MEC candidate; footprint binding waits for magnetics/layout qualification",
     "L301": "XAL5050-103MEC candidate; footprint binding waits for Cuk magnetics/layout qualification",
     "L302": "XAL5050-103MEC candidate; footprint binding waits for Cuk magnetics/layout qualification",
     "U20": "AD3542RBCPZ16 CP-28-15 exact land pattern/vendor CAD not yet vendored",
@@ -35,6 +34,7 @@
     "U501": "Package_SON:Texas_DRC0010J",
     "U506": "Package_SO:SSOP-8_2.95x2.8mm_P0.65mm",
     "U507": "Package_SO:SSOP-8_2.95x2.8mm_P0.65mm",
-    "U701": "Package_SO:SO-4_4.4x4.3mm_P2.54mm"
+    "U701": "Package_SO:SO-4_4.4x4.3mm_P2.54mm",
+    "L203": "Inductor_SMD:L_Coilcraft_XAL5030"
   }
 }

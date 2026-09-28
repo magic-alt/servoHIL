@@ -10,4 +10,5 @@
   (lib (name "Connector_PinHeader_2.54mm") (type "KiCad") (uri "${KIPRJMOD}/footprints/Connector_PinHeader_2.54mm.pretty") (options "") (descr "Bundled KiCad footprints"))
   (lib (name "Package_SON") (type "KiCad") (uri "${KIPRJMOD}/footprints/Package_SON.pretty") (options "") (descr "KiCad installed footprint snapshot; see COPYRIGHT"))
   (lib (name "Fuse") (type "KiCad") (uri "${KIPRJMOD}/footprints/Fuse.pretty") (options "") (descr "KiCad installed footprint snapshot; see COPYRIGHT"))
+  (lib (name "Inductor_SMD") (type "KiCad") (uri "${KIPRJMOD}/footprints/Inductor_SMD.pretty") (options "") (descr "KiCad installed footprint snapshot; see COPYRIGHT"))
 )
