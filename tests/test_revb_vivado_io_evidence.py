@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 from check_revb_vivado_io_drc import expected_io
+from revb import source_digest
 from revb_vivado_io_evidence import validate_run
 
 
@@ -25,6 +26,7 @@ class RevBVivadoIoDrcEvidenceTests(unittest.TestCase):
                 "rtl=/repo/fpga/revb/io_drc/servohil_io_drc_top.sv",
                 "xdc=/repo/fpga/revb/io_drc/axu2cgb_io_drc.xdc",
                 "source_commit=0123456789abcdef",
+                f"source_digest={source_digest(ROOT)}",
                 "timing_claim=NOT_RUN",
                 "",
             ])
@@ -78,6 +80,18 @@ class RevBVivadoIoDrcEvidenceTests(unittest.TestCase):
                 (run / "drc_summary.json").write_text(json.dumps(summary))
                 with self.assertRaisesRegex(ValueError, "Error/Critical Warning"):
                     validate_run(run, ROOT)
+
+    def test_stale_source_digest_is_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            run = Path(td)
+            self.make_run(run)
+            current = source_digest(ROOT)
+            text = (run / "run_identity.txt").read_text().replace(
+                f"source_digest={current}", "source_digest=" + "0" * 64
+            )
+            (run / "run_identity.txt").write_text(text)
+            with self.assertRaisesRegex(ValueError, "source_digest is stale"):
+                validate_run(run, ROOT)
 
     def test_unbound_source_commit_is_rejected(self):
         with tempfile.TemporaryDirectory() as td:
