@@ -25,7 +25,7 @@ class RevBVivadoIoDrcEvidenceTests(unittest.TestCase):
                 "top_module=servohil_io_drc_top",
                 "rtl=/repo/fpga/revb/io_drc/servohil_io_drc_top.sv",
                 "xdc=/repo/fpga/revb/io_drc/axu2cgb_io_drc.xdc",
-                "source_commit=0123456789abcdef",
+                "source_commit=0123456789abcdef0123456789abcdef01234567",
                 f"source_digest={source_digest(ROOT)}",
                 "timing_claim=NOT_RUN",
                 "",
@@ -93,12 +93,24 @@ class RevBVivadoIoDrcEvidenceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "source_digest is stale"):
                 validate_run(run, ROOT)
 
+    def test_source_commit_must_be_full_lowercase_git_sha(self):
+        for bad in ("0123456789abcdef", "g" * 40, "A" * 40):
+            with self.subTest(source_commit=bad), tempfile.TemporaryDirectory() as td:
+                run = Path(td)
+                self.make_run(run)
+                text = (run / "run_identity.txt").read_text().replace(
+                    "source_commit=0123456789abcdef0123456789abcdef01234567", f"source_commit={bad}"
+                )
+                (run / "run_identity.txt").write_text(text)
+                with self.assertRaisesRegex(ValueError, "source_commit"):
+                    validate_run(run, ROOT)
+
     def test_unbound_source_commit_is_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             run = Path(td)
             self.make_run(run)
             text = (run / "run_identity.txt").read_text().replace(
-                "source_commit=0123456789abcdef", "source_commit=UNBOUND"
+                "source_commit=0123456789abcdef0123456789abcdef01234567", "source_commit=UNBOUND"
             )
             (run / "run_identity.txt").write_text(text)
             with self.assertRaisesRegex(ValueError, "source_commit"):

@@ -138,6 +138,21 @@ class DutProfileQualificationTests(unittest.TestCase):
         self.assertEqual(result["verified"], {})
         self.assertTrue(all(v == "NOT_RUN" for section in result["states"].values() for v in section.values()))
 
+    def test_prelayout_evidence_registry_does_not_change_design_source_digest(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            revb = root / "hardware" / "revB"
+            revb.mkdir(parents=True)
+            (revb / "io_contract.json").write_text('{"revision":"Rev.B"}\\n', encoding="utf-8")
+            registry = revb / "prelayout_evidence_status.json"
+            registry.write_text('{"status":"NOT_RUN"}\\n', encoding="utf-8")
+            before = source_digest(root)
+            registry.write_text(
+                '{"status":"PASS","vivado":{"VIVADO_IO_DRC":{"status":"PASS"}}}\\n',
+                encoding="utf-8",
+            )
+            self.assertEqual(source_digest(root), before)
+
     def test_missing_requirement_state_is_rejected(self):
         status = json.loads((ROOT / "hardware/revB/prelayout_evidence_status.json").read_text())
         requirements = json.loads((ROOT / "hardware/revB/qualification_requirements.json").read_text())
