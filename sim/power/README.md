@@ -96,7 +96,7 @@ before freezing parts. Cuk candidate rows expose the invalid-CCM screening statu
 | Six 2x22 uF banks | TDK C3225X7R1C226M250AC, 16 V X7R 1210 | Production catalog part is **+/-20%**, max height 2.8 mm; do not apply generic +/-10% tolerance |
 | C414/C415 | TDK C3225X7R1E106K250AC, 10 uF 25 V X7R 1210 | Higher voltage rating is not proof of interchangeability; effective-capacitance target still open |
 | C410 | TDK CGA6L2X7R1H105K160AA, 1 uF 50 V X7R 1210 | Production automotive AEC-Q200 candidate; DC-bias, RMS-current/ESR and effective-C qualification remain open |
-| C105 | TDK C5750X7R1V476M230KC, 47 uF 35 V X7R 2220 | Production exact-MPN screening candidate; TDK characteristic sheet is located, but >=22 uF effective at 15.05 V still requires hash-bound DC-bias data plus temperature/aging and RMS/ESR review |
+| C105 | TDK C5750X7R1V476M230KC, 47 uF 35 V X7R 2220 | Production exact-MPN screening candidate; native C105 now binds X7R, but the generic KiCad 2220 footprint still requires TDK exact land-pattern/height review; >=22 uF effective at 15.05 V still requires hash-bound DC-bias data plus temperature/aging and RMS/ESR review |
 
 Exact manufacturer source discovery is now also centralized in
 `hardware/revB/component_evidence_sources.json`. The Coilcraft XAL50xx document
