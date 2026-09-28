@@ -7,7 +7,7 @@ board measurement, full DUT inhibition or functional-safety approval.**
 ## Source and implementation
 
 The native circuit commit is `90247a6df219d9f0e203d16366d70aad0cb9fd55`.
-The root project now has 16 sheets. J3/J4 remain removed; the new `90_connector_protection` sheet adds 37 connector-side ESD/transient devices without changing the 64-signal carrier allocation. The current source audit counts 439 in-BOM/on-board physical instances after excluding purchased-host J12/J15 from expansion-board placement. The independent peripheral oracle now also asserts every protection-device pin/net/package identity. Existing power/DAC wiring remains frozen except explicitly reviewed safety/protection shunts.
+The root project now has 15 sheets. J3/J4 remain removed; the new 接口页内 connector-side protection sheet adds 37 connector-side ESD/transient devices without changing the 64-signal carrier allocation. The current source audit counts 439 in-BOM/on-board physical instances after excluding purchased-host J12/J15 from expansion-board placement. The independent peripheral oracle now also asserts every protection-device pin/net/package identity. Existing power/DAC wiring remains frozen except explicitly reviewed safety/protection shunts.
 
 | Sheet | Circuit | Deliberate limit |
 |---|---|---|
@@ -15,7 +15,7 @@ The root project now has 16 sheets. J3/J4 remain removed; the new `90_connector_
 | 80_encoder_phy | Four THVD1450 half-duplex pairs for two clock/data ports; four safety-gated DE controls; pull defaults and selectable termination | SSI/BiSS directional profile, not arbitrary ABZ or SPI compatibility; non-isolated, no encoder supply |
 | 03_peripheral_boundaries | Six SN74LVC541A PWM receive paths; gated THVD1450 RS485; six AUX logic pins and I2C | 3.3V laboratory logic, not a 24V PLC/gate-drive input |
 | rtl/revb/health_heartbeat.sv + runtime_health_integration.sv | Sequence/deadline/lease-qualified WDI/ARM fed only by completed Plant, ADC sample and lease-renew events | AXI/CDC/top-level/Vivado and physical fault-injection integration remain open |
-| 90_connector_protection | PESD15VL1BA on AI/AO, PESD5V0S1BA on low-voltage logic, SM712 on differential cable pairs | Schematic protection only; IEC ESD/surge, return path/layout and powered-off backfeed remain NOT_RUN |
+| in-page connector protection | PESD15VL1BA on AI/AO, PESD5V0S1BA on low-voltage logic, SM712 on differential cable pairs | Schematic protection only; IEC ESD/surge, return path/layout and powered-off backfeed remain NOT_RUN |
 
 Most physical components now have explicit footprint identifiers backed by project-local KiCad snapshots. `hardware/revB/schematic_open_items.json` intentionally retains 14 blank-footprint blockers for exact vendor land patterns or real mechanical/connector choices; CI rejects any unlisted blank footprint. This is still **not** production package/MPN/lifecycle or board-level qualification.
 
@@ -110,7 +110,7 @@ never redraws or overwrites the source.
 - ZIP SHA256 c51a666311c14577a89300f967e87d62e93c2c9e94f02386cf8378beb9fe27c6.
 - Scope is explicitly PRECOMMIT_SCRATCH_NOT_HEAD_EVIDENCE. It is **not** proof that
   the unmodified input HEAD already contained the new native circuit files.
-- Historical PR #22 checkpoint: KiCad 10.0.6, 15 pages, 0 ERC violations. Current 16-page closure must use the latest branch/PR artifact; do not reuse this old count as current evidence.
+- Historical PR #22 checkpoint: KiCad 10.0.6, 15 pages, 0 ERC violations. Current 15-page closure must use the latest branch/PR artifact; do not reuse this old count as current evidence.
 - 20 native/checker/library objects checked against both Git blob SHA and SHA256;
   downloaded native bytes match the locally inspected files.
 - 166 regression tests passed, 0 skipped, including actual Icarus and ngspice.

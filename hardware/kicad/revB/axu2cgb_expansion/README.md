@@ -1,4 +1,4 @@
-# Native editable AXU2CGB expansion — 16-page Rev.B development source
+# Native editable AXU2CGB expansion — 15-page Rev.B development source
 
 Open `servohil_io_revB.kicad_pro`. Checked-in native KiCad files and project-local
 symbol/footprint snapshots are the hardware source of truth. Normal CI is read-only:
@@ -8,11 +8,11 @@ PR #21 added watchdog/AO-disconnect/DUT-permit safety hardware; PR #22 added nat
 AD7606C-16, PWM, SSI/BiSS and RS-485 circuits; PR #23 added ADC initialization/acquisition
 RTL, completion-only runtime-health integration and strict qualification/Vivado-evidence
 contracts. The current schematic-closure work adds deterministic package bindings and
-`90_connector_protection.kicad_sch`.
+各自接口页内的 connector-side protection.
 
 ## Current source state
 
-- 16 sheets total; the original 64-signal AXU2CGB allocation is unchanged.
+- 15 sheets total; the original 64-signal AXU2CGB allocation is unchanged.
 - 439 physical `in_bom=yes && on_board=yes` instances by source audit.
 - J12/J15 are purchased AXU2CGB host boundaries and are deliberately excluded from
   expansion-board BOM/placement.
@@ -31,7 +31,7 @@ Do not substitute a “similar” QFN/inductor/connector footprint simply to mak
 
 ## Interface protection boundary
 
-`90_connector_protection` uses 15 V bidirectional low-leakage TVS devices for the
+接口页内 connector-side protection uses 15 V bidirectional low-leakage TVS devices for the
 low-energy AI and +/-5 V AO lines, 5 V bidirectional TVS devices for 3.3 V logic cables,
 and SM712 devices for SSI/BiSS and RS-485 differential pairs. DUT_PERMIT_A/B remains
 floating; it is intentionally not clamped to board GND because the real DUT voltage,

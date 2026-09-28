@@ -11,13 +11,14 @@ J12/J15 interfaces are schematic boundaries, not expansion-board placements.
 
 This closure adds:
 
+- connector protection placed in the owning interface sheets (`03/06/50/70/80`) so page-local nets remain local;
 - exact local package bindings where the manufacturer package has a reviewed matching
   KiCad land pattern: LT3045/LT3094 MSOP-12+EP, TPS3430 DRC VSON, LVC1G74 DCT,
   AQY212GS SOP-4, Littelfuse 451 fuse and XAL5030;
 - deterministic R/C footprints on all four AD3542R pages while keeping the converter
   CP-28-15 land pattern explicitly open;
 - a fail-closed package/BOM audit in `tools/check_revb_schematic_closure.py`;
-- `90_connector_protection.kicad_sch` with connector-side clamps for low-energy AI/AO,
+- 各自接口页内的 connector-side protection with connector-side clamps for low-energy AI/AO,
   3.3 V logic, SSI/BiSS, RS-485 and the dry-contact interlock;
 - independent oracle assertions for every added protection-device pin and package.
 

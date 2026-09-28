@@ -11,12 +11,12 @@ ServoHIL 面向伺服驱动器和关节模组的实时 Hardware-in-the-Loop 验�
 
 | 模块 | 已实现 | 尚未完成 / 不能据此声称 |
 |---|---|---|
-| 单 ZU2CG / 原生工程 | 16 页原生 KiCad，可直接编辑；载板分配保持 64 路信号 | 14 个精确封装/机械绑定项仍显式 OPEN；完整板级 bitstream、Vivado STA/IO DRC 未验收 |
+| 单 ZU2CG / 原生工程 | 15 页原生 KiCad，可直接编辑；载板分配保持 64 路信号 | 14 个精确封装/机械绑定项仍显式 OPEN；完整板级 bitstream、Vivado STA/IO DRC 未验收 |
 | 输入保护 / 正负电源 / 参考 | 实际器件、原生值驱动计算与 ngspice 矩阵 | DAC 电源跨度/输出裕量、热、厂家模型、MLCC、启动及反灌门禁未关闭 |
 | 独立 watchdog / AO disconnect / DUT permit | PR #21 的窗口 watchdog、八路 ADG5412F、常开 PhotoMOS 许可触点 | 实际 DUT 的安全偏置、漏电流、断线与最大关断时间未验收；不是 STO |
 | 有效进度心跳 RTL | PR #23 已把完成的 Plant/ADC 序号与主机租约续期接入 completion-only health wrapper；超时锁存、显式恢复/重新 ARM 保留 | AXI/CDC/顶层/XDC 与实板故障注入尚未验收 |
 | ADC 输入前端 | AD7606C-16、8 路低能量输入；PR #23 已实现 CONFIG 0x02 八线模式写入/读回、BUSY 流程与 8×16-bit 完成采样序号 | 模拟精度、抗混叠、校准、CDC/板级时序和实测 1 MSPS 未验收 |
-| 数字 PHY / 外部保护 | 六路 PWM、双 SSI/BiSS、RS-485、AUX/I2C；新增 `90_connector_protection`，对 AI/AO/逻辑/差分口配置连接器侧 TVS | 保护拓扑不等于 IEC ESD/浪涌 PASS；不代表任意编码器或工业 24 V 输入兼容 |
+| 数字 PHY / 外部保护 | 六路 PWM、双 SSI/BiSS、RS-485、AUX/I2C；新增 接口页内 connector-side protection，对 AI/AO/逻辑/差分口配置连接器侧 TVS | 保护拓扑不等于 IEC ESD/浪涌 PASS；不代表任意编码器或工业 24 V 输入兼容 |
 | EtherCAT / CAN | 本扩展板没有独立引脚分配或对应板载实现 | 不借用 AUX 来假装已实现；新增接口需独立分配、控制器和 PHY 审查 |
 | PCB Layout / 生产资格 | 门禁与验收路径保留 | 未授权 Layout/Gerber/采购/生产，无实板、EMC 或完整故障验证证据 |
 
@@ -38,7 +38,7 @@ hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_pro
 当前图纸包括顶层、载板接口、输入保护、正电源、负电源/参考、电源监控、
 状态输出、PWM/辅助/RS-485、两页 DAC、AO disconnect、watchdog、DUT permit、
 ADC 输入前端和双编码器 PHY。`70_adc_frontend`、`80_encoder_phy` 是新增页；
-`03_peripheral_boundaries` 已替换 J3/J4 预留模块接口；`90_connector_protection` 统一放置 AI/AO/PWM/AUX/I2C/SSI-BiSS/RS-485/互锁线的连接器侧保护器件。
+`03_peripheral_boundaries` 已替换 J3/J4 预留模块接口；连接器保护器件就地放在 `03/06/50/70/80` 对应接口页，避免把 page-local 网络升级为 global label。
 
 当前源审计统计 **439 个 `in_bom=yes && on_board=yes` 物理器件**，并明确把购买的 AXU2CGB J12/J15 载板边界排除出扩展板 BOM/placement。新增连接器保护器件 37 个。`hardware/revB/schematic_open_items.json` 只允许 **14 个**空 footprint，并由 CI 要求实际空集合与 blocker 清单完全一致。
 实际 KiCad 网表、ERC、PDF 与回归结果以当前 PR 的 `native-schematic-readability` artifact 为准。
@@ -70,7 +70,7 @@ SSI/BiSS 主端发送时钟、接收数据；从端仿真角色相反。
 
 RS-485 同样经过安全许可门控；120 Ω 终端通过跳线接入，默认不装短接帽。
 六路 PWM 使用 SN74LVC541A 缓冲及输入默认下拉；AUX/I2C 为 3.3 V 逻辑接口。
-这些接口非隔离，不供应编码器电源，不直接接栅极功率、电机相线或 24 V PLC 信号。`90_connector_protection` 增加的 TVS 只关闭“原理图缺少接口保护拓扑”这一项；器件到连接器的实际布局、回流路径、部分供电 backfeed 和 IEC ESD/浪涌仍需实板资格。
+这些接口非隔离，不供应编码器电源，不直接接栅极功率、电机相线或 24 V PLC 信号。接口页内 connector-side protection 增加的 TVS 只关闭“原理图缺少接口保护拓扑”这一项；器件到连接器的实际布局、回流路径、部分供电 backfeed 和 IEC ESD/浪涌仍需实板资格。
 
 ## 有效系统进度心跳
 
@@ -157,7 +157,7 @@ PowerShell 中运行测试前设 `$env:NATIVE_NETLIST='build/native/canonical.xm
 
 ## 继续推进的顺序
 
-原理图功能拓扑已经收口到 16 页；下一步不再继续盲目扩页，而是关闭 `schematic_open_items.json` 的 14 个精确封装/机械绑定项，并完成电源/热/MLCC/XAL5050 磁性资格。随后绑定真实 DUT adapter 的中性偏置、许可阈值/漏电、线缆失效和最大关断时间，执行部分供电/backfeed、Vivado STA/IO DRC 与低能量夹具验证。只有这些门禁和工程审签通过后才进入 Layout；样机后仍需真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
+原理图功能拓扑已经收口到 15 页；下一步不再继续盲目扩页，而是关闭 `schematic_open_items.json` 的 14 个精确封装/机械绑定项，并完成电源/热/MLCC/XAL5050 磁性资格。随后绑定真实 DUT adapter 的中性偏置、许可阈值/漏电、线缆失效和最大关断时间，执行部分供电/backfeed、Vivado STA/IO DRC 与低能量夹具验证。只有这些门禁和工程审签通过后才进入 Layout；样机后仍需真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
 
 **AO 断开为高阻而非安全零位；单个许可触点不是冗余 STO，元件额定值不是板级认证。
 没有匹配实际硬件和 DUT 的原始实测证据，就不把生产资格或安全门禁改成 PASS。**
