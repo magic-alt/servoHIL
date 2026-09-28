@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 from revb import source_digest
 from revb_qualification import (
+    _qualification_evidence_state,
     _verified_gate_evidence,
     build_qualification_report,
     evaluate_dut_profile,
@@ -97,6 +98,8 @@ class DutProfileQualificationTests(unittest.TestCase):
         self.assertEqual(set(report["mechanical_required"]), {"J101", "SW101", "J5", "J501", "J701"})
         self.assertIn("MECHANICAL_J701_REQUIRED", report["blockers"])
         self.assertEqual(report["prelayout_contract"]["status"], "PASS_CONTRACT_BLOCKED_EVIDENCE")
+        self.assertEqual(report["prelayout_evidence_status"]["mechanical"]["J701"], "NOT_RUN")
+        self.assertEqual(report["verified_requirement_evidence"], {})
         self.assertIn("MAGNETICS_L_I_T_CURVES", report["component_evidence_required"])
         self.assertIn("MAGNETICS_AC_CORE_AND_WINDING_LOSS", report["component_evidence_required"])
         self.assertIn("MLCC_EXACT_MPN_DC_BIAS_CURVES", report["component_evidence_required"])
@@ -118,6 +121,35 @@ class DutProfileQualificationTests(unittest.TestCase):
             "PHYSICAL_LOW_ENERGY_FIXTURE_ACCEPTANCE_REQUIRED",
             report["blockers"],
         )
+
+    def test_prelayout_evidence_registry_has_exact_required_coverage(self):
+        status = json.loads((ROOT / "hardware/revB/prelayout_evidence_status.json").read_text())
+        requirements = json.loads((ROOT / "hardware/revB/qualification_requirements.json").read_text())
+        result = _qualification_evidence_state(
+            status,
+            ROOT,
+            requirements["mechanical_bindings"]["required_refs"],
+            requirements["component_evidence_required"],
+            requirements["physical_required"],
+            requirements["vivado_required"],
+        )
+        self.assertEqual(result["carrier"], "axu2cgb")
+        self.assertEqual(result["verified"], {})
+        self.assertTrue(all(v == "NOT_RUN" for section in result["states"].values() for v in section.values()))
+
+    def test_missing_requirement_state_is_rejected(self):
+        status = json.loads((ROOT / "hardware/revB/prelayout_evidence_status.json").read_text())
+        requirements = json.loads((ROOT / "hardware/revB/qualification_requirements.json").read_text())
+        del status["physical"]["BOARD_THERMAL"]
+        with self.assertRaisesRegex(ValueError, "physical coverage drift"):
+            _qualification_evidence_state(
+                status,
+                ROOT,
+                requirements["mechanical_bindings"]["required_refs"],
+                requirements["component_evidence_required"],
+                requirements["physical_required"],
+                requirements["vivado_required"],
+            )
 
     def test_nonfinite_or_nonpositive_shutdown_budget_rejected(self):
         for value in (0, -1, float("inf"), float("nan")):
@@ -171,9 +203,16 @@ class GateEvidenceTests(unittest.TestCase):
             root = Path(td)
             entry, _, _ = self.make_evidence(root)
             self.assertEqual(
-                _verified_gate_evidence(entry, root, "permit_reaction"),
+                _verified_gate_evidence(entry, root, "permit_reaction", expected_carrier="axu2cgb"),
                 ["evidence/gate.json", "evidence/raw.csv"],
             )
+
+    def test_carrier_mismatch_is_rejected_for_bound_requirement_evidence(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            entry, _, _ = self.make_evidence(root)
+            with self.assertRaisesRegex(ValueError, "carrier mismatch"):
+                _verified_gate_evidence(entry, root, "permit_reaction", expected_carrier="other")
 
     def test_raw_hash_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as td:

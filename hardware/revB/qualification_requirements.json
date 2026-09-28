@@ -68,5 +68,8 @@
   },
   "component_source_registry": {
     "path": "hardware/revB/component_evidence_sources.json"
+  },
+  "prelayout_evidence_status": {
+    "path": "hardware/revB/prelayout_evidence_status.json"
   }
 }
