@@ -222,6 +222,26 @@ class GateEvidenceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "raw report hash mismatch"):
                 _verified_gate_evidence(entry, root, "permit_reaction")
 
+    def test_raw_artifact_hash_mismatch_is_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            entry, report_path, _ = self.make_evidence(root)
+            artifact = root / "evidence" / "io_runtime.csv"
+            artifact.write_bytes(b"port,pin\n")
+            report = json.loads(report_path.read_text())
+            report["raw_artifacts"] = [{
+                "path": "evidence/io_runtime.csv",
+                "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+            }]
+            report_path.write_text(json.dumps(report))
+            self.assertIn(
+                "evidence/io_runtime.csv",
+                _verified_gate_evidence(entry, root, "permit_reaction", expected_carrier="axu2cgb"),
+            )
+            artifact.write_bytes(b"changed\n")
+            with self.assertRaisesRegex(ValueError, "raw artifact hash mismatch"):
+                _verified_gate_evidence(entry, root, "permit_reaction", expected_carrier="axu2cgb")
+
     def test_stale_source_digest_is_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

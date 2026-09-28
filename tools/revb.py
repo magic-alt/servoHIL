@@ -173,7 +173,7 @@ def source_digest(root: Path):
     """Bind evidence to content, not a moving branch name or inherited Rev.A verdict."""
     h=hashlib.sha256()
     files=[]
-    for directory in ['hardware/revB','hardware/carriers','tools','bom','references']:
+    for directory in ['hardware/revB','hardware/carriers','tools','bom','references','fpga/revb','rtl/revb']:
         files += [p for p in (root/directory).rglob('*') if p.is_file() and '__pycache__' not in str(p) and p.suffix!='.pyc' and p.name!='gates.json']
     for p in sorted(files):
         h.update(str(p.relative_to(root)).encode()+b'\0'+p.read_bytes()+b'\0')
@@ -207,7 +207,21 @@ def check_release(root: Path, carrier: str):
         raw=(root/report['raw_report']).resolve()
         if (not raw.is_relative_to(root.resolve()) or not raw.is_file() or
             hashlib.sha256(raw.read_bytes()).hexdigest()!=report.get('raw_sha256')):
-            blocked.append(name+': missing/changed raw report')
+            blocked.append(name+': missing/changed raw report'); continue
+        artifacts=report.get('raw_artifacts',[])
+        if artifacts:
+            if not isinstance(artifacts,list): blocked.append(name+': invalid raw_artifacts'); continue
+            seen=set()
+            for artifact in artifacts:
+                if not isinstance(artifact,dict) or set(artifact)!={'path','sha256'}:
+                    blocked.append(name+': invalid raw_artifacts'); break
+                rel=Path(artifact['path'])
+                path=(root/rel).resolve()
+                if (rel.is_absolute() or '..' in rel.parts or not path.is_relative_to(root.resolve()) or
+                    not path.is_file() or artifact['path'] in seen or
+                    hashlib.sha256(path.read_bytes()).hexdigest()!=artifact['sha256']):
+                    blocked.append(name+': missing/changed raw artifact'); break
+                seen.add(artifact['path'])
     if blocked: raise ValueError('BLOCKED: '+', '.join(blocked))
     return {'status':'REVIEWED_RELEASE_GATE', 'carrier':carrier, 'source_digest':digest}
 

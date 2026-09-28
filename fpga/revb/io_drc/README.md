@@ -52,3 +52,31 @@ A successful local command is not yet a checked-in PASS. The raw reports must be
 - raw report path and SHA-256.
 
 Functional STA remains blocked until a real functional top, clock/generated-clock definitions, I/O delays and timing/CDC policy are bound.
+
+## Import source-bound raw evidence
+
+After a successful Vivado run, validate the raw directory independently:
+
+```sh
+python tools/revb_vivado_io_evidence.py validate-run build/revb-vivado-io-drc
+```
+
+Then prepare a non-overwriting evidence pack under the repository top-level
+`evidence/` directory:
+
+```sh
+python tools/revb_vivado_io_evidence.py prepare \
+  build/revb-vivado-io-drc \
+  evidence/revb/vivado_io_drc/<run-id> \
+  --source-commit "$(git rev-parse HEAD)" \
+  --reviewer "<reviewer>" \
+  --reviewed-on YYYY-MM-DD
+```
+
+The prepared `evidence.json` may be registered as
+`prelayout_evidence_status.json -> vivado -> VIVADO_IO_DRC` only after review.
+The importer checks the Vivado runtime I/O table against all 64 expected pins and
+I/O standards, requires zero Error/Critical Warning DRC findings, and SHA-256
+binds every retained raw artifact.
+
+This still leaves `VIVADO_TIMING=NOT_RUN`.
