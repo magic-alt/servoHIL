@@ -6,6 +6,7 @@ ratings, ERC, or a component datasheet into physical hardware qualification.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -45,6 +46,71 @@ def _nested(profile: dict[str, Any], section: str, fields: tuple[str, ...]) -> d
             raise ValueError(f"missing {section}.{field}")
     return value
 
+
+def _string_list(data: dict[str, Any], name: str, *, minimum: int = 1) -> list[str]:
+    value = data.get(name)
+    if not isinstance(value, list) or len(value) < minimum:
+        raise ValueError(f"{name} must contain at least {minimum} entries")
+    if any(not isinstance(item, str) or not item.strip() for item in value):
+        raise ValueError(f"{name} entries must be nonempty strings")
+    if len(set(value)) != len(value):
+        raise ValueError(f"{name} must not contain duplicates")
+    return value
+
+
+def _verified_gate_evidence(entry: dict[str, Any], root: Path, gate_name: str) -> list[str]:
+    """Validate the same source-bound evidence envelope used by tools/revb.py release."""
+    if entry.get("status") != "PASS":
+        return []
+
+    evidence = entry.get("evidence")
+    if not isinstance(evidence, str) or not evidence.strip():
+        raise ValueError(f"{gate_name}: PASS requires a release evidence JSON path")
+
+    root = root.resolve()
+    rel = Path(evidence)
+    if rel.is_absolute() or ".." in rel.parts:
+        raise ValueError(f"{gate_name}: evidence path escapes repository")
+    report_path = (root / rel).resolve()
+    if not report_path.is_relative_to(root):
+        raise ValueError(f"{gate_name}: evidence path escapes repository")
+    if not report_path.is_file():
+        raise ValueError(f"{gate_name}: evidence file missing: {evidence}")
+
+    try:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"{gate_name}: invalid evidence JSON") from exc
+    if not isinstance(report, dict):
+        raise ValueError(f"{gate_name}: evidence report must be an object")
+    if report.get("gate") != gate_name or report.get("result") != "PASS":
+        raise ValueError(f"{gate_name}: evidence gate/result mismatch")
+
+    # Keep the qualification aggregator and the actual release path on one source
+    # identity algorithm rather than inventing a parallel digest.
+    from revb import source_digest
+
+    expected_digest = source_digest(root)
+    if report.get("source_digest") != expected_digest:
+        raise ValueError(f"{gate_name}: stale evidence source digest")
+
+    raw_name = report.get("raw_report")
+    raw_sha = report.get("raw_sha256")
+    if not isinstance(raw_name, str) or not raw_name.strip():
+        raise ValueError(f"{gate_name}: evidence report must name raw_report")
+    raw_rel = Path(raw_name)
+    if raw_rel.is_absolute() or ".." in raw_rel.parts:
+        raise ValueError(f"{gate_name}: raw report path escapes repository")
+    raw_path = (root / raw_rel).resolve()
+    if not raw_path.is_relative_to(root) or not raw_path.is_file():
+        raise ValueError(f"{gate_name}: raw report missing")
+    if not isinstance(raw_sha, str) or len(raw_sha) != 64:
+        raise ValueError(f"{gate_name}: raw_sha256 missing/invalid")
+    actual = hashlib.sha256(raw_path.read_bytes()).hexdigest()
+    if actual != raw_sha:
+        raise ValueError(f"{gate_name}: raw report hash mismatch")
+
+    return [evidence, raw_name]
 
 def _profile_is_unbound(profile: dict[str, Any]) -> bool:
     if not profile.get("adapter_id"):
@@ -171,36 +237,76 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
     requirements = json.loads(
         (root / "hardware/revB/qualification_requirements.json").read_text(encoding="utf-8")
     )
-    dut = evaluate_dut_profile(
-        load_profile(root / requirements["dut_profile"]["path"]),
-        root=root,
-    )
+    if requirements.get("schema_version") != 2:
+        raise ValueError("unsupported qualification requirements schema")
+    if requirements.get("release_policy", {}).get("layout_allowed") is not False:
+        raise ValueError("qualification requirements must preserve layout_allowed=false")
+
+    component_required = _string_list(requirements, "component_evidence_required", minimum=1)
+    physical_required = _string_list(requirements, "physical_required", minimum=1)
+    vivado_required = _string_list(requirements, "vivado_required", minimum=1)
+    post_layout_required = _string_list(requirements, "release_after_layout_required", minimum=1)
+    _string_list(requirements, "analytical_required", minimum=1)
+
+    dut_section = requirements.get("dut_profile")
+    if not isinstance(dut_section, dict) or not isinstance(dut_section.get("path"), str):
+        raise ValueError("qualification requirements must bind dut_profile.path")
+    expected_dut_evidence = _string_list(dut_section, "required_evidence", minimum=5)
+    if set(expected_dut_evidence) != {
+        "ao_disconnect",
+        "permit",
+        "cable_open",
+        "cable_short",
+        "shutdown_time",
+    }:
+        raise ValueError("DUT evidence contract drift")
+
+    dut = evaluate_dut_profile(load_profile(root / dut_section["path"]), root=root)
 
     if gates.get("layout_allowed") is not False:
         raise ValueError("qualification branch must preserve layout_allowed=false")
 
     blockers = list(dut["blockers"])
     active_gates = gates.get("gates", {})
+    if not isinstance(active_gates, dict):
+        raise ValueError("gates.gates must be an object")
+    verified_gate_evidence: dict[str, list[str]] = {}
     for name, entry in sorted(active_gates.items()):
-        if not isinstance(entry, dict) or entry.get("status") != "PASS":
+        if not isinstance(entry, dict):
+            blockers.append(f"GATE_{name.upper()}_NOT_PASS")
+            continue
+        if entry.get("status") == "PASS":
+            verified_gate_evidence[name] = _verified_gate_evidence(entry, root, name)
+        else:
             blockers.append(f"GATE_{name.upper()}_NOT_PASS")
 
-    # These categories require real evidence outside this aggregator. Their
-    # presence in the requirements file keeps them visible even if another
-    # report accidentally omits a blocker.
-    for name in requirements.get("physical_required", []):
+    # Component evidence remains explicit even if an analytical report becomes
+    # green. These items require manufacturer curves and/or physical evidence.
+    for name in component_required:
+        blockers.append(f"COMPONENT_{name}_REQUIRED")
+
+    # Physical and tool evidence cannot be replaced by catalog or simulation.
+    for name in physical_required:
         blockers.append(f"PHYSICAL_{name}_REQUIRED")
-    for name in requirements.get("vivado_required", []):
+    for name in vivado_required:
         blockers.append(f"TOOL_{name}_REQUIRED")
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "revision": gates.get("revision", "Rev.B"),
         "qualification": "BLOCKED" if blockers else "READY_FOR_ENGINEERING_REVIEW",
         "layout_allowed": False,
         "dut_adapter": dut,
+        "component_evidence_required": component_required,
+        "physical_required": physical_required,
+        "vivado_required": vivado_required,
+        "post_layout_release_required": post_layout_required,
+        "verified_gate_evidence": verified_gate_evidence,
         "blockers": sorted(set(blockers)),
-        "note": "Evidence aggregation only; never a fabrication or functional-safety approval.",
+        "note": (
+            "Evidence aggregation only; analytical screens and catalog ratings cannot "
+            "authorize fabrication, safety or production release."
+        ),
     }
 
 

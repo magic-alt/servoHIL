@@ -1,9 +1,9 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "revision": "Rev.B",
   "release_policy": {
     "layout_allowed": false,
-    "note": "This manifest is fail-closed. Analysis may close analytical subchecks but cannot substitute for physical or Vivado evidence."
+    "note": "This manifest is fail-closed. Analysis may close analytical subchecks but cannot substitute for physical, manufacturer-curve, Vivado or DUT-bound evidence."
   },
   "dut_profile": {
     "path": "hardware/revB/dut_adapter_profile.json",
@@ -22,16 +22,34 @@
     "MAGNETICS_STRESS",
     "PERIPHERAL_LOAD_BUDGET"
   ],
+  "component_evidence_required": [
+    "MAGNETICS_L_I_T_CURVES",
+    "MAGNETICS_AC_CORE_AND_WINDING_LOSS",
+    "MAGNETICS_STARTUP_SHORT_SATURATION",
+    "MAGNETICS_EXACT_LAND_PATTERN_HEIGHT_PLACEMENT",
+    "MLCC_EXACT_MPN_DC_BIAS_CURVES",
+    "MLCC_TEMPERATURE_AGING_MARGIN",
+    "MLCC_RMS_CURRENT_ESR",
+    "MOUNTED_BOARD_TEMPERATURE_RISE"
+  ],
   "physical_required": [
     "DUT_ADAPTER_INHIBIT",
     "PARTIAL_POWER_AND_BACKFEED",
     "BOARD_THERMAL",
     "AO_DISCONNECT_REACTION",
     "PERMIT_REACTION",
-    "CONNECTOR_ESD_REVIEW"
+    "CONNECTOR_ESD_REVIEW",
+    "LOW_ENERGY_FIXTURE_ACCEPTANCE"
   ],
   "vivado_required": [
     "VIVADO_IO_DRC",
     "VIVADO_TIMING"
+  ],
+  "release_after_layout_required": [
+    "EMC",
+    "THERMAL",
+    "POWER_DOWN",
+    "FAULT_INJECTION",
+    "FOC_CLOSED_LOOP"
   ]
 }
