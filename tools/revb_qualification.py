@@ -9,7 +9,6 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import re
 from pathlib import Path
 from typing import Any
 
@@ -60,44 +59,58 @@ def _string_list(data: dict[str, Any], name: str, *, minimum: int = 1) -> list[s
 
 
 def _verified_gate_evidence(entry: dict[str, Any], root: Path, gate_name: str) -> list[str]:
-    """PASS requires repository-bound raw evidence with byte identity."""
+    """Validate the same source-bound evidence envelope used by tools/revb.py release."""
     if entry.get("status") != "PASS":
         return []
+
     evidence = entry.get("evidence")
-    if isinstance(evidence, dict):
-        records = [evidence]
-    elif isinstance(evidence, list):
-        records = evidence
-    else:
-        raise ValueError(f"{gate_name}: PASS requires hashed evidence records")
-    if not records:
-        raise ValueError(f"{gate_name}: PASS requires at least one evidence record")
+    if not isinstance(evidence, str) or not evidence.strip():
+        raise ValueError(f"{gate_name}: PASS requires a release evidence JSON path")
 
     root = root.resolve()
-    verified: list[str] = []
-    for index, record in enumerate(records):
-        if not isinstance(record, dict):
-            raise ValueError(f"{gate_name}: evidence[{index}] must be an object")
-        raw_path = record.get("path")
-        digest = record.get("sha256")
-        if not isinstance(raw_path, str) or not raw_path.strip():
-            raise ValueError(f"{gate_name}: evidence[{index}].path must be nonempty")
-        rel = Path(raw_path)
-        if rel.is_absolute() or ".." in rel.parts:
-            raise ValueError(f"{gate_name}: evidence path escapes repository")
-        path = (root / rel).resolve()
-        if not path.is_relative_to(root):
-            raise ValueError(f"{gate_name}: evidence path escapes repository")
-        if not path.is_file():
-            raise ValueError(f"{gate_name}: evidence file missing: {raw_path}")
-        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
-            raise ValueError(f"{gate_name}: evidence[{index}].sha256 must be lowercase SHA-256")
-        actual = hashlib.sha256(path.read_bytes()).hexdigest()
-        if actual != digest:
-            raise ValueError(f"{gate_name}: evidence hash mismatch: {raw_path}")
-        verified.append(raw_path)
-    return verified
+    rel = Path(evidence)
+    if rel.is_absolute() or ".." in rel.parts:
+        raise ValueError(f"{gate_name}: evidence path escapes repository")
+    report_path = (root / rel).resolve()
+    if not report_path.is_relative_to(root):
+        raise ValueError(f"{gate_name}: evidence path escapes repository")
+    if not report_path.is_file():
+        raise ValueError(f"{gate_name}: evidence file missing: {evidence}")
 
+    try:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"{gate_name}: invalid evidence JSON") from exc
+    if not isinstance(report, dict):
+        raise ValueError(f"{gate_name}: evidence report must be an object")
+    if report.get("gate") != gate_name or report.get("result") != "PASS":
+        raise ValueError(f"{gate_name}: evidence gate/result mismatch")
+
+    # Keep the qualification aggregator and the actual release path on one source
+    # identity algorithm rather than inventing a parallel digest.
+    from revb import source_digest
+
+    expected_digest = source_digest(root)
+    if report.get("source_digest") != expected_digest:
+        raise ValueError(f"{gate_name}: stale evidence source digest")
+
+    raw_name = report.get("raw_report")
+    raw_sha = report.get("raw_sha256")
+    if not isinstance(raw_name, str) or not raw_name.strip():
+        raise ValueError(f"{gate_name}: evidence report must name raw_report")
+    raw_rel = Path(raw_name)
+    if raw_rel.is_absolute() or ".." in raw_rel.parts:
+        raise ValueError(f"{gate_name}: raw report path escapes repository")
+    raw_path = (root / raw_rel).resolve()
+    if not raw_path.is_relative_to(root) or not raw_path.is_file():
+        raise ValueError(f"{gate_name}: raw report missing")
+    if not isinstance(raw_sha, str) or len(raw_sha) != 64:
+        raise ValueError(f"{gate_name}: raw_sha256 missing/invalid")
+    actual = hashlib.sha256(raw_path.read_bytes()).hexdigest()
+    if actual != raw_sha:
+        raise ValueError(f"{gate_name}: raw report hash mismatch")
+
+    return [evidence, raw_name]
 
 def _profile_is_unbound(profile: dict[str, Any]) -> bool:
     if not profile.get("adapter_id"):
