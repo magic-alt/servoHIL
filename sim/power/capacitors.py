@@ -92,6 +92,12 @@ def report(root=ROOT,curve_dir=None):
     a=load('analysis',root);q=load('qualification',root);base=a.build_report(root)
     native=native_components(root)
     catalog=json.loads((root/'sim/power/capacitor_candidates.json').read_text())
+    registry=json.loads((root/'hardware/revB/component_evidence_sources.json').read_text())
+    if registry.get('schema_version')!=1 or registry.get('layout_allowed') is not False:
+        raise ValueError('component evidence source registry policy drift')
+    mlcc_sources=registry.get('mlcc',{})
+    if mlcc_sources.get('source_status')=='PASS':
+        raise ValueError('MLCC source discovery cannot be qualification PASS')
     reserve=catalog['bias_reserve_v'];a.positive(reserve)
     bias={'input_protected':max(base['assumptions']['vin_prot_v']),
           'cuk_transfer':base['cuk']['max_transfer_v'],
@@ -109,6 +115,11 @@ def report(root=ROOT,curve_dir=None):
         if mpn is None:
             row.update(status='BLOCKED_MPN');rows.append(row);continue
         p=catalog['parts'][mpn]
+        source=mlcc_sources.get('exact_parts',{}).get(mpn)
+        if not isinstance(source,dict):
+            raise ValueError(mpn+': exact manufacturer source missing')
+        if p.get('characterization_sheet_url')!=source.get('characterization_sheet_url'):
+            raise ValueError(mpn+': characterization source drift')
         for ref in bank['references']:
             item=native[ref];rating=re.search(r'/\s*(\d+(?:\.\d+)?)V\b',item['Value'])
             if not math.isclose(a.numeric(item['Value']),p['capacitance_f'],rel_tol=1e-9):
@@ -119,6 +130,8 @@ def report(root=ROOT,curve_dir=None):
                 raise ValueError(ref+': candidate voltage rating below native requirement')
         row.update({k:p[k] for k in ['source_url','rated_voltage_v','tolerance_loss','temperature_loss',
                                       'lifecycle','height_max_mm','note']})
+        row['characterization_sheet_url']=p.get('characterization_sheet_url')
+        row['manufacturer_curve_source_status']=p.get('curve_source_status')
         row['automotive_qualification']=p.get('automotive_qualification')
         if curve_dir is not None and mpn not in curves:
             path=Path(curve_dir)/(mpn+'.json')
@@ -140,6 +153,8 @@ def report(root=ROOT,curve_dir=None):
         if row['bias_screen_v']>=p['rated_voltage_v']:row['status']='FAIL_VOLTAGE_RATING_SCREEN'
         rows.append(row)
     return {'status':'NOT_QUALIFIED','layout_allowed':False,'source_digest':a.content_digest(root),
+            'manufacturer_source_registry_status':registry.get('status'),
+            'mlcc_source_status':mlcc_sources.get('source_status'),
             'catalog_checked_on':catalog['checked_on'],'imported_curve_count':len(curves),'banks':rows,
             'warning':'Curve byte integrity is not manufacturer authentication or full-temperature/lifetime validation. '
                       'Dynamic voltage reserve and aging remain assumptions; NRND/height/ESR/RMS-current require review.'}

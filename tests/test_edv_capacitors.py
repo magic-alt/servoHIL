@@ -42,6 +42,10 @@ class CapacitorEvidence(unittest.TestCase):
         self.assertEqual(row['status'],'BLOCKED_MISSING_CURVE')
         self.assertFalse(r['layout_allowed'])
         self.assertEqual(r['imported_curve_count'],0)
+        self.assertEqual(r['manufacturer_source_registry_status'],'MANUFACTURER_SOURCES_LOCATED_EVIDENCE_NOT_IMPORTED')
+        self.assertIn('NOT_HASH',r['mlcc_source_status'])
+        self.assertIn('NOT_HASH',row['manufacturer_curve_source_status'])
+        self.assertTrue(row['characterization_sheet_url'].startswith('https://product.tdk.com/'))
         self.assertEqual(len(r['banks']),9)
 
     def test_lifecycle_and_unknown_input_mpn_are_not_silent_approval(self):
