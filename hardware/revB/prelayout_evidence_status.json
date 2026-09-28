@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "carrier": "axu2cgb",
+  "status": "ALL_REQUIRED_EVIDENCE_NOT_RUN",
+  "layout_allowed": false,
+  "policy": "Every PASS uses the same source_digest + raw_report SHA-256 evidence envelope as the Rev.B release path. Templates, source URLs, screenshots, catalog rows and analytical PASSes do not change these entries.",
+  "mechanical": {
+    "J101": {
+      "gate": "prelayout_mechanical_j101",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "SW101": {
+      "gate": "prelayout_mechanical_sw101",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "J5": {
+      "gate": "prelayout_mechanical_j5",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "J501": {
+      "gate": "prelayout_mechanical_j501",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "J701": {
+      "gate": "prelayout_mechanical_j701",
+      "status": "NOT_RUN",
+      "evidence": null
+    }
+  },
+  "component": {
+    "MAGNETICS_L_I_T_CURVES": {
+      "gate": "prelayout_component_magnetics_l_i_t_curves",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "MAGNETICS_AC_CORE_AND_WINDING_LOSS": {
+      "gate": "prelayout_component_magnetics_ac_core_and_winding_loss",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "MAGNETICS_STARTUP_SHORT_SATURATION": {
+      "gate": "prelayout_component_magnetics_startup_short_saturation",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "MAGNETICS_EXACT_LAND_PATTERN_HEIGHT_PLACEMENT": {
+      "gate": "prelayout_component_magnetics_exact_land_pattern_height_placement",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "MLCC_EXACT_MPN_DC_BIAS_CURVES": {
+      "gate": "prelayout_component_mlcc_exact_mpn_dc_bias_curves",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "MLCC_TEMPERATURE_AGING_MARGIN": {
+      "gate": "prelayout_component_mlcc_temperature_aging_margin",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "MLCC_RMS_CURRENT_ESR": {
+      "gate": "prelayout_component_mlcc_rms_current_esr",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "MOUNTED_BOARD_TEMPERATURE_RISE": {
+      "gate": "prelayout_component_mounted_board_temperature_rise",
+      "status": "NOT_RUN",
+      "evidence": null
+    }
+  },
+  "physical": {
+    "DUT_ADAPTER_INHIBIT": {
+      "gate": "prelayout_physical_dut_adapter_inhibit",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "PARTIAL_POWER_AND_BACKFEED": {
+      "gate": "prelayout_physical_partial_power_and_backfeed",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "BOARD_THERMAL": {
+      "gate": "prelayout_physical_board_thermal",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "AO_DISCONNECT_REACTION": {
+      "gate": "prelayout_physical_ao_disconnect_reaction",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "PERMIT_REACTION": {
+      "gate": "prelayout_physical_permit_reaction",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "CONNECTOR_ESD_REVIEW": {
+      "gate": "prelayout_physical_connector_esd_review",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "LOW_ENERGY_FIXTURE_ACCEPTANCE": {
+      "gate": "prelayout_physical_low_energy_fixture_acceptance",
+      "status": "NOT_RUN",
+      "evidence": null
+    }
+  },
+  "vivado": {
+    "VIVADO_IO_DRC": {
+      "gate": "prelayout_tool_vivado_io_drc",
+      "status": "NOT_RUN",
+      "evidence": null
+    },
+    "VIVADO_TIMING": {
+      "gate": "prelayout_tool_vivado_timing",
+      "status": "NOT_RUN",
+      "evidence": null
+    }
+  }
+}

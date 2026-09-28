@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "plan_id": "LOW_ENERGY_FIXTURE_ACCEPTANCE",
+  "revision": "Rev.B",
+  "status": "NOT_RUN_FIXTURE_NOT_BOUND",
+  "result": "NOT_RUN",
+  "layout_allowed": false,
+  "policy": "Bring-up starts with energy limiting and independent observation. Current/voltage limits must be reviewed against the assembled board before energization and are not guessed by this plan.",
+  "prerequisites": [
+    "schematic/ERC source closure green",
+    "assembly visual inspection complete",
+    "continuity/short checks complete",
+    "fixture wiring independently reviewed",
+    "current-limit and overvoltage settings reviewed",
+    "emergency power removal available"
+  ],
+  "sequence": [
+    {
+      "step": 1,
+      "action": "unpowered resistance/continuity and isolation checks",
+      "advance_if": "no unexpected low-impedance path"
+    },
+    {
+      "step": 2,
+      "action": "apply current-limited 12 V field input with carrier/DUT disconnected",
+      "advance_if": "rail voltages/current remain inside reviewed limits"
+    },
+    {
+      "step": 3,
+      "action": "power carrier interface with local field power states exercised",
+      "advance_if": "partial-power/backfeed behavior acceptable"
+    },
+    {
+      "step": 4,
+      "action": "exercise watchdog/interlock and AO disconnect without real DUT",
+      "advance_if": "hardware inhibit paths operate as designed"
+    },
+    {
+      "step": 5,
+      "action": "connect passive/dummy low-energy loads and exercise ADC/DAC/interface paths",
+      "advance_if": "signals and temperatures remain acceptable"
+    },
+    {
+      "step": 6,
+      "action": "only then connect reviewed real DUT adapter",
+      "advance_if": "DUT adapter acceptance plan limits are bound"
+    }
+  ],
+  "required_evidence": [
+    "bench wiring/configuration",
+    "supply limit settings",
+    "rail/current logs",
+    "scope/logic captures for safety transitions",
+    "thermal observations",
+    "exact board/fixture revisions"
+  ]
+}

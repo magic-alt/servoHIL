@@ -1,0 +1,167 @@
+{
+  "schema_version": 2,
+  "revision": "Rev.B",
+  "checked_on": "2026-09-28",
+  "status": "5_OPEN_REAL_MECHANICAL_CONTRACTS_2_CABLE_SHORT_SEMANTICS_BLOCKED",
+  "layout_allowed": false,
+  "source_manifest": "hardware/revB/schematic_open_items.json",
+  "policy": "No mechanical part is selected by this file. Native electrical facts are bound where already proven; enclosure, mating cable, derating and real DUT fields remain blockers. A two-wire dry-contact cable short must not be assumed fail-safe.",
+  "interfaces": {
+    "J101": {
+      "interface": "12 V field input",
+      "selection_status": "OPEN_NO_PART_SELECTED",
+      "selected_part": null,
+      "mating_part": null,
+      "board_mount_style": null,
+      "wire_gauge_awg": null,
+      "continuous_current_a": null,
+      "transient_current_a": null,
+      "voltage_rating_v": null,
+      "keying": null,
+      "retention": null,
+      "operating_temperature_c": null,
+      "cycle_life": null,
+      "creepage_clearance_basis": null,
+      "enclosure_keepout_mm": null,
+      "evidence_pack": null,
+      "pin_count": 2,
+      "pinout": {
+        "1": "VIN_RAW",
+        "2": "GND"
+      },
+      "native_value": "12V INPUT / 9-15V",
+      "input_operating_range_v": [
+        9,
+        15
+      ],
+      "upstream_fuse_ref": "F101",
+      "upstream_fuse_nominal_a": 2,
+      "current_rating_basis": "Selected connector must safely carry the reviewed input current and coordinate with the 2 A upstream board fuse after contact/ambient derating; continuous/transient load current remains to be finalized."
+    },
+    "SW101": {
+      "interface": "power-reset switch",
+      "selection_status": "OPEN_NO_PART_SELECTED",
+      "selected_part": null,
+      "actuator_style": null,
+      "actuation_force_n": null,
+      "travel_mm": null,
+      "switch_function": "MOMENTARY_NORMALLY_OPEN_RESET_CONTACT",
+      "terminal_numbering": {
+        "1": "UVLO_IN",
+        "2": "GND"
+      },
+      "voltage_rating_v": null,
+      "current_rating_a": null,
+      "operating_temperature_c": null,
+      "cycle_life": null,
+      "enclosure_access_keepout_mm": null,
+      "evidence_pack": null,
+      "pin_count": 2,
+      "pinout": {
+        "1": "UVLO_IN",
+        "2": "GND"
+      },
+      "native_value": "POWER RESET (normally open)",
+      "electrical_role": "Low-energy UVLO/reset control contact; not the 12 V main-current path"
+    },
+    "J5": {
+      "interface": "eight-channel analog output",
+      "selection_status": "OPEN_NO_PART_SELECTED",
+      "selected_part": null,
+      "mating_part": null,
+      "pin_count": 10,
+      "pinout": {
+        "1": "DUT_AO0",
+        "2": "DUT_AO1",
+        "3": "DUT_AO2",
+        "4": "DUT_AO3",
+        "5": "DUT_AO4",
+        "6": "DUT_AO5",
+        "7": "DUT_AO6",
+        "8": "DUT_AO7",
+        "9": "GND",
+        "10": "GND"
+      },
+      "ao_working_voltage_v": "REQUESTED_BIPOLAR_-5_TO_+5_V; exact DUT common-mode/load contract still required",
+      "common_mode_contract": null,
+      "contact_current_a": null,
+      "contact_resistance_ohm": null,
+      "keying": null,
+      "retention": null,
+      "cable_type": null,
+      "shield_grounding_contract": null,
+      "creepage_clearance_basis": null,
+      "enclosure_keepout_mm": null,
+      "evidence_pack": null,
+      "signal_pin_count": 8,
+      "ground_pins": [
+        9,
+        10
+      ],
+      "requested_ao_span_v": [
+        -5,
+        5
+      ],
+      "disconnect_state": "HIGH_IMPEDANCE_NOT_GUARANTEED_ZERO",
+      "dut_adapter_required": true
+    },
+    "J501": {
+      "interface": "3.3 V dry-contact service/interlock",
+      "selection_status": "OPEN_NO_PART_SELECTED",
+      "selected_part": null,
+      "mating_part": null,
+      "pin_count": 2,
+      "pinout": {
+        "1": "INTERLOCK_FEED",
+        "2": "INTERLOCK_RAW"
+      },
+      "contact_voltage_v": null,
+      "contact_current_a": null,
+      "keying": null,
+      "retention": null,
+      "cable_open_behavior": "INHIBIT_BY_CURRENT_DESIGN",
+      "cable_short_behavior": "SHORT_ACROSS_CONTACT_MIMICS_CLOSED_CONTACT_BLOCKER",
+      "leakage_common_mode_contract": null,
+      "creepage_clearance_basis": null,
+      "enclosure_keepout_mm": null,
+      "evidence_pack": null,
+      "nominal_feed_v": 3.3,
+      "feed_series_resistor_ref": "R606",
+      "feed_series_resistance_ohm": 1000,
+      "fault_semantics_note": "A two-wire short across J501 pins 1-2 bypasses open-contact detection in the present topology. Connector selection cannot fix this; accept the limitation explicitly or redesign for line-fault monitoring."
+    },
+    "J701": {
+      "interface": "floating DUT permit contact",
+      "selection_status": "OPEN_NO_PART_SELECTED",
+      "selected_part": null,
+      "mating_part": null,
+      "pin_count": 2,
+      "pinout": {
+        "1": "DUT_PERMIT_A",
+        "2": "DUT_PERMIT_B"
+      },
+      "dut_open_circuit_voltage_v": null,
+      "dut_wetting_current_a": null,
+      "inhibited_max_leakage_a": null,
+      "contact_voltage_rating_v": null,
+      "contact_current_rating_a": null,
+      "isolation_creepage_clearance_basis": null,
+      "keying": null,
+      "retention": null,
+      "cable_open_behavior": "OPEN_CONTACT_INTENDED_TO_INHIBIT_REQUIRES_REAL_DUT_CONTRACT",
+      "cable_short_behavior": "SHORT_ACROSS_A_B_CAN_BYPASS_OPEN_CONTACT_DUT_DEPENDENT_BLOCKER",
+      "evidence_pack": null,
+      "lab_interface_envelope": {
+        "max_voltage_v": 24,
+        "max_current_a": 0.01
+      },
+      "optorelay_off_state_leakage_component_limit_a": 0.000001,
+      "fault_semantics_note": "The present single floating two-wire contact cannot by itself prove fail-safe behavior for a cable short. Actual DUT line monitoring or a different interface architecture is required if short-to-permit must be detected."
+    }
+  },
+  "native_sources": {
+    "expected_connections": "hardware/kicad/revB/axu2cgb_expansion/expected_connections.json",
+    "safety_oracle": "tools/check_native_safety.py",
+    "providers": "hardware/revB/providers.json"
+  }
+}

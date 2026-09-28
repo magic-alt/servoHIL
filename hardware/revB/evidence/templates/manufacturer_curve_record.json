@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "record_type": "MANUFACTURER_CHARACTERISTIC_TEMPLATE_ONLY",
+  "status": "TEMPLATE_ONLY_NOT_EVIDENCE",
+  "manufacturer": null,
+  "exact_part_number": null,
+  "characteristic": null,
+  "source_url": null,
+  "retrieved_on": null,
+  "original_file": null,
+  "original_sha256": null,
+  "normalized_file": null,
+  "normalized_sha256": null,
+  "conditions": {
+    "temperature_c": null,
+    "frequency_hz": null,
+    "ac_amplitude": null,
+    "dc_bias_or_current_units": null
+  },
+  "reviewer": null,
+  "normalization_note": null,
+  "scope_limit": "Reference characteristic evidence only. Does not establish worst-case guarantee, board temperature, startup/fault survival or production qualification."
+}

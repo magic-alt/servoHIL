@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "plan_id": "VIVADO_IO_DRC_TIMING",
+  "revision": "Rev.B",
+  "status": "BLOCKED_TOP_XDC_CLOCKS_NOT_BOUND",
+  "result": "NOT_RUN",
+  "layout_allowed": false,
+  "inputs": {
+    "vivado_version": null,
+    "target_part": "xczu2cg-sfvc784-1-e",
+    "top_module": null,
+    "xdc_files": [],
+    "rtl_sources": [],
+    "clock_definitions": [],
+    "source_commit": null,
+    "io_contract": "hardware/revB/vivado_input_contract.json",
+    "constraint_preview": "hardware/kicad/revB/axu2cgb_expansion/carrier.xdc.preview"
+  },
+  "required_reports": [
+    "report_drc",
+    "report_io or equivalent package-pin/IO-standard report",
+    "report_timing_summary with setup/hold",
+    "unconstrained path/clock review"
+  ],
+  "pass_contract": [
+    "exact target part/top/XDC/source revision bound",
+    "all intended top-level IO ports constrained to reviewed package pins and I/O standards",
+    "declared clocks match the design contract",
+    "no failing DRC items accepted by suppression without engineering rationale",
+    "setup/hold timing meets declared clocks",
+    "unconstrained paths/clocks explicitly reviewed",
+    "raw report bytes retained with SHA-256"
+  ],
+  "current_blocker": "Target part is bound from the AXU2CGB carrier profile and cross-checked against the board manufacturer, but only a review-preview XDC exists. No reviewed I/O-DRC top, active XDC, functional timing top or clock/timing contract is bound."
+}

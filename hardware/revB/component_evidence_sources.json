@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "checked_on": "2026-09-28",
+  "status": "MANUFACTURER_SOURCES_LOCATED_EVIDENCE_NOT_IMPORTED",
+  "layout_allowed": false,
+  "policy": "This registry records exact manufacturer source locations and catalog facts. URLs and transcribed catalog values are provenance discovery, not qualifying evidence. A curve-based subcheck requires archived original bytes, SHA-256, conditions, reviewer-controlled normalization and no extrapolation. Physical thermal/fault evidence remains separate.",
+  "magnetics": {
+    "manufacturer": "Coilcraft",
+    "family": "XAL50xx",
+    "datasheet_url": "https://www.coilcraft.com/getmedia/49bc46c8-4b2c-45b9-9b6c-2eaa235ea698/xal50xx.pdf",
+    "datasheet_document": "Document 908",
+    "datasheet_revision": "02/26/26",
+    "source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED_OR_DIGITIZED",
+    "source_scope": [
+      "catalog electrical table",
+      "typical L vs Current curves",
+      "typical L vs Frequency curves",
+      "physical characteristics",
+      "temperature-derating references"
+    ],
+    "limitations": [
+      "L-vs-current curves are typical rather than guaranteed worst-case limits",
+      "Irms temperature rise depends on PCB land pattern, trace size, airflow and nearby components",
+      "datasheet does not replace startup/short-circuit/current-limit or mounted-board thermal testing"
+    ],
+    "exact_parts": {
+      "XAL5050-103MEC": {
+        "references": [
+          "L201",
+          "L301",
+          "L302"
+        ],
+        "inductance_uh": 10,
+        "dcr_max_mohm_25c": 45,
+        "srf_typ_mhz": 15,
+        "isat_typ_a_30pct_drop_25c": 4.9,
+        "irms_a_20c_rise": 3.6,
+        "irms_a_40c_rise": 4.9,
+        "web_page": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5050-103/"
+      },
+      "XAL5050-682MEC": {
+        "references": [
+          "L202"
+        ],
+        "inductance_uh": 6.8,
+        "dcr_max_mohm_25c": 29.45,
+        "srf_typ_mhz": 21,
+        "isat_typ_a_30pct_drop_25c": 6,
+        "irms_a_20c_rise": 4.7,
+        "irms_a_40c_rise": 6.4,
+        "web_page": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5050-682/"
+      },
+      "XAL5030-472MEC": {
+        "references": [
+          "L203"
+        ],
+        "inductance_uh": 4.7,
+        "dcr_max_mohm_25c": 40,
+        "srf_typ_mhz": 23,
+        "isat_typ_a_30pct_drop_25c": 6.7,
+        "irms_a_20c_rise": 4.3,
+        "irms_a_40c_rise": 5.9,
+        "web_page": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5030-472/"
+      }
+    },
+    "next_evidence": [
+      "archive exact official datasheet bytes and SHA-256",
+      "digitize/review exact 4.7uH, 6.8uH and 10uH L-vs-current curves with documented method",
+      "bind temperature-derating evidence to intended ambient/current corners",
+      "calculate AC/core+winding loss at actual switching waveforms",
+      "retain real mounted-board temperature rise measurements"
+    ]
+  },
+  "mlcc": {
+    "manufacturer": "TDK",
+    "source_status": "EXACT_CHARACTERIZATION_SHEETS_LOCATED_NOT_HASH_ARCHIVED",
+    "common_limitation": "TDK characteristic graphs are reference data and do not guarantee product characteristics. They may support engineering screening after exact evidence import but do not replace worst-case/lifetime/board validation.",
+    "exact_parts": {
+      "C3225X7R1C226M250AC": {
+        "assigned_banks": [
+          "buck_6v2",
+          "buck_3v3",
+          "buck_1v8",
+          "ldo_5v0",
+          "ldo_5v2",
+          "ldo_n5v2"
+        ],
+        "product_status": "PRODUCTION",
+        "capacitance_uf": 22,
+        "tolerance_percent": 20,
+        "rated_voltage_v": 16,
+        "dielectric": "X7R",
+        "product_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1C226M250AC",
+        "characterization_sheet_url": "https://product.tdk.com/en/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c3225x7r1c226m250ac.pdf"
+      },
+      "C3225X7R1E106K250AC": {
+        "assigned_banks": [
+          "cuk_output"
+        ],
+        "product_status": "PRODUCTION",
+        "capacitance_uf": 10,
+        "tolerance_percent": 10,
+        "rated_voltage_v": 25,
+        "dielectric": "X7R",
+        "product_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1E106K250AC",
+        "characterization_sheet_url": "https://product.tdk.com/en/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c3225x7r1e106k250ac.pdf"
+      },
+      "CGA6L2X7R1H105K160AA": {
+        "assigned_banks": [
+          "cuk_transfer"
+        ],
+        "product_status": "PRODUCTION",
+        "automotive_qualification": "AEC-Q200",
+        "capacitance_uf": 1,
+        "tolerance_percent": 10,
+        "rated_voltage_v": 50,
+        "dielectric": "X7R",
+        "product_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA6L2X7R1H105K160AA",
+        "characterization_sheet_url": "https://product.tdk.com/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/cga6l2x7r1h105k160aa.pdf"
+      }
+    },
+    "unresolved": {
+      "input_protected": {
+        "status": "BLOCKED_EXACT_MPN_NOT_SELECTED",
+        "native_requirement": "47uF / 35V / 2220",
+        "next_evidence": [
+          "select exact production MPN",
+          "bind case/height/rating",
+          "archive DC-bias/temperature/ESR/RMS-current evidence"
+        ]
+      }
+    },
+    "next_evidence": [
+      "download exact manufacturer CSV/PDF/model bytes into a local reviewed evidence pack without redistributing restricted vendor IP",
+      "record SHA-256 and graph conditions",
+      "normalize DC-bias curves with explicit reviewer note",
+      "run no-extrapolation effective-capacitance screening",
+      "review ripple-temperature-rise/ESR at actual frequency and RMS current",
+      "retain temperature/aging margin separately"
+    ]
+  }
+}

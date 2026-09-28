@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "checked_on": "2026-09-28",
+  "status": "BLOCKED_PRE_LAYOUT_EVIDENCE_REQUIRED",
+  "layout_allowed": false,
+  "policy": "This contract coordinates pre-layout qualification work. A located datasheet, analytical screen, template, or empty evidence directory is progress only and never a PASS.",
+  "mechanical_bindings": {
+    "manifest": "hardware/revB/schematic_open_items.json",
+    "plan": "hardware/revB/mechanical_binding_plan.json",
+    "required_open_refs": [
+      "J101",
+      "SW101",
+      "J5",
+      "J501",
+      "J701"
+    ],
+    "close_rule": "A reference may leave open_footprints only after an exact selected part, exact mating/cable contract, locally reviewable footprint/mechanical data and the ref-specific evidence pack are complete."
+  },
+  "component_evidence": {
+    "source_registry": "hardware/revB/component_evidence_sources.json",
+    "magnetics_exact_mpns": [
+      "XAL5050-103MEC",
+      "XAL5050-682MEC",
+      "XAL5030-472MEC"
+    ],
+    "mlcc_assigned_exact_mpns": [
+      "C3225X7R1C226M250AC",
+      "C3225X7R1E106K250AC",
+      "CGA6L2X7R1H105K160AA"
+    ],
+    "unresolved_banks": [
+      "input_protected"
+    ],
+    "policy": "Manufacturer characteristic sources may satisfy provenance/curve-source subchecks only after exact bytes/conditions are archived and reviewed. They do not replace startup/fault stress or mounted-board thermal evidence."
+  },
+  "workstreams": {
+    "MECHANICAL_BINDINGS": {
+      "status": "BLOCKED",
+      "required": [
+        "J101",
+        "SW101",
+        "J5",
+        "J501",
+        "J701"
+      ],
+      "evidence_template": "hardware/revB/evidence/templates/mechanical_binding_record.json"
+    },
+    "MAGNETICS": {
+      "status": "BLOCKED",
+      "required": [
+        "L_I_T_CURVES",
+        "AC_CORE_AND_WINDING_LOSS",
+        "STARTUP_SHORT_SATURATION",
+        "MOUNTED_BOARD_TEMPERATURE"
+      ],
+      "evidence_template": "hardware/revB/evidence/templates/manufacturer_curve_record.json"
+    },
+    "MLCC": {
+      "status": "BLOCKED",
+      "required": [
+        "EXACT_MPN_DC_BIAS",
+        "TEMPERATURE_AGING",
+        "RMS_CURRENT_ESR",
+        "INPUT_PROTECTED_EXACT_MPN"
+      ],
+      "evidence_template": "hardware/revB/evidence/templates/manufacturer_curve_record.json"
+    },
+    "DUT_ADAPTER": {
+      "status": "BLOCKED_UNBOUND",
+      "profile": "hardware/revB/dut_adapter_profile.json",
+      "evidence_template": "hardware/revB/evidence/templates/dut_adapter_measurement_record.json",
+      "verification_plan": "hardware/revB/verification_plans/dut_adapter_acceptance.json"
+    },
+    "PARTIAL_POWER_BACKFEED": {
+      "status": "NOT_RUN",
+      "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json",
+      "verification_plan": "hardware/revB/verification_plans/partial_power_backfeed.json"
+    },
+    "BOARD_THERMAL": {
+      "status": "NOT_RUN",
+      "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json",
+      "verification_plan": "hardware/revB/verification_plans/board_thermal.json"
+    },
+    "VIVADO_IO_DRC_TIMING": {
+      "status": "BLOCKED_TOP_XDC_CLOCKS_NOT_BOUND",
+      "evidence_template": "hardware/revB/evidence/templates/vivado_report_record.json",
+      "verification_plan": "hardware/revB/verification_plans/vivado_io_timing.json",
+      "input_contract": "hardware/revB/vivado_input_contract.json"
+    },
+    "LOW_ENERGY_FIXTURE": {
+      "status": "NOT_RUN",
+      "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json",
+      "verification_plan": "hardware/revB/verification_plans/low_energy_fixture.json"
+    }
+  },
+  "release_boundary": {
+    "pre_layout_required": true,
+    "post_layout_still_required": [
+      "EMC",
+      "THERMAL",
+      "POWER_DOWN",
+      "FAULT_INJECTION",
+      "FOC_CLOSED_LOOP"
+    ],
+    "note": "Completing this contract can make the design ready for an engineering layout review; it is not fabrication, safety, EMC, or production approval."
+  }
+}

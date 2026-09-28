@@ -42,10 +42,21 @@ def curve_retention(curve,voltage,part_number):
 def report(root=ROOT):
     a=analysis(root);values=a.native_values(root);base=a.build_report(root)
     data=json.loads((root/'sim/power/component_candidates.json').read_text())
+    registry=json.loads((root/'hardware/revB/component_evidence_sources.json').read_text())
+    if registry.get('schema_version')!=1 or registry.get('layout_allowed') is not False:
+        raise ValueError('component evidence source registry policy drift')
+    magnetic_sources=registry.get('magnetics',{})
+    if magnetic_sources.get('source_status')=='PASS':
+        raise ValueError('manufacturer source discovery cannot be qualification PASS')
     val=lambda r:a.numeric(values[r])
     rows=[]
     for ref,mpn in data['assignments'].items():
         part=data['parts'][mpn]
+        source=magnetic_sources.get('exact_parts',{}).get(mpn)
+        if not isinstance(source,dict):
+            raise ValueError(f'{ref}: exact manufacturer source missing for {mpn}')
+        if part.get('datasheet_url')!=magnetic_sources.get('datasheet_url'):
+            raise ValueError(f'{ref}: manufacturer datasheet source drift')
         if not math.isclose(part['inductance_h'],val(ref),rel_tol=1e-9):
             raise ValueError(f'{ref}: candidate inductance no longer matches native value')
         if ref in ['L201','L202','L203']:
@@ -57,6 +68,9 @@ def report(root=ROOT):
             # CCM arithmetic only: invalid-mode corners cannot provide safe bounds.
             peak=stress['worst_switch']['switch_peak_a'];rms=stress['worst_'+side+'_rms_a']
         rows.append({'reference':ref,'part_number':mpn,'source_url':part['source_url'],
+            'manufacturer_datasheet_url':magnetic_sources.get('datasheet_url'),
+            'manufacturer_datasheet_document':magnetic_sources.get('datasheet_document'),
+            'manufacturer_source_status':magnetic_sources.get('source_status'),
             'inductance_h':val(ref),'dcr_max_ohm_25c':part['dcr_max_ohm_25c'],
             'screen_peak_a':peak,'screen_rms_a':rms,
             'stress_model_status':stress['status'],
@@ -69,6 +83,7 @@ def report(root=ROOT):
             'ratings_basis':'25C catalog typical/reference, NOT guaranteed actual-board current limits'})
     mlcc=[dict(bank=name,**row) for name,row in base['mlcc'].items()]
     return {'status':'SCREENED_NOT_QUALIFIED','layout_allowed':False,'source_digest':a.content_digest(root),
+            'manufacturer_source_registry_status':registry.get('status'),
             'magnetics':rows,'mlcc':mlcc,'thermal':base['thermal'],
             'thermal_summary':base['thermal_summary'],'analytical_blocker_ids':base['blocker_ids'],
             'mlcc_curve_warning':'No vendor DC-bias curve imported. Interpolation helper is not a qualification certificate.'}

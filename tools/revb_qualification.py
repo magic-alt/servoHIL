@@ -58,7 +58,12 @@ def _string_list(data: dict[str, Any], name: str, *, minimum: int = 1) -> list[s
     return value
 
 
-def _verified_gate_evidence(entry: dict[str, Any], root: Path, gate_name: str) -> list[str]:
+def _verified_gate_evidence(
+    entry: dict[str, Any],
+    root: Path,
+    gate_name: str,
+    expected_carrier: str | None = None,
+) -> list[str]:
     """Validate the same source-bound evidence envelope used by tools/revb.py release."""
     if entry.get("status") != "PASS":
         return []
@@ -85,6 +90,8 @@ def _verified_gate_evidence(entry: dict[str, Any], root: Path, gate_name: str) -
         raise ValueError(f"{gate_name}: evidence report must be an object")
     if report.get("gate") != gate_name or report.get("result") != "PASS":
         raise ValueError(f"{gate_name}: evidence gate/result mismatch")
+    if expected_carrier is not None and report.get("carrier") != expected_carrier:
+        raise ValueError(f"{gate_name}: evidence carrier mismatch")
 
     # Keep the qualification aggregator and the actual release path on one source
     # identity algorithm rather than inventing a parallel digest.
@@ -111,6 +118,75 @@ def _verified_gate_evidence(entry: dict[str, Any], root: Path, gate_name: str) -
         raise ValueError(f"{gate_name}: raw report hash mismatch")
 
     return [evidence, raw_name]
+
+
+def _qualification_evidence_state(
+    data: dict[str, Any],
+    root: Path,
+    mechanical_required: list[str],
+    component_required: list[str],
+    physical_required: list[str],
+    vivado_required: list[str],
+) -> dict[str, Any]:
+    if data.get("schema_version") != 1:
+        raise ValueError("unsupported prelayout evidence status schema")
+    if data.get("layout_allowed") is not False:
+        raise ValueError("prelayout evidence status must preserve layout_allowed=false")
+    carrier = data.get("carrier")
+    if not isinstance(carrier, str) or not carrier.strip():
+        raise ValueError("prelayout evidence status carrier must be bound")
+
+    expected = {
+        "mechanical": set(mechanical_required),
+        "component": set(component_required),
+        "physical": set(physical_required),
+        "vivado": set(vivado_required),
+    }
+    blockers: list[str] = []
+    verified: dict[str, list[str]] = {}
+    states: dict[str, dict[str, str]] = {}
+    blocker_prefix = {
+        "mechanical": lambda name: f"MECHANICAL_{name}_REQUIRED",
+        "component": lambda name: f"COMPONENT_{name}_REQUIRED",
+        "physical": lambda name: f"PHYSICAL_{name}_REQUIRED",
+        "vivado": lambda name: f"TOOL_{name}_REQUIRED",
+    }
+    for category, required in expected.items():
+        section = data.get(category)
+        if not isinstance(section, dict) or set(section) != required:
+            raise ValueError(
+                f"prelayout evidence {category} coverage drift: "
+                f"missing={sorted(required-set(section or {}))} "
+                f"unexpected={sorted(set(section or {})-required)}"
+            )
+        states[category] = {}
+        for name in sorted(required):
+            entry = section[name]
+            if not isinstance(entry, dict):
+                raise ValueError(f"{category}.{name}: evidence state must be an object")
+            status = entry.get("status")
+            if status not in {"NOT_RUN", "BLOCKED", "FAIL", "PASS"}:
+                raise ValueError(f"{category}.{name}: invalid evidence status")
+            gate_name = entry.get("gate")
+            if not isinstance(gate_name, str) or not gate_name.startswith("prelayout_"):
+                raise ValueError(f"{category}.{name}: invalid evidence gate name")
+            states[category][name] = status
+            key = f"{category}.{name}"
+            if status == "PASS":
+                verified[key] = _verified_gate_evidence(
+                    entry, root, gate_name, expected_carrier=carrier
+                )
+            else:
+                if entry.get("evidence") not in (None, ""):
+                    raise ValueError(f"{category}.{name}: non-PASS state cannot claim evidence")
+                blockers.append(blocker_prefix[category](name))
+    return {
+        "carrier": carrier,
+        "status": data.get("status"),
+        "states": states,
+        "verified": verified,
+        "blockers": blockers,
+    }
 
 def _profile_is_unbound(profile: dict[str, Any]) -> bool:
     if not profile.get("adapter_id"):
@@ -237,7 +313,7 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
     requirements = json.loads(
         (root / "hardware/revB/qualification_requirements.json").read_text(encoding="utf-8")
     )
-    if requirements.get("schema_version") != 2:
+    if requirements.get("schema_version") != 3:
         raise ValueError("unsupported qualification requirements schema")
     if requirements.get("release_policy", {}).get("layout_allowed") is not False:
         raise ValueError("qualification requirements must preserve layout_allowed=false")
@@ -263,6 +339,14 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
 
     dut = evaluate_dut_profile(load_profile(root / dut_section["path"]), root=root)
 
+    evidence_section = requirements.get("prelayout_evidence_status")
+    if not isinstance(evidence_section, dict) or not isinstance(evidence_section.get("path"), str):
+        raise ValueError("qualification requirements must bind prelayout_evidence_status.path")
+
+    from check_revb_prelayout_contract import check as check_prelayout_contract
+    prelayout = check_prelayout_contract(root)
+    mechanical_required = list(prelayout["mechanical_open_refs"])
+
     if gates.get("layout_allowed") is not False:
         raise ValueError("qualification branch must preserve layout_allowed=false")
 
@@ -280,28 +364,34 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
         else:
             blockers.append(f"GATE_{name.upper()}_NOT_PASS")
 
-    # Component evidence remains explicit even if an analytical report becomes
-    # green. These items require manufacturer curves and/or physical evidence.
-    for name in component_required:
-        blockers.append(f"COMPONENT_{name}_REQUIRED")
-
-    # Physical and tool evidence cannot be replaced by catalog or simulation.
-    for name in physical_required:
-        blockers.append(f"PHYSICAL_{name}_REQUIRED")
-    for name in vivado_required:
-        blockers.append(f"TOOL_{name}_REQUIRED")
+    evidence_status = json.loads(
+        (root / evidence_section["path"]).read_text(encoding="utf-8")
+    )
+    requirement_evidence = _qualification_evidence_state(
+        evidence_status,
+        root,
+        mechanical_required,
+        component_required,
+        physical_required,
+        vivado_required,
+    )
+    blockers.extend(requirement_evidence["blockers"])
 
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "revision": gates.get("revision", "Rev.B"),
         "qualification": "BLOCKED" if blockers else "READY_FOR_ENGINEERING_REVIEW",
         "layout_allowed": False,
         "dut_adapter": dut,
+        "prelayout_contract": prelayout,
+        "mechanical_required": mechanical_required,
         "component_evidence_required": component_required,
         "physical_required": physical_required,
         "vivado_required": vivado_required,
         "post_layout_release_required": post_layout_required,
         "verified_gate_evidence": verified_gate_evidence,
+        "prelayout_evidence_status": requirement_evidence["states"],
+        "verified_requirement_evidence": requirement_evidence["verified"],
         "blockers": sorted(set(blockers)),
         "note": (
             "Evidence aggregation only; analytical screens and catalog ratings cannot "

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "record_type": "DUT_ADAPTER_MEASUREMENT_TEMPLATE_ONLY",
+  "status": "TEMPLATE_ONLY_NOT_EVIDENCE",
+  "adapter_id": null,
+  "hw_revision": null,
+  "dut_revision": null,
+  "test_case": null,
+  "instrument_set": [],
+  "setup_description": null,
+  "stimulus": null,
+  "measured_values": {},
+  "acceptance_limits": {},
+  "result": "NOT_RUN",
+  "raw_report": null,
+  "raw_sha256": null,
+  "measured_at": null,
+  "reviewer": null,
+  "safety_note": "AO disconnect is high impedance, not guaranteed safe zero. A single permit contact is not redundant STO."
+}

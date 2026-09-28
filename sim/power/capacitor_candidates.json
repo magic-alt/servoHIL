@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "checked_on": "2026-09-26",
+  "checked_on": "2026-09-28",
   "status": "CANDIDATES_NOT_BOM_OR_LAYOUT_RELEASE",
-  "source_note": "Catalog pages rechecked 2026-09-26. No original DC-bias CSV is archived; catalog curves remain reference-only. Candidate binding is not BOM/layout release.",
+  "source_note": "TDK exact product pages and exact-MPN characterization sheets rechecked 2026-09-28. Characterization sheets expose DC-bias, impedance/ESR, capacitance/frequency, temperature and ripple-temperature-rise reference graphs, but original CSV/bytes are not yet archived in a reviewed evidence pack. Candidate binding is not BOM/layout release.",
   "bias_reserve_v": 0.05,
   "bias_reserve_status": "Engineering screening reserve, NOT a measured startup/load-step/surge bound.",
   "parts": {
@@ -17,7 +17,9 @@
       "height_max_mm": 2.8,
       "lifecycle": "PRODUCTION",
       "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1C226M250AC",
-      "note": "The M tolerance is +/-20%, NOT the generic analysis +/-10% scenario. Land pattern and height still need review."
+      "note": "The M tolerance is +/-20%, NOT the generic analysis +/-10% scenario. Land pattern and height still need review.",
+      "characterization_sheet_url": "https://product.tdk.com/en/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c3225x7r1c226m250ac.pdf",
+      "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED"
     },
     "C3225X7R1E106K250AC": {
       "manufacturer": "TDK",
@@ -30,7 +32,9 @@
       "height_max_mm": 2.8,
       "lifecycle": "PRODUCTION",
       "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1E106K250AC",
-      "note": "25V candidate exceeds native 16V rating; nominal capacitance and case match. This is not a declaration of interchangeability."
+      "note": "25V candidate exceeds native 16V rating; nominal capacitance and case match. This is not a declaration of interchangeability.",
+      "characterization_sheet_url": "https://product.tdk.com/en/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c3225x7r1e106k250ac.pdf",
+      "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED"
     },
     "C3225X7R1H105K160AA": {
       "manufacturer": "TDK",
@@ -43,7 +47,9 @@
       "height_max_mm": 1.8,
       "lifecycle": "PRODUCTION_NRND",
       "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1H105K160AA",
-      "note": "NRND reference candidate only. Find a supported replacement before BOM freeze; validate transfer-capacitor RMS current/ESR/temperature."
+      "note": "NRND reference candidate only. Find a supported replacement before BOM freeze; validate transfer-capacitor RMS current/ESR/temperature.",
+      "characterization_sheet_url": "https://product.tdk.com/en/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c3225x7r1h105k160aa.pdf",
+      "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED"
     },
     "CGA6L2X7R1H105K160AA": {
       "manufacturer": "TDK",
@@ -61,7 +67,9 @@
         125
       ],
       "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA6L2X7R1H105K160AA",
-      "note": "Production automotive-grade replacement for the assigned NRND commercial 1uF/50V/1210 candidate. DC-bias/reference curves still require archived exact-MPN evidence."
+      "note": "Production automotive-grade replacement for the assigned NRND commercial 1uF/50V/1210 candidate. DC-bias/reference curves still require archived exact-MPN evidence.",
+      "characterization_sheet_url": "https://product.tdk.com/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/cga6l2x7r1h105k160aa.pdf",
+      "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED"
     }
   },
   "bank_candidates": {

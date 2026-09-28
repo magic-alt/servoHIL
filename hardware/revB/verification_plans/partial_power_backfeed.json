@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "plan_id": "PARTIAL_POWER_AND_BACKFEED",
+  "revision": "Rev.B",
+  "status": "NOT_RUN_LIMITS_REQUIRE_REVIEW",
+  "result": "NOT_RUN",
+  "layout_allowed": false,
+  "policy": "Execute only with current-limited/energy-limited sources. A qualitative absence of smoke is not acceptance. Measure rail rise and injection current for every energized/unpowered-domain combination.",
+  "scenarios": [
+    {
+      "id": "PP-01",
+      "energized": [
+        "12V_FIELD_INPUT"
+      ],
+      "unpowered": [
+        "carrier J12/J15 domains"
+      ],
+      "measure": [
+        "all local regulated rails",
+        "carrier-facing IO voltage/current",
+        "input current"
+      ],
+      "limit_sources": [
+        "device absolute-maximum/injection-current limits",
+        "carrier interface contract"
+      ]
+    },
+    {
+      "id": "PP-02",
+      "energized": [
+        "carrier J12/J15 interface supplies"
+      ],
+      "unpowered": [
+        "12V_FIELD_INPUT",
+        "local power chain"
+      ],
+      "measure": [
+        "12V input node",
+        "local regulated rails",
+        "reverse current into power stages"
+      ],
+      "limit_sources": [
+        "power-device reverse-current/backfeed limits"
+      ]
+    },
+    {
+      "id": "PP-03",
+      "energized": [
+        "external DUT AO-side voltage"
+      ],
+      "unpowered": [
+        "HIL board supplies"
+      ],
+      "measure": [
+        "DUT_AO clamp/disconnect current",
+        "local analog rails",
+        "digital rails"
+      ],
+      "limit_sources": [
+        "ADG/output protection absolute maximum and leakage contracts",
+        "real DUT adapter contract"
+      ]
+    },
+    {
+      "id": "PP-04",
+      "energized": [
+        "external DUT permit input"
+      ],
+      "unpowered": [
+        "HIL board supplies"
+      ],
+      "measure": [
+        "DUT_PERMIT_A/B leakage",
+        "board rail rise",
+        "isolation path current"
+      ],
+      "limit_sources": [
+        "AQY212GS/contact path ratings",
+        "real DUT permit contract"
+      ]
+    },
+    {
+      "id": "PP-05",
+      "energized": [
+        "external PWM/encoder/RS485/AUX interface"
+      ],
+      "unpowered": [
+        "corresponding HIL supply domains"
+      ],
+      "measure": [
+        "interface injection current",
+        "unpowered rail rise",
+        "protection-device temperature if material"
+      ],
+      "limit_sources": [
+        "transceiver/buffer absolute maximum and injection-current limits"
+      ]
+    }
+  ],
+  "pass_requires": [
+    "all raw measurements bound to exact setup",
+    "no device limit exceeded",
+    "no unintended rail reaches an enable/logic-valid region unless explicitly designed",
+    "safe/inhibit semantics preserved during every partial-power state"
+  ]
+}

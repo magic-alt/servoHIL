@@ -61,6 +61,68 @@ python tools/check_revb_schematic_closure.py
 A passing source-closure report only proves that the checked-in schematic matches the
 explicit binding contract. It does not authorize Layout.
 
+## Pre-layout qualification workstreams
+
+The remaining pre-layout work is coordinated by
+`hardware/revB/prelayout_qualification_contract.json`. Its checked-in state is
+deliberately **BLOCKED_PRE_LAYOUT_EVIDENCE_REQUIRED** and cannot authorize Layout.
+
+Run both source/evidence contract audits:
+
+```sh
+python tools/check_revb_schematic_closure.py
+python tools/check_revb_prelayout_contract.py
+python tools/revb_qualification.py
+```
+
+The five mechanical interfaces have a machine-readable selection plan in
+`hardware/revB/mechanical_binding_plan.json`. Known native electrical facts are
+already bound there, but no connector or switch is claimed as selected: each exact
+part and evidence pack remains null until the real enclosure, mating cable and DUT
+contract are known.
+
+The native contract currently resolves J101 as a 2-pin 9–15 V input, SW101 as a
+2-pin normally-open reset/control contact, and J5 as **10 pins**: eight DUT_AO
+signals plus two ground contacts. J501 and J701 are both two-wire dry-contact
+interfaces. Their cable-short behavior is deliberately an architecture blocker:
+shorting the two wires can mimic/force a closed contact, so connector selection
+alone cannot prove fail-safe short detection.
+
+Manufacturer-source discovery is tracked separately in
+`hardware/revB/component_evidence_sources.json`:
+
+- Coilcraft XAL5050-103MEC / XAL5050-682MEC / XAL5030-472MEC source pages and the
+  current XAL50xx datasheet are located, but the characteristic bytes/curves are
+  not yet hash-archived and independently digitized;
+- TDK exact characterization sheets are located for the assigned 22 uF / 16 V,
+  10 uF / 25 V and automotive 1 uF / 50 V candidates, but no reviewed,
+  hash-bound DC-bias curve pack has yet been imported;
+- the protected-input MLCC bank still has no exact production MPN.
+
+Located source URLs are provenance discovery, not qualification evidence.
+
+The executable bench/tool plans live under
+`hardware/revB/verification_plans/`:
+
+- `dut_adapter_acceptance.json`;
+- `partial_power_backfeed.json`;
+- `board_thermal.json`;
+- `low_energy_fixture.json`;
+- `vivado_io_timing.json`.
+
+All checked-in results remain `NOT_RUN`. The Vivado input contract now binds the
+AXU2CGB-original target device to `xczu2cg-sfvc784-1-e`
+(`XCZU2CG-1SFVC784E`). The existing `carrier.xdc.preview` remains preview-only
+and cannot close a gate. A reviewed I/O-DRC top, active XDC, functional timing top,
+clock/generated-clock definitions, I/O delays and timing/CDC policy are still
+required before IO-DRC/STA evidence can be accepted.
+
+`hardware/revB/prelayout_evidence_status.json` is the machine state for future
+closure. Every mechanical/component/physical/Vivado item begins at `NOT_RUN`.
+A PASS must use the same source-digest-bound, raw-SHA256 evidence envelope as the
+existing Rev.B release path; the qualification aggregator rejects missing coverage,
+stale source identity, path escape, carrier mismatch and changed raw bytes.
+
 ## Qualification state
 
 `hardware/revB/qualification_requirements.json`,

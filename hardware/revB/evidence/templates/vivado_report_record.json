@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "record_type": "VIVADO_REPORT_TEMPLATE_ONLY",
+  "status": "TEMPLATE_ONLY_NOT_EVIDENCE",
+  "gate": null,
+  "vivado_version": null,
+  "target_part": null,
+  "top_module": null,
+  "xdc_files": [],
+  "source_files": [],
+  "source_commit": null,
+  "source_digest": null,
+  "command_or_run": null,
+  "raw_report": null,
+  "raw_sha256": null,
+  "result": "NOT_RUN",
+  "reviewed_on": null,
+  "reviewer": null,
+  "note": "A PASS must bind the exact part/top/XDC/source revision and raw Vivado report bytes. A screenshot or hand-entered timing number is insufficient."
+}

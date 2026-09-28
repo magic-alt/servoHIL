@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "plan_id": "DUT_ADAPTER_ACCEPTANCE",
+  "revision": "Rev.B",
+  "status": "BLOCKED_DUT_PROFILE_UNBOUND",
+  "result": "NOT_RUN",
+  "layout_allowed": false,
+  "profile": "hardware/revB/dut_adapter_profile.json",
+  "policy": "Do not populate numeric limits from assumptions. Limits must come from the reviewed real DUT adapter/input contract and measurements must bind exact HIL/DUT revisions.",
+  "test_cases": [
+    {
+      "id": "DUT-AO-DISCONNECT",
+      "purpose": "Characterize AO state after physical disconnect and inhibit.",
+      "stimulus": [
+        "command representative AO levels",
+        "remove SAFE_ENABLE / force disconnect"
+      ],
+      "measure": [
+        "DUT_AO voltage versus time",
+        "residual current into representative DUT/load",
+        "source impedance if applicable"
+      ],
+      "acceptance_from_profile": [
+        "ao_neutral.min_v",
+        "ao_neutral.max_v",
+        "ao_neutral.max_residual_current_a"
+      ],
+      "note": "High impedance is not equivalent to guaranteed zero volts."
+    },
+    {
+      "id": "DUT-PERMIT",
+      "purpose": "Measure real DUT permit input thresholds, wetting current and inhibited leakage.",
+      "stimulus": [
+        "permit open",
+        "permit closed"
+      ],
+      "measure": [
+        "DUT open-circuit voltage",
+        "closed contact current",
+        "inhibited leakage"
+      ],
+      "acceptance_from_profile": [
+        "permit_input.asserted_min_v",
+        "permit_input.inhibited_max_v",
+        "permit_input.max_input_leakage_a"
+      ]
+    },
+    {
+      "id": "DUT-CABLE-OPEN",
+      "purpose": "Verify cable-open behavior.",
+      "stimulus": [
+        "open each required permit/interlock conductor"
+      ],
+      "measure": [
+        "DUT reaction",
+        "permit/interlock state",
+        "time to inhibit"
+      ],
+      "acceptance_from_profile": [
+        "cable_faults.open_response",
+        "max_end_to_end_disable_us"
+      ]
+    },
+    {
+      "id": "DUT-CABLE-SHORT",
+      "purpose": "Verify cable-short behavior.",
+      "stimulus": [
+        "apply reviewed low-energy short cases"
+      ],
+      "measure": [
+        "DUT reaction",
+        "permit/interlock state",
+        "fault current",
+        "time to inhibit"
+      ],
+      "acceptance_from_profile": [
+        "cable_faults.short_response",
+        "max_end_to_end_disable_us"
+      ]
+    },
+    {
+      "id": "DUT-SHUTDOWN-LATENCY",
+      "purpose": "Measure end-to-end disable latency from fault stimulus to DUT inhibition.",
+      "stimulus": [
+        "reviewed watchdog/interlock/fault stimuli"
+      ],
+      "measure": [
+        "fault edge timestamp",
+        "AO disconnect edge",
+        "permit-open edge",
+        "DUT inhibited edge"
+      ],
+      "acceptance_from_profile": [
+        "max_end_to_end_disable_us"
+      ]
+    }
+  ],
+  "required_raw_evidence": [
+    "scope/logic traces with timebase",
+    "instrument identities and calibration state",
+    "wiring/setup photo or drawing",
+    "machine-readable measurements",
+    "exact HIL and DUT revisions"
+  ]
+}

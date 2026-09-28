@@ -1,7 +1,7 @@
 {
   "status": "CANDIDATE_NOT_PURCHASE_OR_LAYOUT_RELEASE",
-  "checked_on": "2026-09-26",
-  "source_note": "Manufacturer specifications at 25C. Isat is typically 30 percent L drop; Irms is reference current for temperature rise, NOT an absolute or guaranteed limit. Datasheet/curves/footprints must be reviewed before binding native MPNs.",
+  "checked_on": "2026-09-28",
+  "source_note": "Manufacturer catalog and XAL50xx Document 908 sources rechecked 2026-09-28. Exact XAL5030/XAL5050 L-vs-current curves are located in the official 2026-02-26 datasheet but not yet archived/digitized as hash-bound evidence. Catalog Isat/Irms remain screening-only and board thermal/fault evidence remains required.",
   "parts": {
     "XAL5050-103MEC": {
       "inductance_h": 0.00001,
@@ -11,7 +11,10 @@
       "isat_typ_a_30pct_25c": 4.9,
       "irms_ref_a_20c_rise": 3.6,
       "irms_ref_a_40c_rise": 4.9,
-      "source_url": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5050-103/"
+      "source_url": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5050-103/",
+      "datasheet_url": "https://www.coilcraft.com/getmedia/49bc46c8-4b2c-45b9-9b6c-2eaa235ea698/xal50xx.pdf",
+      "datasheet_document": "XAL50xx Document 908, revised 02/26/26",
+      "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED_OR_DIGITIZED"
     },
     "XAL5050-682MEC": {
       "inductance_h": 0.0000068,
@@ -21,7 +24,10 @@
       "isat_typ_a_30pct_25c": 6,
       "irms_ref_a_20c_rise": 4.7,
       "irms_ref_a_40c_rise": 6.4,
-      "source_url": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5050-682/"
+      "source_url": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5050-682/",
+      "datasheet_url": "https://www.coilcraft.com/getmedia/49bc46c8-4b2c-45b9-9b6c-2eaa235ea698/xal50xx.pdf",
+      "datasheet_document": "XAL50xx Document 908, revised 02/26/26",
+      "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED_OR_DIGITIZED"
     },
     "XAL5030-472MEC": {
       "inductance_h": 0.0000047,
@@ -31,7 +37,10 @@
       "isat_typ_a_30pct_25c": 6.7,
       "irms_ref_a_20c_rise": 4.3,
       "irms_ref_a_40c_rise": 5.9,
-      "source_url": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5030-472/"
+      "source_url": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/molded-inductor/xal/xal50xx/xal5030-472/",
+      "datasheet_url": "https://www.coilcraft.com/getmedia/49bc46c8-4b2c-45b9-9b6c-2eaa235ea698/xal50xx.pdf",
+      "datasheet_document": "XAL50xx Document 908, revised 02/26/26",
+      "curve_source_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED_OR_DIGITIZED"
     }
   },
   "assignments": {
