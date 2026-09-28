@@ -33,10 +33,13 @@
       ],
       "required_evidence": [
         "reviewed exact-part CAD or manufacturer recommended land-pattern source",
+        "official EVAL-AD3542RFMCZ Gerber geometry archived and reviewed",
         "independent pad-count/pitch/body/terminal dimension review",
+        "current exposed/center-pad presence and electrical treatment resolved from CAD/Gerber",
         "locally vendored KiCad footprint with source/provenance record",
         "native netlist/ERC regression after binding"
-      ]
+      ],
+      "evidence_manifest": "hardware/revB/ad3542r_footprint_evidence.json"
     },
     "U21": {
       "same_as": "U20",
