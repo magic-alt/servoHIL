@@ -76,9 +76,17 @@ python tools/revb_qualification.py
 ```
 
 The five mechanical interfaces have a machine-readable selection plan in
-`hardware/revB/mechanical_binding_plan.json`. No connector or switch is currently
-claimed as selected: each exact part and evidence pack remains null until the real
-enclosure, mating cable and DUT contract are known.
+`hardware/revB/mechanical_binding_plan.json`. Known native electrical facts are
+already bound there, but no connector or switch is claimed as selected: each exact
+part and evidence pack remains null until the real enclosure, mating cable and DUT
+contract are known.
+
+The native contract currently resolves J101 as a 2-pin 9–15 V input, SW101 as a
+2-pin normally-open reset/control contact, and J5 as **10 pins**: eight DUT_AO
+signals plus two ground contacts. J501 and J701 are both two-wire dry-contact
+interfaces. Their cable-short behavior is deliberately an architecture blocker:
+shorting the two wires can mimic/force a closed contact, so connector selection
+alone cannot prove fail-safe short detection.
 
 Manufacturer-source discovery is tracked separately in
 `hardware/revB/component_evidence_sources.json`:
@@ -102,10 +110,18 @@ The executable bench/tool plans live under
 - `low_energy_fixture.json`;
 - `vivado_io_timing.json`.
 
-All checked-in results remain `NOT_RUN`. The Vivado plan is additionally blocked
-because this repository currently has no active non-archive `.xdc` or `.xpr`
-binding for the Rev.B RTL. Target part, top module, clocks and XDC must be bound
-before any IO-DRC/STA result can be accepted.
+All checked-in results remain `NOT_RUN`. The Vivado input contract now binds the
+AXU2CGB-original target device to `xczu2cg-sfvc784-1-e`
+(`XCZU2CG-1SFVC784E`). The existing `carrier.xdc.preview` remains preview-only
+and cannot close a gate. A reviewed I/O-DRC top, active XDC, functional timing top,
+clock/generated-clock definitions, I/O delays and timing/CDC policy are still
+required before IO-DRC/STA evidence can be accepted.
+
+`hardware/revB/prelayout_evidence_status.json` is the machine state for future
+closure. Every mechanical/component/physical/Vivado item begins at `NOT_RUN`.
+A PASS must use the same source-digest-bound, raw-SHA256 evidence envelope as the
+existing Rev.B release path; the qualification aggregator rejects missing coverage,
+stale source identity, path escape, carrier mismatch and changed raw bytes.
 
 ## Qualification state
 
