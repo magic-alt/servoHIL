@@ -10,6 +10,17 @@ from kicad_sexpr import parse, items, one, walk
 NATIVE = ROOT / 'hardware/kicad/revB/axu2cgb_expansion'
 
 class NativeSafetySourceTests(unittest.TestCase):
+    def test_reviewed_ad3542r_delta_is_exact_and_narrow(self):
+        from check_native_safety import REVIEWED_COMPONENT_DELTAS
+        expected = {
+            ref: {
+                'value': 'AD3542RBCPZ16',
+                'footprint': 'Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R',
+            }
+            for ref in ('U20', 'U21', 'U22', 'U23')
+        }
+        self.assertEqual(REVIEWED_COMPONENT_DELTAS, expected)
+
     def test_real_watchdog_and_permit_sheets_exist(self):
         root = parse((NATIVE/'servohil_io_revB.kicad_sch').read_text())
         names = {str(p[2]) for s in items(root, 'sheet') for p in items(s, 'property') if p[1]=='Sheetfile'}
@@ -51,6 +62,26 @@ class NativeSafetyNetlistTests(unittest.TestCase):
     def test_actual_native_safety_and_frozen_existing_wiring(self):
         from check_native_safety import check
         self.assertEqual(check(os.environ['NATIVE_NETLIST'])['new_components'],47)
+
+    @unittest.skipUnless(os.environ.get('NATIVE_NETLIST'), 'requires actual native KiCad export')
+    def test_ad3542r_delta_rejects_generic_or_wrong_footprint(self):
+        import tempfile
+        import xml.etree.ElementTree as ET
+        from check_native_safety import check
+        source = os.environ['NATIVE_NETLIST']
+        for ref, bad_value, bad_footprint in (
+            ('U20', 'AD3542RBCPZ16', 'Package_DFN_QFN:QFN-28-1EP_4x4mm_P0.4mm'),
+            ('U21', 'AD3542R', 'Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R'),
+        ):
+            with self.subTest(ref=ref), tempfile.TemporaryDirectory() as tmp:
+                tree = ET.parse(source)
+                comp = next(x for x in tree.findall('./components/comp') if x.get('ref') == ref)
+                comp.find('value').text = bad_value
+                comp.find('footprint').text = bad_footprint
+                path = Path(tmp) / 'bad-ad3542r.xml'
+                tree.write(path)
+                with self.assertRaisesRegex(ValueError, 'component/value/footprint changed'):
+                    check(path)
 
     @unittest.skipUnless(os.environ.get('NATIVE_NETLIST'), 'requires actual native KiCad export')
     def test_actual_netlist_mutations_rejected(self):
