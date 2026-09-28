@@ -89,6 +89,26 @@ class RevBPrelayoutContractTests(unittest.TestCase):
                     _validate_mechanical(ROOT, contract, manifest, plan)
 
 
+    def test_two_wire_cable_short_architecture_remains_decision_required(self):
+        report = check(ROOT)
+        state = report["cable_fault_architecture"]
+        self.assertEqual(state["status"], "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS")
+        self.assertIn("NOT_DETECTABLE", state["J501"])
+        self.assertIn("NOT_DETECTABLE", state["J701"])
+        self.assertEqual(state["selected_resolutions"], {"J501": None, "J701": None})
+
+    def test_j701_cable_fault_contract_cannot_claim_sto(self):
+        from check_revb_prelayout_contract import _validate_cable_fault_architecture
+        contract = self.load("hardware/revB/prelayout_qualification_contract.json")
+        data = self.load("hardware/revB/cable_fault_architecture.json")
+        self.assertIn("STO", data["interfaces"]["J701"]["forbidden_claims"])
+        self.assertIn("redundant safety output", data["interfaces"]["J701"]["forbidden_claims"])
+        self.assertIsNone(data["interfaces"]["J701"]["selected_resolution"])
+        self.assertEqual(
+            _validate_cable_fault_architecture(ROOT, contract["mechanical_bindings"])["status"],
+            "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS",
+        )
+
     def test_template_can_never_be_promoted_to_pass(self):
         template = self.load("hardware/revB/evidence/templates/physical_measurement_record.json")
         template["status"] = "PASS"
