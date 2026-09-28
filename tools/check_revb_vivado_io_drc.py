@@ -178,6 +178,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
         "synth_design -top $top -part $part",
         "report_drc -file",
         "report_io -file",
+        'puts $fh "source_digest=$source_digest"',
         'puts $fh "timing_claim=NOT_RUN"',
     ]
     for fragment in required_fragments:
