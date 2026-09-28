@@ -103,6 +103,7 @@ class DutProfileQualificationTests(unittest.TestCase):
         self.assertIn("MAGNETICS_L_I_T_CURVES", report["component_evidence_required"])
         self.assertIn("MAGNETICS_AC_CORE_AND_WINDING_LOSS", report["component_evidence_required"])
         self.assertIn("MLCC_EXACT_MPN_DC_BIAS_CURVES", report["component_evidence_required"])
+        self.assertIn("MLCC_EXACT_LAND_PATTERN_HEIGHT_PLACEMENT", report["component_evidence_required"])
         self.assertIn("MOUNTED_BOARD_TEMPERATURE_RISE", report["component_evidence_required"])
         self.assertIn("LOW_ENERGY_FIXTURE_ACCEPTANCE", report["physical_required"])
         self.assertIn("VIVADO_IO_DRC", report["vivado_required"])
