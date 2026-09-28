@@ -60,7 +60,8 @@
       "required": [
         "EXACT_MPN_DC_BIAS",
         "TEMPERATURE_AGING",
-        "RMS_CURRENT_ESR"
+        "RMS_CURRENT_ESR",
+        "EXACT_LAND_PATTERN_HEIGHT_PLACEMENT"
       ],
       "evidence_template": "hardware/revB/evidence/templates/manufacturer_curve_record.json"
     },
