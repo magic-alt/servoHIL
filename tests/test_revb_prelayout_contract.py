@@ -30,10 +30,17 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         self.assertIn("BLOCKER", report["mechanical_fault_semantic_blockers"]["J501"])
         self.assertIn("BLOCKER", report["mechanical_fault_semantic_blockers"]["J701"])
         self.assertEqual(report["dut_adapter_status"], "UNBOUND")
-        self.assertEqual(report["vivado_status"], "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_XDC_CLOCKS_UNBOUND")
+        self.assertEqual(report["vivado_status"], "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED")
         self.assertEqual(report["vivado_input_contract"]["target_part"], "xczu2cg-sfvc784-1-e")
         self.assertEqual(report["vivado_input_contract"]["marketing_part"], "XCZU2CG-1SFVC784E")
-        self.assertEqual(report["active_vivado_inputs"], {"xdc": [], "project": []})
+        self.assertEqual(
+            report["active_vivado_inputs"],
+            {
+                "harness_xdc": ["fpga/revb/io_drc/axu2cgb_io_drc.xdc"],
+                "functional_xdc": [],
+                "project": [],
+            },
+        )
         self.assertGreaterEqual(report["template_count"], 4)
         self.assertEqual(report["verification_plan_count"], 5)
 
@@ -114,29 +121,15 @@ class RevBPrelayoutContractTests(unittest.TestCase):
             _validate_verification_plan(plan, "partial-power")
 
     def test_vivado_preview_cannot_be_promoted_to_active_constraint(self):
-        from check_revb_prelayout_contract import _validate_vivado_contract
-        contract = self.load("hardware/revB/prelayout_qualification_contract.json")
-        work = copy.deepcopy(contract["workstreams"]["VIVADO_IO_DRC_TIMING"])
         original = self.load("hardware/revB/vivado_input_contract.json")
-        original["io_constraint_preview"]["can_close_gate"] = True
-        import tempfile
-        with tempfile.TemporaryDirectory() as td:
-            root = Path(td)
-            # Build only the paths needed by the validator under a temp repo root.
-            for rel in [
-                "hardware/carriers/axu2cgb/profile.json",
-                "hardware/kicad/revB/axu2cgb_expansion/carrier.xdc.preview",
-            ]:
-                src = ROOT / rel
-                dst = root / rel
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                dst.write_bytes(src.read_bytes())
-            vpath = root / "hardware/revB/vivado_input_contract.json"
-            vpath.parent.mkdir(parents=True, exist_ok=True)
-            vpath.write_text(json.dumps(original), encoding="utf-8")
-            work["input_contract"] = "hardware/revB/vivado_input_contract.json"
-            with self.assertRaisesRegex(ValueError, "cannot close"):
-                _validate_vivado_contract(root, work)
+        self.assertFalse(original["io_constraint_preview"]["can_close_gate"])
+        self.assertEqual(
+            original["io_constraint_preview"]["status"],
+            "REVIEW_PREVIEW_ONLY_NOT_ACTIVE_XDC",
+        )
+        self.assertFalse(original["io_drc_harness"]["can_close_timing"])
+        self.assertIsNone(original["functional_timing"]["top_module"])
+        self.assertEqual(original["functional_timing"]["active_xdc_files"], [])
 
 
     def test_source_location_does_not_equal_qualification_pass(self):

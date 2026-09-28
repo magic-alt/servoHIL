@@ -218,10 +218,10 @@ def _validate_verification_plan(data: dict[str, Any], name: str) -> None:
 def _validate_vivado_contract(root: Path, work: dict[str, Any]) -> dict[str, Any]:
     raw = work.get("input_contract")
     contract = _load(_repo_file(root, raw, "Vivado input contract"), "Vivado input contract")
-    if contract.get("schema_version") != 1 or contract.get("layout_allowed") is not False:
+    if contract.get("schema_version") != 2 or contract.get("layout_allowed") is not False:
         raise ValueError("Vivado input contract schema/layout policy drift")
-    if contract.get("status") != "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_AND_CLOCKS_UNBOUND":
-        raise ValueError("Vivado input contract must remain preview-only until top/XDC/clocks are reviewed")
+    if contract.get("status") != "IO_DRC_HARNESS_BOUND_TIMING_UNBOUND":
+        raise ValueError("Vivado input contract status drift")
     carrier = _load(_repo_file(root, contract.get("carrier_profile"), "carrier profile"), "carrier profile")
     if carrier.get("id") != "axu2cgb" or carrier.get("board_variant") != "AXU2CGB-original":
         raise ValueError("Vivado carrier identity drift")
@@ -231,27 +231,48 @@ def _validate_vivado_contract(root: Path, work: dict[str, Any]) -> dict[str, Any
         raise ValueError("Vivado marketing part identity drift")
     preview = _repo_file(root, contract.get("io_constraint_preview", {}).get("path"), "XDC preview")
     if preview.suffix != ".preview" or contract.get("io_constraint_preview", {}).get("status") != "REVIEW_PREVIEW_ONLY_NOT_ACTIVE_XDC":
-        raise ValueError("carrier constraint preview must not masquerade as active XDC")
+        raise ValueError("carrier constraint preview must not masquerade as functional XDC")
     if contract.get("io_constraint_preview", {}).get("can_close_gate") is not False:
         raise ValueError("constraint preview cannot close a Vivado gate")
-    if contract.get("active_xdc_files") != []:
-        raise ValueError("active XDC list must remain empty until reviewed binding")
-    for field in ("io_drc_top_module", "timing_top_module"):
-        if contract.get(field) is not None:
-            raise ValueError(field + " must remain unbound in current contract")
-    if contract.get("clock_definitions") != [] or contract.get("timing_constraints") != []:
-        raise ValueError("Vivado clocks/timing constraints cannot be predeclared")
+
+    harness = contract.get("io_drc_harness")
+    if not isinstance(harness, dict) or harness.get("status") != "BOUND_NOT_RUN":
+        raise ValueError("Vivado I/O DRC harness must remain bound/not-run until raw evidence exists")
+    if harness.get("top_module") != "servohil_io_drc_top":
+        raise ValueError("Vivado I/O DRC harness top drift")
+    if harness.get("xdc_files") != ["fpga/revb/io_drc/axu2cgb_io_drc.xdc"]:
+        raise ValueError("Vivado I/O DRC harness XDC drift")
+    if harness.get("rtl_sources") != ["fpga/revb/io_drc/servohil_io_drc_top.sv"]:
+        raise ValueError("Vivado I/O DRC harness RTL drift")
+    for path in harness["xdc_files"] + harness["rtl_sources"] + [harness.get("runner")]:
+        _repo_file(root, path, "Vivado I/O DRC harness input")
+    if harness.get("can_close_timing") is not False:
+        raise ValueError("Vivado I/O DRC harness cannot close timing")
+
+    timing = contract.get("functional_timing")
+    if not isinstance(timing, dict):
+        raise ValueError("Vivado functional timing contract missing")
+    if timing.get("top_module") is not None or timing.get("active_xdc_files") != []:
+        raise ValueError("functional timing top/XDC must remain unbound")
+    if timing.get("clock_definitions") != [] or timing.get("timing_constraints") != []:
+        raise ValueError("functional timing clocks/constraints cannot be predeclared")
+
+    from check_revb_vivado_io_drc import check as check_io_drc_harness
+    harness_report = check_io_drc_harness(root)
     return {
         "target_part": contract["target_part"]["vivado_part"],
         "marketing_part": contract["target_part"]["marketing_part"],
         "constraint_preview": contract["io_constraint_preview"]["path"],
         "status": contract["status"],
+        "io_drc_harness": harness_report,
+        "functional_timing_status": timing.get("status"),
     }
 
 
-def _active_vivado_inputs(root: Path) -> dict[str, list[str]]:
+def _active_vivado_inputs(root: Path, harness_xdc: set[str]) -> dict[str, list[str]]:
     root = root.resolve()
-    xdc: list[str] = []
+    harness: list[str] = []
+    functional_xdc: list[str] = []
     project: list[str] = []
     for path in root.rglob("*"):
         if not path.is_file():
@@ -259,12 +280,17 @@ def _active_vivado_inputs(root: Path) -> dict[str, list[str]]:
         rel = path.relative_to(root)
         if rel.parts and rel.parts[0] in {"archive", "build", ".git"}:
             continue
+        rel_text = rel.as_posix()
         suffix = path.suffix.lower()
         if suffix == ".xdc":
-            xdc.append(rel.as_posix())
+            (harness if rel_text in harness_xdc else functional_xdc).append(rel_text)
         elif suffix == ".xpr":
-            project.append(rel.as_posix())
-    return {"xdc": sorted(xdc), "project": sorted(project)}
+            project.append(rel_text)
+    return {
+        "harness_xdc": sorted(harness),
+        "functional_xdc": sorted(functional_xdc),
+        "project": sorted(project),
+    }
 
 
 def check(root: str | Path = ROOT) -> dict[str, Any]:
@@ -334,15 +360,18 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
     if gates.get("layout_allowed") is not False:
         raise ValueError("Rev.B gates must preserve layout_allowed=false")
 
-    vivado = _active_vivado_inputs(root)
     work = contract.get("workstreams", {}).get("VIVADO_IO_DRC_TIMING", {})
     vivado_contract = _validate_vivado_contract(root, work)
-    if not vivado["xdc"] and not vivado["project"]:
-        if work.get("status") != "BLOCKED_TOP_XDC_CLOCKS_NOT_BOUND":
-            raise ValueError("Vivado workstream must remain blocked while top/XDC/clocks are unbound")
-        vivado_status = "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_XDC_CLOCKS_UNBOUND"
+    harness_paths = set(vivado_contract["io_drc_harness"]["harness_xdc"] for _ in [0])
+    vivado = _active_vivado_inputs(root, harness_paths)
+    if vivado["harness_xdc"] != ["fpga/revb/io_drc/axu2cgb_io_drc.xdc"]:
+        raise ValueError("expected exactly the reviewed I/O DRC harness XDC")
+    if not vivado["functional_xdc"] and not vivado["project"]:
+        if work.get("status") != "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED":
+            raise ValueError("Vivado workstream must reflect bound I/O DRC harness and blocked timing")
+        vivado_status = "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED"
     else:
-        vivado_status = "ACTIVE_INPUTS_PRESENT_REQUIRE_EXACT_BINDING_REVIEW"
+        vivado_status = "FUNCTIONAL_INPUTS_PRESENT_REQUIRE_EXACT_BINDING_REVIEW"
 
     return {
         "schema_version": 1,
