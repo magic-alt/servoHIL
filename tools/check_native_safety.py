@@ -82,6 +82,10 @@ passive('R703','10k','PERMIT_BASE',GND)
 REVIEWED_FOOTPRINT_DELTAS = {
     'F101':'Fuse:Fuse_Littelfuse-NANO2-451_453',
     'L203':'Inductor_SMD:L_Coilcraft_XAL5030',
+    'L201':'Inductor_SMD:L_Coilcraft_XAL5050-XXX',
+    'L202':'Inductor_SMD:L_Coilcraft_XAL5050-XXX',
+    'L301':'Inductor_SMD:L_Coilcraft_XAL5050-XXX',
+    'L302':'Inductor_SMD:L_Coilcraft_XAL5050-XXX',
     'U211':'Package_SO:MSOP-12-1EP_3x4mm_P0.65mm_EP1.65x2.85mm',
     'U212':'Package_SO:MSOP-12-1EP_3x4mm_P0.65mm_EP1.65x2.85mm',
     'U302':'Package_SO:MSOP-12-1EP_3x4mm_P0.65mm_EP1.65x2.85mm',
