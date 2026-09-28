@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "checked_on": "2026-09-28",
+  "part": {
+    "manufacturer": "Analog Devices",
+    "mpn": "AD3542RBCPZ16",
+    "package_option": "CP-28-15",
+    "package_description": "28-lead LFCSP, 4 mm x 4 mm x 0.95 mm",
+    "pin_count": 28,
+    "lead_pitch_mm": 0.4
+  },
+  "status": "OFFICIAL_SOURCES_LOCATED_GERBER_AND_CAD_BYTES_NOT_ARCHIVED",
+  "release_effect": "BLOCKER_REMAINS_OPEN",
+  "official_sources": {
+    "product_page": "https://www.analog.com/en/products/AD3542R.html",
+    "datasheet_rev_c": "https://www.analog.com/media/en/technical-documentation/data-sheets/ad3542r.pdf",
+    "package_drawing_cp_28_15": "https://www.analog.com/media/en/package-pcb-resources/package/pkg_pdf/lfcspcp/cp-28/cp-28-15.pdf",
+    "evaluation_board_page": "https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/eval-ad3542r.html",
+    "evaluation_schematic": "https://wiki.analog.com/_media/resources/eval/user-guides/dac/eval-ad3542r/02_050892d_top.pdf",
+    "evaluation_gerber_zip": "https://wiki.analog.com/_media/resources/eval/user-guides/dac/eval-ad3542r/09-050892-01c.zip",
+    "evaluation_bom": "https://wiki.analog.com/_media/resources/eval/user-guides/dac/eval-ad3542r/05-050892-01-d.xlsx",
+    "adi_documentation_source": {
+      "repository": "analogdevicesinc/system-level",
+      "commit": "76eb29d83e6eaca9ce4470921d315938b2b1aa17",
+      "path": "docs/solutions/reference-designs/eval-ad35xxr/user-guide.rst",
+      "blob_sha": "6327c05006caf900728a31445a3c4fdf3d31253a",
+      "source_lines": [721, 722, 723, 724, 725, 726]
+    }
+  },
+  "confirmed_facts": [
+    "AD3542RBCPZ16 ordering guide package option is CP-28-15",
+    "CP-28-15 body is 4 mm x 4 mm with 0.95 mm nominal package height",
+    "CP-28-15 lead pitch is 0.40 mm BSC",
+    "official EVAL-AD3542RFMCZ schematic uses AD3542RBCPZ16 as U1",
+    "Analog Devices publishes EVAL-AD3542RFMCZ schematic, Gerber ZIP and BOM downloads",
+    "Analog Devices product page links exact-part CAD through Ultra Librarian and SamacSys"
+  ],
+  "exposed_pad_review": {
+    "status": "UNRESOLVED_REQUIRES_CURRENT_CAD_OR_GERBER",
+    "reason": "An early preliminary AD3542R document explicitly instructed connecting an exposed pad to AGND, while current Rev.C pin tables enumerate pins 1..28 and do not independently define a numbered exposed-pad terminal. Do not infer the manufacturing land pattern from either wording alone.",
+    "required_resolution": [
+      "inspect current exact-part vendor CAD land pattern",
+      "inspect actual U1 copper/mask geometry in official EVAL-AD3542RFMCZ Gerber",
+      "record whether a center pad exists and its electrical/net assignment",
+      "cross-check against current CP-28-15 package drawing and Rev.C pinout"
+    ]
+  },
+  "retrieved_artifacts": {
+    "package_drawing_sha256": null,
+    "evaluation_schematic_sha256": null,
+    "evaluation_gerber_zip_sha256": null,
+    "evaluation_bom_sha256": null,
+    "ultra_librarian_archive_sha256": null,
+    "samacsys_archive_sha256": null
+  },
+  "geometry_review": {
+    "status": "NOT_RUN_BYTES_NOT_ARCHIVED",
+    "pad_count": null,
+    "pin1_orientation": null,
+    "pitch_mm": null,
+    "side_pad_size_mm": null,
+    "center_pad_present": null,
+    "center_pad_size_mm": null,
+    "solder_mask_strategy": null,
+    "paste_strategy": null
+  },
+  "close_criteria": [
+    "official Gerber ZIP or exact-part CAD bytes archived with SHA-256",
+    "current exact-part pad count and pin-1 orientation independently checked",
+    "0.40 mm pitch and terminal geometry independently checked",
+    "exposed/center-pad presence and electrical treatment resolved from current evidence",
+    "KiCad footprint vendored locally with provenance",
+    "U20..U23 bound to the reviewed footprint",
+    "native KiCad netlist and ERC regressions pass",
+    "source closure checker confirms the four blockers are removed for evidence-backed reasons"
+  ]
+}
