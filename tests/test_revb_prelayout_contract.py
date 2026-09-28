@@ -28,7 +28,9 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         self.assertEqual(set(report["mechanical_open_refs"]), EXPECTED_MECHANICAL)
         self.assertEqual(report["mechanical_open_count"], 5)
         self.assertEqual(report["dut_adapter_status"], "UNBOUND")
-        self.assertEqual(report["vivado_status"], "BLOCKED_NO_ACTIVE_XDC_OR_XPR")
+        self.assertEqual(report["vivado_status"], "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_XDC_CLOCKS_UNBOUND")
+        self.assertEqual(report["vivado_input_contract"]["target_part"], "xczu2cg-sfvc784-1-e")
+        self.assertEqual(report["vivado_input_contract"]["marketing_part"], "XCZU2CG-1SFVC784E")
         self.assertEqual(report["active_vivado_inputs"], {"xdc": [], "project": []})
         self.assertGreaterEqual(report["template_count"], 4)
         self.assertEqual(report["verification_plan_count"], 5)
@@ -79,6 +81,32 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         plan["result"] = "PASS"
         with self.assertRaisesRegex(ValueError, "result must remain NOT_RUN"):
             _validate_verification_plan(plan, "partial-power")
+
+    def test_vivado_preview_cannot_be_promoted_to_active_constraint(self):
+        from check_revb_prelayout_contract import _validate_vivado_contract
+        contract = self.load("hardware/revB/prelayout_qualification_contract.json")
+        work = copy.deepcopy(contract["workstreams"]["VIVADO_IO_DRC_TIMING"])
+        original = self.load("hardware/revB/vivado_input_contract.json")
+        original["io_constraint_preview"]["can_close_gate"] = True
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            # Build only the paths needed by the validator under a temp repo root.
+            for rel in [
+                "hardware/carriers/axu2cgb/profile.json",
+                "hardware/kicad/revB/axu2cgb_expansion/carrier.xdc.preview",
+            ]:
+                src = ROOT / rel
+                dst = root / rel
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                dst.write_bytes(src.read_bytes())
+            vpath = root / "hardware/revB/vivado_input_contract.json"
+            vpath.parent.mkdir(parents=True, exist_ok=True)
+            vpath.write_text(json.dumps(original), encoding="utf-8")
+            work["input_contract"] = "hardware/revB/vivado_input_contract.json"
+            with self.assertRaisesRegex(ValueError, "cannot close"):
+                _validate_vivado_contract(root, work)
+
 
     def test_source_location_does_not_equal_qualification_pass(self):
         report = check(ROOT)

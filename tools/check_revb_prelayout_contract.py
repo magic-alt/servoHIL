@@ -160,6 +160,41 @@ def _validate_verification_plan(data: dict[str, Any], name: str) -> None:
         raise ValueError(f"{name}: verification plan must remain explicitly blocked/not-run")
 
 
+
+def _validate_vivado_contract(root: Path, work: dict[str, Any]) -> dict[str, Any]:
+    raw = work.get("input_contract")
+    contract = _load(_repo_file(root, raw, "Vivado input contract"), "Vivado input contract")
+    if contract.get("schema_version") != 1 or contract.get("layout_allowed") is not False:
+        raise ValueError("Vivado input contract schema/layout policy drift")
+    if contract.get("status") != "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_AND_CLOCKS_UNBOUND":
+        raise ValueError("Vivado input contract must remain preview-only until top/XDC/clocks are reviewed")
+    carrier = _load(_repo_file(root, contract.get("carrier_profile"), "carrier profile"), "carrier profile")
+    if carrier.get("id") != "axu2cgb" or carrier.get("board_variant") != "AXU2CGB-original":
+        raise ValueError("Vivado carrier identity drift")
+    if carrier.get("device") != contract.get("target_part", {}).get("vivado_part"):
+        raise ValueError("Vivado target part no longer matches carrier profile")
+    if contract.get("target_part", {}).get("marketing_part") != "XCZU2CG-1SFVC784E":
+        raise ValueError("Vivado marketing part identity drift")
+    preview = _repo_file(root, contract.get("io_constraint_preview", {}).get("path"), "XDC preview")
+    if preview.suffix != ".preview" or contract.get("io_constraint_preview", {}).get("status") != "REVIEW_PREVIEW_ONLY_NOT_ACTIVE_XDC":
+        raise ValueError("carrier constraint preview must not masquerade as active XDC")
+    if contract.get("io_constraint_preview", {}).get("can_close_gate") is not False:
+        raise ValueError("constraint preview cannot close a Vivado gate")
+    if contract.get("active_xdc_files") != []:
+        raise ValueError("active XDC list must remain empty until reviewed binding")
+    for field in ("io_drc_top_module", "timing_top_module"):
+        if contract.get(field) is not None:
+            raise ValueError(field + " must remain unbound in current contract")
+    if contract.get("clock_definitions") != [] or contract.get("timing_constraints") != []:
+        raise ValueError("Vivado clocks/timing constraints cannot be predeclared")
+    return {
+        "target_part": contract["target_part"]["vivado_part"],
+        "marketing_part": contract["target_part"]["marketing_part"],
+        "constraint_preview": contract["io_constraint_preview"]["path"],
+        "status": contract["status"],
+    }
+
+
 def _active_vivado_inputs(root: Path) -> dict[str, list[str]]:
     root = root.resolve()
     xdc: list[str] = []
@@ -247,12 +282,13 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
 
     vivado = _active_vivado_inputs(root)
     work = contract.get("workstreams", {}).get("VIVADO_IO_DRC_TIMING", {})
+    vivado_contract = _validate_vivado_contract(root, work)
     if not vivado["xdc"] and not vivado["project"]:
-        if work.get("status") != "BLOCKED_INPUTS_NOT_BOUND":
-            raise ValueError("Vivado workstream must remain blocked while no active XDC/XPR is bound")
-        vivado_status = "BLOCKED_NO_ACTIVE_XDC_OR_XPR"
+        if work.get("status") != "BLOCKED_TOP_XDC_CLOCKS_NOT_BOUND":
+            raise ValueError("Vivado workstream must remain blocked while top/XDC/clocks are unbound")
+        vivado_status = "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_XDC_CLOCKS_UNBOUND"
     else:
-        vivado_status = "INPUTS_PRESENT_REQUIRE_EXACT_BINDING_REVIEW"
+        vivado_status = "ACTIVE_INPUTS_PRESENT_REQUIRE_EXACT_BINDING_REVIEW"
 
     return {
         "schema_version": 1,
@@ -266,6 +302,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
         "verification_plans": plan_paths,
         "dut_adapter_status": dut.get("status"),
         "vivado_status": vivado_status,
+        "vivado_input_contract": vivado_contract,
         "active_vivado_inputs": vivado,
         "workstreams": {k: v.get("status") for k, v in sorted(contract.get("workstreams", {}).items())},
         "note": "Contract integrity passes; physical/tool/manufacturer evidence remains blocked and no Layout authorization is implied."

@@ -83,9 +83,10 @@
       "verification_plan": "hardware/revB/verification_plans/board_thermal.json"
     },
     "VIVADO_IO_DRC_TIMING": {
-      "status": "BLOCKED_INPUTS_NOT_BOUND",
+      "status": "BLOCKED_TOP_XDC_CLOCKS_NOT_BOUND",
       "evidence_template": "hardware/revB/evidence/templates/vivado_report_record.json",
-      "verification_plan": "hardware/revB/verification_plans/vivado_io_timing.json"
+      "verification_plan": "hardware/revB/verification_plans/vivado_io_timing.json",
+      "input_contract": "hardware/revB/vivado_input_contract.json"
     },
     "LOW_ENERGY_FIXTURE": {
       "status": "NOT_RUN",

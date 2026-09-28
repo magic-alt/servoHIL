@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "status": "TARGET_PART_BOUND_PREVIEW_ONLY_TOP_AND_CLOCKS_UNBOUND",
+  "layout_allowed": false,
+  "carrier_profile": "hardware/carriers/axu2cgb/profile.json",
+  "carrier_id": "axu2cgb",
+  "board_variant": "AXU2CGB-original",
+  "target_part": {
+    "vivado_part": "xczu2cg-sfvc784-1-e",
+    "marketing_part": "XCZU2CG-1SFVC784E",
+    "source": "hardware/carriers/axu2cgb/profile.json",
+    "repo_profile_status": "BOUND_CANDIDATE",
+    "manufacturer_crosscheck_url": "https://www.en.alinx.com/Product/SoC-Development-Boards/Zynq-UltraScale-plus-MPSoC/AXU2CGB.html",
+    "manufacturer_crosscheck_status": "SOURCE_LOCATED_NOT_HASH_ARCHIVED"
+  },
+  "io_constraint_preview": {
+    "path": "hardware/kicad/revB/axu2cgb_expansion/carrier.xdc.preview",
+    "status": "REVIEW_PREVIEW_ONLY_NOT_ACTIVE_XDC",
+    "provenance": "derived from hardware/carriers/axu2cgb physical pinout and assignments",
+    "can_close_gate": false
+  },
+  "io_contract": "hardware/revB/io_contract.json",
+  "rtl_directory": "rtl/revb",
+  "io_drc_top_module": null,
+  "timing_top_module": null,
+  "active_xdc_files": [],
+  "clock_definitions": [],
+  "timing_constraints": [],
+  "current_blockers": [
+    "No reviewed I/O-DRC top module bound",
+    "carrier.xdc.preview is not an active reviewed XDC",
+    "No functional timing top module bound",
+    "No source clock/create_clock/generated-clock contract bound",
+    "No input/output delay or asynchronous clock-domain timing policy bound"
+  ],
+  "pass_boundary": {
+    "io_drc": "Requires exact target part + reviewed top-level port shell + reviewed XDC + raw report_drc/report_io evidence tied to source revision.",
+    "timing": "Requires functional top + exact clocks/generated clocks/I/O delays/CDC timing policy + raw timing summary and unconstrained-path review. The I/O preview alone cannot close timing."
+  }
+}
