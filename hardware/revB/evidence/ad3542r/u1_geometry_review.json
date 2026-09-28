@@ -1217,5 +1217,6 @@
       "package": "CP-28-15",
       "sha256": "f6aab2aa746e79a01b4d9067bde56c886001a4cb1b7ed83e198d480ab0845b73"
     }
-  }
+  },
+  "schema_version": 1
 }
