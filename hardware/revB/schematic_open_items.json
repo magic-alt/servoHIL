@@ -1,61 +1,19 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "revision": "Rev.B",
   "checked_on": "2026-09-28",
-  "status": "SCHEMATIC_FUNCTION_COMPLETE_9_PHYSICAL_BINDINGS_OPEN",
+  "status": "SCHEMATIC_FUNCTION_COMPLETE_5_PHYSICAL_BINDINGS_OPEN",
   "layout_allowed": false,
   "policy": "A blank physical footprint is allowed only when it is listed here with an unresolved exact land-pattern or mechanical contract. This manifest is a blocker list, not a fabrication waiver.",
-  "close_policy": "Removing an item requires the exact footprint/mechanical contract plus the evidence named in binding_requirements. Catalog ratings, package-body dimensions, ERC, simulation or a visually similar land pattern are insufficient by themselves.",
+  "close_policy": "Removing an open item requires the exact footprint/mechanical contract plus the evidence named in binding_requirements. Resolved package bindings must remain source-bound through resolved_bindings. Catalog ratings, package-body dimensions, ERC, simulation or a visually similar land pattern are insufficient by themselves.",
   "open_footprints": {
     "J101": "12 V field connector mechanical/keying/current-rating selection not bound",
     "SW101": "power-reset switch mechanical actuator/footprint not bound",
-    "U20": "AD3542RBCPZ16 CP-28-15 exact land pattern/vendor CAD not yet vendored",
-    "U21": "AD3542RBCPZ16 CP-28-15 exact land pattern/vendor CAD not yet vendored",
-    "U22": "AD3542RBCPZ16 CP-28-15 exact land pattern/vendor CAD not yet vendored",
-    "U23": "AD3542RBCPZ16 CP-28-15 exact land pattern/vendor CAD not yet vendored",
     "J5": "AO connector mechanical/keying choice not bound",
     "J501": "3.3 V dry-contact service connector mechanical choice not bound",
     "J701": "floating DUT-permit connector mechanical/current/spacing choice not bound"
   },
   "binding_requirements": {
-    "U20": {
-      "kind": "exact_land_pattern",
-      "status": "OPEN_VENDOR_LAND_PATTERN_NOT_VENDORED",
-      "manufacturer": "Analog Devices",
-      "mpn": "AD3542RBCPZ16",
-      "package_option": "CP-28-15",
-      "package_description": "28-lead LFCSP, 4 mm x 4 mm x 0.95 mm",
-      "datasheet_url": "https://www.analog.com/media/en/technical-documentation/data-sheets/ad3542r.pdf",
-      "package_drawing_url": "https://www.analog.com/media/en/package-pcb-resources/package/pkg_pdf/lfcspcp/cp-28/cp-28-15.pdf",
-      "cad_sources": [
-        "Analog Devices product page CAD models",
-        "Analog Devices linked Ultra Librarian/SamacSys exact-part CAD"
-      ],
-      "required_evidence": [
-        "reviewed exact-part CAD or manufacturer recommended land-pattern source",
-        "official EVAL-AD3542RFMCZ Gerber geometry archived and reviewed",
-        "independent pad-count/pitch/body/terminal dimension review",
-        "current exposed/center-pad presence and electrical treatment resolved from CAD/Gerber",
-        "locally vendored KiCad footprint with source/provenance record",
-        "native netlist/ERC regression after binding"
-      ],
-      "evidence_manifest": "hardware/revB/ad3542r_footprint_evidence.json"
-    },
-    "U21": {
-      "same_as": "U20",
-      "kind": "exact_land_pattern",
-      "status": "OPEN_VENDOR_LAND_PATTERN_NOT_VENDORED"
-    },
-    "U22": {
-      "same_as": "U20",
-      "kind": "exact_land_pattern",
-      "status": "OPEN_VENDOR_LAND_PATTERN_NOT_VENDORED"
-    },
-    "U23": {
-      "same_as": "U20",
-      "kind": "exact_land_pattern",
-      "status": "OPEN_VENDOR_LAND_PATTERN_NOT_VENDORED"
-    },
     "J101": {
       "kind": "mechanical_selection",
       "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
@@ -169,6 +127,37 @@
     "L202": "Inductor_SMD:L_Coilcraft_XAL5050-XXX",
     "L301": "Inductor_SMD:L_Coilcraft_XAL5050-XXX",
     "L302": "Inductor_SMD:L_Coilcraft_XAL5050-XXX",
-    "U101": "Package_DFN_QFN:TI_RPW0010A"
+    "U101": "Package_DFN_QFN:TI_RPW0010A",
+    "U20": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
+    "U21": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
+    "U22": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
+    "U23": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R"
+  },
+  "resolved_bindings": {
+    "U20": {
+      "kind": "exact_land_pattern",
+      "status": "RESOLVED_REVIEWED_OFFICIAL_EVAL_LAND_PATTERN",
+      "manufacturer": "Analog Devices",
+      "mpn": "AD3542RBCPZ16",
+      "package_option": "CP-28-15",
+      "footprint": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
+      "evidence_manifest": "hardware/revB/ad3542r_footprint_evidence.json",
+      "geometry_evidence": "hardware/revB/evidence/ad3542r/u1_geometry_review.json"
+    },
+    "U21": {
+      "same_as": "U20",
+      "kind": "exact_land_pattern",
+      "status": "RESOLVED_REVIEWED_OFFICIAL_EVAL_LAND_PATTERN"
+    },
+    "U22": {
+      "same_as": "U20",
+      "kind": "exact_land_pattern",
+      "status": "RESOLVED_REVIEWED_OFFICIAL_EVAL_LAND_PATTERN"
+    },
+    "U23": {
+      "same_as": "U20",
+      "kind": "exact_land_pattern",
+      "status": "RESOLVED_REVIEWED_OFFICIAL_EVAL_LAND_PATTERN"
+    }
   }
 }
