@@ -196,6 +196,10 @@ def _validate_sources(
     input_row = mlcc["exact_parts"].get("C5750X7R1V476M230KC", {})
     if input_row.get("assigned_banks") != ["input_protected"]:
         raise ValueError("input_protected source registry assignment drift")
+    if input_row.get("land_pattern_status") != "MANUFACTURER_RECOMMENDATION_LOCATED_LOCAL_FOOTPRINT_NOT_EXACTLY_QUALIFIED":
+        raise ValueError("input_protected exact land-pattern status drift")
+    if input_row.get("local_footprint") != "Capacitor_SMD:C_2220_5750Metric":
+        raise ValueError("input_protected local footprint binding drift")
     requirement = input_row.get("screening_requirement", {})
     if requirement.get("bias_screen_v") != 15.05 or requirement.get("minimum_effective_capacitance_uf") != 22:
         raise ValueError("input_protected MLCC screening requirement drift")
