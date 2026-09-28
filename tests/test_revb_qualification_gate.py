@@ -1,13 +1,19 @@
-import copy
+import hashlib
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-from revb_qualification import build_qualification_report, evaluate_dut_profile, load_profile
+from revb_qualification import (
+    _verified_gate_evidence,
+    build_qualification_report,
+    evaluate_dut_profile,
+    load_profile,
+)
 
 
 class DutProfileQualificationTests(unittest.TestCase):
@@ -116,6 +122,68 @@ class DutProfileQualificationTests(unittest.TestCase):
                 p["max_end_to_end_disable_us"] = value
                 with self.assertRaises(ValueError):
                     evaluate_dut_profile(p)
+
+
+class GateEvidenceTests(unittest.TestCase):
+    def test_non_pass_gate_does_not_need_evidence(self):
+        self.assertEqual(
+            _verified_gate_evidence({"status": "NOT_RUN", "evidence": None}, ROOT, "test"),
+            [],
+        )
+
+    def test_pass_without_hashed_evidence_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "PASS requires hashed evidence"):
+            _verified_gate_evidence({"status": "PASS", "evidence": None}, ROOT, "test")
+
+    def test_missing_or_hash_mismatched_evidence_is_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            missing = {
+                "status": "PASS",
+                "evidence": [{"path": "evidence/raw.csv", "sha256": "0" * 64}],
+            }
+            with self.assertRaisesRegex(ValueError, "evidence file missing"):
+                _verified_gate_evidence(missing, root, "test")
+
+            path = root / "raw.csv"
+            path.write_bytes(b"measured,data\n")
+            mismatch = {
+                "status": "PASS",
+                "evidence": [{"path": "raw.csv", "sha256": "0" * 64}],
+            }
+            with self.assertRaisesRegex(ValueError, "hash mismatch"):
+                _verified_gate_evidence(mismatch, root, "test")
+
+    def test_pass_accepts_only_existing_byte_matched_repository_evidence(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "evidence" / "raw.csv"
+            path.parent.mkdir()
+            raw = b"scope_time_s,permit_v\n0.000000,0.0\n"
+            path.write_bytes(raw)
+            entry = {
+                "status": "PASS",
+                "evidence": [
+                    {
+                        "path": "evidence/raw.csv",
+                        "sha256": hashlib.sha256(raw).hexdigest(),
+                    }
+                ],
+            }
+            self.assertEqual(
+                _verified_gate_evidence(entry, root, "permit_reaction"),
+                ["evidence/raw.csv"],
+            )
+
+    def test_pass_evidence_cannot_escape_repository(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            entry = {
+                "status": "PASS",
+                "evidence": [{"path": "../outside.csv", "sha256": "0" * 64}],
+            }
+            with self.assertRaisesRegex(ValueError, "escapes repository"):
+                _verified_gate_evidence(entry, root, "test")
 
 
 if __name__ == "__main__":
