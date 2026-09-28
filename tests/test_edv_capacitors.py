@@ -55,6 +55,8 @@ class CapacitorEvidence(unittest.TestCase):
         self.assertEqual(input_row['status'],'BLOCKED_MISSING_CURVE')
         self.assertEqual(input_row['lifecycle'],'PRODUCTION')
         self.assertEqual(input_row['rated_voltage_v'],35)
+        self.assertEqual(input_row['part_number'],'C5750X7R1V476M230KC')
+        self.assertIn('REVIEW_OPEN',json.loads((ROOT/'sim/power/capacitor_candidates.json').read_text())['parts']['C5750X7R1V476M230KC']['land_pattern_status'])
         self.assertAlmostEqual(input_row['bias_screen_v'],15.05)
         self.assertAlmostEqual(input_row['required_bias_retention'],22/(47*.8*.85*.97))
         self.assertIn('NOT_HASH',input_row['manufacturer_curve_source_status'])
