@@ -23,13 +23,15 @@ The harness XDC is only approved for this I/O-DRC scope. It contains package-pin
 From repository root with Vivado on PATH:
 
 ```sh
-vivado -mode batch -source fpga/revb/io_drc/run_io_drc.tcl -tclargs build/revb-vivado-io-drc "$(git rev-parse HEAD)"
+digest="$(python tools/revb_vivado_io_evidence.py source-digest)"
+vivado -mode batch -source fpga/revb/io_drc/run_io_drc.tcl -tclargs build/revb-vivado-io-drc "$(git rev-parse HEAD)" "$digest"
 ```
 
 PowerShell:
 
 ```powershell
-vivado -mode batch -source fpga/revb/io_drc/run_io_drc.tcl -tclargs build/revb-vivado-io-drc $(git rev-parse HEAD)
+$digest = python tools/revb_vivado_io_evidence.py source-digest
+vivado -mode batch -source fpga/revb/io_drc/run_io_drc.tcl -tclargs build/revb-vivado-io-drc $(git rev-parse HEAD) $digest
 ```
 
 Expected raw outputs:
@@ -76,7 +78,8 @@ python tools/revb_vivado_io_evidence.py prepare \
 The prepared `evidence.json` may be registered as
 `prelayout_evidence_status.json -> vivado -> VIVADO_IO_DRC` only after review.
 The importer checks the Vivado runtime I/O table against all 64 expected pins and
-I/O standards, requires zero Error/Critical Warning DRC findings, and SHA-256
-binds every retained raw artifact.
+I/O standards, requires zero Error/Critical Warning DRC findings, SHA-256 binds
+every retained raw artifact, and rejects a raw run whose recorded source digest
+does not exactly match the current repository source.
 
 This still leaves `VIVADO_TIMING=NOT_RUN`.
