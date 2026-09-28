@@ -61,6 +61,52 @@ python tools/check_revb_schematic_closure.py
 A passing source-closure report only proves that the checked-in schematic matches the
 explicit binding contract. It does not authorize Layout.
 
+## Pre-layout qualification workstreams
+
+The remaining pre-layout work is coordinated by
+`hardware/revB/prelayout_qualification_contract.json`. Its checked-in state is
+deliberately **BLOCKED_PRE_LAYOUT_EVIDENCE_REQUIRED** and cannot authorize Layout.
+
+Run both source/evidence contract audits:
+
+```sh
+python tools/check_revb_schematic_closure.py
+python tools/check_revb_prelayout_contract.py
+python tools/revb_qualification.py
+```
+
+The five mechanical interfaces have a machine-readable selection plan in
+`hardware/revB/mechanical_binding_plan.json`. No connector or switch is currently
+claimed as selected: each exact part and evidence pack remains null until the real
+enclosure, mating cable and DUT contract are known.
+
+Manufacturer-source discovery is tracked separately in
+`hardware/revB/component_evidence_sources.json`:
+
+- Coilcraft XAL5050-103MEC / XAL5050-682MEC / XAL5030-472MEC source pages and the
+  current XAL50xx datasheet are located, but the characteristic bytes/curves are
+  not yet hash-archived and independently digitized;
+- TDK exact characterization sheets are located for the assigned 22 uF / 16 V,
+  10 uF / 25 V and automotive 1 uF / 50 V candidates, but no reviewed,
+  hash-bound DC-bias curve pack has yet been imported;
+- the protected-input MLCC bank still has no exact production MPN.
+
+Located source URLs are provenance discovery, not qualification evidence.
+
+The executable bench/tool plans live under
+`hardware/revB/verification_plans/`:
+
+- `dut_adapter_acceptance.json`;
+- `partial_power_backfeed.json`;
+- `board_thermal.json`;
+- `low_energy_fixture.json`;
+- `vivado_io_timing.json`.
+
+All checked-in results remain `NOT_RUN`. The Vivado plan is additionally blocked
+because this repository currently has no active non-archive `.xdc` or `.xpr`
+binding for the Rev.B RTL. Target part, top module, clocks and XDC must be bound
+before any IO-DRC/STA result can be accepted.
+
 ## Qualification state
 
 `hardware/revB/qualification_requirements.json`,

@@ -95,8 +95,16 @@ before freezing parts. Cuk candidate rows expose the invalid-CCM screening statu
 |---|---|---|
 | Six 2x22 uF banks | TDK C3225X7R1C226M250AC, 16 V X7R 1210 | Production catalog part is **+/-20%**, max height 2.8 mm; do not apply generic +/-10% tolerance |
 | C414/C415 | TDK C3225X7R1E106K250AC, 10 uF 25 V X7R 1210 | Higher voltage rating is not proof of interchangeability; effective-capacitance target still open |
-| C410 | TDK C3225X7R1H105K160AA, 1 uF 50 V X7R 1210 | **NRND**, reference only; replacement, RMS current and effective-C target open |
+| C410 | TDK CGA6L2X7R1H105K160AA, 1 uF 50 V X7R 1210 | Production automotive AEC-Q200 candidate; DC-bias, RMS-current/ESR and effective-C qualification remain open |
 | C105 | No exact MPN bound | 47 uF / 35 V, native 2220; MPN and bias evidence remain blocked |
+
+Exact manufacturer source discovery is now also centralized in
+`hardware/revB/component_evidence_sources.json`. The Coilcraft XAL50xx document
+and exact TDK characterization-sheet URLs are recorded there, with status explicitly
+kept as source-located/not-hash-imported. Do not convert those URLs or transcribed
+catalog values into a curve PASS. Archive the actual reviewed source bytes and
+SHA-256, record test/graph conditions, then import reviewer-controlled normalized
+data without extrapolation.
 
 Manufacturer source URLs, lifecycle check date and height are in the catalog.
 Every reference's native capacitance, case and minimum voltage rating is checked.
