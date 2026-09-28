@@ -385,7 +385,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
 
     work = contract.get("workstreams", {}).get("VIVADO_IO_DRC_TIMING", {})
     vivado_contract = _validate_vivado_contract(root, work)
-    harness_paths = set(vivado_contract["io_drc_harness"]["harness_xdc"] for _ in [0])
+    harness_paths = {vivado_contract["io_drc_harness"]["harness_xdc"]}
     vivado = _active_vivado_inputs(root, harness_paths)
     if vivado["harness_xdc"] != ["fpga/revb/io_drc/axu2cgb_io_drc.xdc"]:
         raise ValueError("expected exactly the reviewed I/O DRC harness XDC")
