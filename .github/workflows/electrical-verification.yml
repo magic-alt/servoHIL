@@ -53,6 +53,7 @@ jobs:
       - name: Exact magnetic and MLCC candidate reports
         run: |
           python sim/power/qualification.py --output build/edv/components
+          python sim/power/magnetics.py --output build/edv/magnetics
           python sim/power/capacitors.py --output build/edv/capacitors
       - name: Execute switching stages and LDO envelopes
         run: python sim/power/spice.py --output build/edv/spice

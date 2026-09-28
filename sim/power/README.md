@@ -115,6 +115,39 @@ named generic 10%-tolerance sensitivity. With the 20%-tolerance 22 uF candidate,
 temperature and 3% aging losses. That is a **requirement**, not imported data.
 The 3% aging and 50 mV voltage reserve are still engineering assumptions.
 
+### Coilcraft XAL L-vs-current evidence import
+
+XAL L-vs-current evidence uses the same fail-closed pattern as MLCC curves. The
+checked-in report without a curve pack remains `BLOCKED_MISSING_CURVE`:
+
+```sh
+python sim/power/magnetics.py --output build/edv/magnetics
+```
+
+After an engineer obtains the reviewed Coilcraft source bytes, create one pack
+per exact MPN (`XAL5050-103MEC.json`, `XAL5050-682MEC.json`,
+`XAL5030-472MEC.json`) with:
+
+- `schema: 1`, `manufacturer: "Coilcraft"`, exact `part_number`;
+- `characteristic: "L_VS_CURRENT_REFERENCE"`;
+- the reviewed HTTPS `source_url`, retrieval date, reviewer and normalization note;
+- conditions including `temperature_c` and a nonempty `curve_basis`;
+- an `original` file + SHA-256 and reviewer-normalized CSV + SHA-256.
+
+The normalized CSV columns are exactly `current_a,inductance_uh`, begin at 0 A,
+remain strictly increasing in current, and are never extrapolated.
+
+```sh
+python sim/power/magnetics.py \
+  --curve-dir /path/to/reviewed-xal-packs \
+  --output build/edv/magnetics-with-curves
+```
+
+Even a byte-valid exact-MPN curve can only produce
+`SCREEN_ONLY_REFERENCE_CURVE`; Coilcraft L(I) graphs are treated as
+typical/reference evidence. AC/core+winding loss, startup/short saturation and
+mounted-board thermal evidence remain separate blockers.
+
 No actual manufacturer curve CSV has been imported. To import reviewed evidence:
 
 ```sh
