@@ -9,6 +9,7 @@ set script_dir [file dirname [file normalize [info script]]]
 set repo_root [file normalize [file join $script_dir ../../..]]
 set out_dir [expr {$argc >= 1 ? [lindex $argv 0] : [file join $repo_root build/revb-vivado-io-drc]}]
 set source_commit [expr {$argc >= 2 ? [lindex $argv 1] : "UNBOUND"}]
+set source_digest [expr {$argc >= 3 ? [lindex $argv 2] : "UNBOUND"}]
 set part "xczu2cg-sfvc784-1-e"
 set top "servohil_io_drc_top"
 set rtl [file join $script_dir servohil_io_drc_top.sv]
@@ -48,6 +49,7 @@ puts $fh "top_module=$top"
 puts $fh "rtl=$rtl"
 puts $fh "xdc=$xdc"
 puts $fh "source_commit=$source_commit"
+puts $fh "source_digest=$source_digest"
 puts $fh "timing_claim=NOT_RUN"
 close $fh
 
