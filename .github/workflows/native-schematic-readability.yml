@@ -14,6 +14,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Rev.B package/BOM closure gate
+        run: |
+          mkdir -p build/readability
+          python tools/check_revb_schematic_closure.py | tee build/readability/schematic-closure.json
       - name: Source-only schematic regressions
         run: python -m unittest discover -s tests -p test_native_readability.py -v
       - name: Install native KiCad CLI and numerical regression dependency

@@ -11,17 +11,17 @@ ServoHIL 面向伺服驱动器和关节模组的实时 Hardware-in-the-Loop 验�
 
 | 模块 | 已实现 | 尚未完成 / 不能据此声称 |
 |---|---|---|
-| 单 ZU2CG / 原生工程 | 15 页，可直接编辑；载板分配保持 64 路信号 | 完整板级 bitstream、Vivado STA/IO DRC 未验收 |
+| 单 ZU2CG / 原生工程 | 16 页原生 KiCad，可直接编辑；载板分配保持 64 路信号 | 14 个精确封装/机械绑定项仍显式 OPEN；完整板级 bitstream、Vivado STA/IO DRC 未验收 |
 | 输入保护 / 正负电源 / 参考 | 实际器件、原生值驱动计算与 ngspice 矩阵 | DAC 电源跨度/输出裕量、热、厂家模型、MLCC、启动及反灌门禁未关闭 |
 | 独立 watchdog / AO disconnect / DUT permit | PR #21 的窗口 watchdog、八路 ADG5412F、常开 PhotoMOS 许可触点 | 实际 DUT 的安全偏置、漏电流、断线与最大关断时间未验收；不是 STO |
-| 有效进度心跳 RTL | Plant/I/O 序号、主机会话租约、超时锁存、显式恢复/重新 ARM | 独立核心已仿真；真实 Plant/主机、AXI/CDC、板级集成尚未完成 |
-| ADC 输入前端 | AD7606C-16、8 路单端低能量输入、RC、参考/去耦、1.8 V 八数据线连接 | 初始化/采样驱动、通道身份、精度、抗混叠、输入故障能量与实板时序未验收 |
-| 数字 PHY | 六路 PWM 缓冲、双 SSI/BiSS 差分接口、RS-485、辅助逻辑/I2C | 不代表任意编码器或工业 24 V 输入兼容；电缆/部分供电/协议实测未验收 |
+| 有效进度心跳 RTL | PR #23 已把完成的 Plant/ADC 序号与主机租约续期接入 completion-only health wrapper；超时锁存、显式恢复/重新 ARM 保留 | AXI/CDC/顶层/XDC 与实板故障注入尚未验收 |
+| ADC 输入前端 | AD7606C-16、8 路低能量输入；PR #23 已实现 CONFIG 0x02 八线模式写入/读回、BUSY 流程与 8×16-bit 完成采样序号 | 模拟精度、抗混叠、校准、CDC/板级时序和实测 1 MSPS 未验收 |
+| 数字 PHY / 外部保护 | 六路 PWM、双 SSI/BiSS、RS-485、AUX/I2C；新增 `90_connector_protection`，对 AI/AO/逻辑/差分口配置连接器侧 TVS | 保护拓扑不等于 IEC ESD/浪涌 PASS；不代表任意编码器或工业 24 V 输入兼容 |
 | EtherCAT / CAN | 本扩展板没有独立引脚分配或对应板载实现 | 不借用 AUX 来假装已实现；新增接口需独立分配、控制器和 PHY 审查 |
 | PCB Layout / 生产资格 | 门禁与验收路径保留 | 未授权 Layout/Gerber/采购/生产，无实板、EMC 或完整故障验证证据 |
 
-本轮 ADC/PHY 原生实现及验证在 [PR #22](https://github.com/magic-alt/servoHIL/pull/22)。
-PR #21 已合并，其 13 页 / 144 项测试属于历史检查点，不再冒充当前工程状态。
+PR #22 完成原生 ADC/PHY 电路；PR #23 完成资格门禁、AD7606C-16 初始化/采样 RTL、completion-only health 集成和 Vivado 证据导入框架。
+当前 Rev.B schematic-closure 工作继续收口 KiCad 封装/BOM 与连接器侧保护。PR #21 的 13 页 / 144 项测试仅保留为历史检查点。
 
 ## 打开工程与查阅证据
 
@@ -38,12 +38,10 @@ hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_pro
 当前图纸包括顶层、载板接口、输入保护、正电源、负电源/参考、电源监控、
 状态输出、PWM/辅助/RS-485、两页 DAC、AO disconnect、watchdog、DUT permit、
 ADC 输入前端和双编码器 PHY。`70_adc_frontend`、`80_encoder_phy` 是新增页；
-`03_peripheral_boundaries` 已替换 J3/J4 预留模块接口，避免与板载器件并接。
+`03_peripheral_boundaries` 已替换 J3/J4 预留模块接口；`90_connector_protection` 统一放置 AI/AO/PWM/AUX/I2C/SSI-BiSS/RS-485/互锁线的连接器侧保护器件。
 
-当前电路有 **409 个物理器件**：PR #21 的 263 个减去 2 个预留连接器，
-新增 148 个 ADC/PHY/无源/连接器器件。独立外设契约检查 461 个引脚，
-原有 47 个安全链器件 / 168 个引脚检查继续保留。
-实际 KiCad 10.0.6 的 15 页网表、ERC、PDF 与回归检查见 PR 的原生 CI artifact。
+当前源审计统计 **439 个 `in_bom=yes && on_board=yes` 物理器件**，并明确把购买的 AXU2CGB J12/J15 载板边界排除出扩展板 BOM/placement。新增连接器保护器件 37 个。`hardware/revB/schematic_open_items.json` 只允许 **14 个**空 footprint，并由 CI 要求实际空集合与 blocker 清单完全一致。
+实际 KiCad 网表、ERC、PDF 与回归结果以当前 PR 的 `native-schematic-readability` artifact 为准。
 
 **当前 PDF 不在历史目录中。** 最新 `native-schematic-readability` artifact 包含
 原理图 PDF、原生 source ZIP、XML、ERC、测试日志与确切 source commit。
@@ -59,9 +57,7 @@ REFCAP 去耦、软件模式和串行模式固定脚都已画入。
 J801 提供 8 路单端输入及信号地，每路正/负腿 100 Ω、差分 1 nF。
 这是低能量实验室输入候选，不是承受 24 V 或长线浪涌的工业 AI 端口。
 
-八条 DOUT 接线不等于上电后自动进入八线采样：初始化必须配置并读回
-`CONFIG[4:3]=11`，验证采样范围、内部滤波、过采样及通道身份。
-本 PR 没有把缺失的初始化/采样状态机标为已完成，也没有宣称实测 1 MSPS。
+八条 DOUT 接线不等于上电后自动进入八线采样。PR #23 的 `ad7606c16_controller.sv` 已按 fail-closed 顺序完成 CONFIG 0x02 八线模式写入/读回、CONVST/BUSY 等待、八条 DOUT 的 16-bit 捕获，并只在完整捕获后推进 `sample_seq`。这仍不是模拟精度、CDC、板级时序或实测 1 MSPS 的证据。
 
 ### 编码器、PWM 与 RS-485
 
@@ -74,7 +70,7 @@ SSI/BiSS 主端发送时钟、接收数据；从端仿真角色相反。
 
 RS-485 同样经过安全许可门控；120 Ω 终端通过跳线接入，默认不装短接帽。
 六路 PWM 使用 SN74LVC541A 缓冲及输入默认下拉；AUX/I2C 为 3.3 V 逻辑接口。
-这些接口非隔离，不供应编码器电源，不直接接栅极功率、电机相线或 24 V PLC 信号。
+这些接口非隔离，不供应编码器电源，不直接接栅极功率、电机相线或 24 V PLC 信号。`90_connector_protection` 增加的 TVS 只关闭“原理图缺少接口保护拓扑”这一项；器件到连接器的实际布局、回流路径、部分供电 backfeed 和 IEC ESD/浪涌仍需实板资格。
 
 ## 有效系统进度心跳
 
@@ -89,9 +85,7 @@ RS-485 同样经过安全许可门控；120 Ω 终端通过跳线接入，默认
 再次上升。未 ARM 时仍输出健康心跳，以允许外部硬件 watchdog 完成资格判定。
 **不能用未 ARM 时本就有效的 HIL_FAULT_N 反向禁止心跳，否则会形成启动死锁。**
 
-[RTL 接口与集成边界](rtl/revb/README.md) 说明同步事务、CDC、会话和 ARM 时序。
-真实 Plant/I/O completion、主机租约生产者、AXI/CDC、顶层/XDC、Vivado 与板测
-仍是下一阶段工作；独立核心仿真不能代替这些集成。
+[RTL 接口与集成边界](rtl/revb/README.md) 说明同步事务、CDC、会话和 ARM 时序。PR #23 的 `runtime_health_integration.sv` 已只接受完成的 Plant、ADC sample 与 lease renewal 序号，不把 command/request 当作完成；尚未关闭的是这些完成事件到真实 AXI/CDC/top/XDC 的物理集成、Vivado STA/IO DRC 与板测。
 
 ## 电源 EDV 与新增负载
 
@@ -123,6 +117,7 @@ ADC 外部 RC 的简化计算也不等于完整抗混叠设计或 16 位精度�
 
 ```sh
 mkdir -p build/native
+python tools/check_revb_schematic_closure.py
 python tools/check_native_readability.py
 kicad-cli sch export netlist --format kicadxml -o build/native/netlist.xml hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch
 python tools/check_native_readability.py --normalize build/native/netlist.xml --output build/native/canonical.xml
@@ -162,11 +157,7 @@ PowerShell 中运行测试前设 `$env:NATIVE_NETLIST='build/native/canonical.xm
 
 ## 继续推进的顺序
 
-先关闭电源/热/MLCC/磁性与新增负载问题，绑定实际 DUT adapter 的中性偏置、许可输入
-阈值/漏电、线缆失效和最大允许关断时间，再进行低能量夹具验证。
-同时完成 ADC 初始化/采样、真实 Plant/I/O 与租约集成、Vivado 时序及接口验证。
-最终原理图、完整 BOM/封装/连接器、部分供电与 DUT 禁止验证通过并获得工程审签后，
-才进入 Layout；样机完成后还需要真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
+原理图功能拓扑已经收口到 16 页；下一步不再继续盲目扩页，而是关闭 `schematic_open_items.json` 的 14 个精确封装/机械绑定项，并完成电源/热/MLCC/XAL5050 磁性资格。随后绑定真实 DUT adapter 的中性偏置、许可阈值/漏电、线缆失效和最大关断时间，执行部分供电/backfeed、Vivado STA/IO DRC 与低能量夹具验证。只有这些门禁和工程审签通过后才进入 Layout；样机后仍需真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
 
 **AO 断开为高阻而非安全零位；单个许可触点不是冗余 STO，元件额定值不是板级认证。
 没有匹配实际硬件和 DUT 的原始实测证据，就不把生产资格或安全门禁改成 PASS。**

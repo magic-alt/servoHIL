@@ -108,6 +108,25 @@ header('J1002','AUX 3.3V LOGIC / GND',aux,'2x04')
 header('J1003','I2C 3.3V / GND',{1:'MGMT_SCL',2:'MGMT_SDA',3:'GND',4:'GND'},'1x04')
 resistor('R1050','4.7k','MGMT_SCL','3V3_D');resistor('R1051','4.7k','MGMT_SDA','3V3_D')
 
+# Connector-side ESD/transient protection. Placement must be at connector entry;
+# these declarations validate schematic pin/net/package identity only.
+def esd_line(ref,value,net):
+    part(ref,value,{1:net,2:'GND'},'Diode_SMD:D_SOD-323')
+for ch in range(8):esd_line(f'D{1201+ch}','PESD15VL1BA',f'AI{ch}_IN')
+for ch in range(8):esd_line(f'D{1211+ch}','PESD15VL1BA',f'DUT_AO{ch}')
+for ch,name in enumerate(['UH','UL','VH','VL','WH','WL']):
+    esd_line(f'D{1221+ch}','PESD5V0S1BA',f'PWM_{name}_IN')
+for ch in range(6):esd_line(f'D{1231+ch}','PESD5V0S1BA',f'AUX{ch}_PORT')
+esd_line('D1241','PESD5V0S1BA','MGMT_SCL')
+esd_line('D1242','PESD5V0S1BA','MGMT_SDA')
+for ref,a,b in [
+    ('D1251','ENC0_P0_A','ENC0_P0_B'),('D1252','ENC0_P1_A','ENC0_P1_B'),
+    ('D1253','ENC1_P0_A','ENC1_P0_B'),('D1254','ENC1_P1_A','ENC1_P1_B'),
+    ('D1255','RS485_A','RS485_B')]:
+    part(ref,'SM712-02HTG',{1:a,2:b,3:'GND'},'Package_TO_SOT_SMD:SOT-23')
+esd_line('D1261','PESD5V0S1BA','INTERLOCK_FEED')
+esd_line('D1262','PESD5V0S1BA','INTERLOCK_RAW')
+
 
 def check_pins(nets,members):
     for key,expected in PINS.items():
