@@ -15,7 +15,8 @@
       "J501",
       "J701"
     ],
-    "close_rule": "A reference may leave open_footprints only after an exact selected part, exact mating/cable contract, locally reviewable footprint/mechanical data and the ref-specific evidence pack are complete."
+    "close_rule": "A reference may leave open_footprints only after an exact selected part, exact mating/cable contract, locally reviewable footprint/mechanical data and the ref-specific evidence pack are complete.",
+    "cable_fault_architecture": "hardware/revB/cable_fault_architecture.json"
   },
   "component_evidence": {
     "source_registry": "hardware/revB/component_evidence_sources.json",
