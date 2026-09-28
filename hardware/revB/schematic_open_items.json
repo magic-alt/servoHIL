@@ -1,10 +1,11 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "revision": "Rev.B",
   "checked_on": "2026-09-28",
   "status": "SCHEMATIC_FUNCTION_COMPLETE_9_PHYSICAL_BINDINGS_OPEN",
   "layout_allowed": false,
   "policy": "A blank physical footprint is allowed only when it is listed here with an unresolved exact land-pattern or mechanical contract. This manifest is a blocker list, not a fabrication waiver.",
+  "close_policy": "Removing an item requires the exact footprint/mechanical contract plus the evidence named in binding_requirements. Catalog ratings, package-body dimensions, ERC, simulation or a visually similar land pattern are insufficient by themselves.",
   "open_footprints": {
     "J101": "12 V field connector mechanical/keying/current-rating selection not bound",
     "SW101": "power-reset switch mechanical actuator/footprint not bound",
@@ -15,6 +16,136 @@
     "J5": "AO connector mechanical/keying choice not bound",
     "J501": "3.3 V dry-contact service connector mechanical choice not bound",
     "J701": "floating DUT-permit connector mechanical/current/spacing choice not bound"
+  },
+  "binding_requirements": {
+    "U20": {
+      "kind": "exact_land_pattern",
+      "status": "OPEN_VENDOR_LAND_PATTERN_NOT_VENDORED",
+      "manufacturer": "Analog Devices",
+      "mpn": "AD3542RBCPZ16",
+      "package_option": "CP-28-15",
+      "package_description": "28-lead LFCSP, 4 mm x 4 mm x 0.95 mm",
+      "datasheet_url": "https://www.analog.com/media/en/technical-documentation/data-sheets/ad3542r.pdf",
+      "package_drawing_url": "https://www.analog.com/media/en/package-pcb-resources/package/pkg_pdf/lfcspcp/cp-28/cp-28-15.pdf",
+      "cad_sources": [
+        "Analog Devices product page CAD models",
+        "Analog Devices linked Ultra Librarian/SamacSys exact-part CAD"
+      ],
+      "required_evidence": [
+        "reviewed exact-part CAD or manufacturer recommended land-pattern source",
+        "independent pad-count/pitch/body/terminal dimension review",
+        "locally vendored KiCad footprint with source/provenance record",
+        "native netlist/ERC regression after binding"
+      ]
+    },
+    "U21": {
+      "same_as": "U20",
+      "kind": "exact_land_pattern",
+      "status": "OPEN_VENDOR_LAND_PATTERN_NOT_VENDORED"
+    },
+    "U22": {
+      "same_as": "U20",
+      "kind": "exact_land_pattern",
+      "status": "OPEN_VENDOR_LAND_PATTERN_NOT_VENDORED"
+    },
+    "U23": {
+      "same_as": "U20",
+      "kind": "exact_land_pattern",
+      "status": "OPEN_VENDOR_LAND_PATTERN_NOT_VENDORED"
+    },
+    "J101": {
+      "kind": "mechanical_selection",
+      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
+      "interface": "12 V field input",
+      "required_contract_fields": [
+        "manufacturer and mating part number",
+        "contact voltage/current rating with derating basis",
+        "wire gauge and termination method",
+        "keying/polarization and retention",
+        "operating temperature and cycle life",
+        "creepage/clearance basis",
+        "enclosure/keepout dimensions"
+      ],
+      "required_evidence": [
+        "manufacturer drawing/datasheet",
+        "reviewed mating/cable assembly",
+        "mechanical fit/keepout review"
+      ]
+    },
+    "SW101": {
+      "kind": "mechanical_selection",
+      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
+      "interface": "power-reset switch",
+      "required_contract_fields": [
+        "manufacturer and exact part number",
+        "actuator style and accessible travel",
+        "contact voltage/current rating",
+        "switch function and terminal numbering",
+        "operating temperature and cycle life",
+        "board/enclosure keepout"
+      ],
+      "required_evidence": [
+        "manufacturer drawing/datasheet",
+        "mechanical access/fit review"
+      ]
+    },
+    "J5": {
+      "kind": "mechanical_selection",
+      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
+      "interface": "eight-channel analog output",
+      "required_contract_fields": [
+        "manufacturer and mating part number",
+        "pin count and pinout",
+        "AO working/common-mode voltage contract",
+        "contact current/contact resistance",
+        "keying/polarization and retention",
+        "cable/shield/grounding contract",
+        "creepage/clearance and enclosure keepout"
+      ],
+      "required_evidence": [
+        "manufacturer drawing/datasheet",
+        "reviewed DUT cable assembly",
+        "mechanical fit/keepout review"
+      ]
+    },
+    "J501": {
+      "kind": "mechanical_selection",
+      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
+      "interface": "3.3 V dry-contact service/interlock",
+      "required_contract_fields": [
+        "manufacturer and mating part number",
+        "pinout and contact rating",
+        "keying/polarization and retention",
+        "cable open/short fault contract",
+        "leakage/common-mode environment",
+        "creepage/clearance and enclosure keepout"
+      ],
+      "required_evidence": [
+        "manufacturer drawing/datasheet",
+        "reviewed service/interlock cable assembly",
+        "fault-response verification plan"
+      ]
+    },
+    "J701": {
+      "kind": "mechanical_selection",
+      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
+      "interface": "floating DUT permit contact",
+      "required_contract_fields": [
+        "manufacturer and mating part number",
+        "actual DUT open-circuit voltage and wetting/current contract",
+        "maximum allowed leakage in inhibited state",
+        "contact/cable voltage and current ratings",
+        "isolation/creepage/clearance basis",
+        "keying/polarization and retention",
+        "cable open/short fault behavior"
+      ],
+      "required_evidence": [
+        "manufacturer drawing/datasheet",
+        "reviewed real DUT permit input contract",
+        "reviewed permit cable assembly",
+        "measured leakage/threshold/fault-response evidence"
+      ]
+    }
   },
   "excluded_host_boundaries": [
     "J12",
