@@ -129,7 +129,7 @@ RS-485 同样经过安全许可门控；120 Ω 终端通过跳线接入，默认
 
 这不是额定电流认证或实际功耗量测。新的预算用于重跑原有 25 工况 ngspice 和
 热/磁性筛查；AON 安全链预算、同时短路、动态损耗和真实板级热仍开放。
-原 DAC 电源跨度/输出裕量、真实稳压器模型及输入保护能量问题仍未关闭。XAL50xx 与已分配 TDK MLCC 的精确原厂资料入口已经登记，但曲线原始文件尚未 hash-import；C105 / `input_protected` 已绑定 TDK C5750X7R1V476M230KC 作为 47 uF / 35 V / X7R / 2220 精确筛选候选，但 >=22 uF effective@15.05 V 尚未由 hash-bound DC-bias 数据证明，因此磁性、MLCC 和实板 thermal 资格仍保持 BLOCKED。
+原 DAC 电源跨度/输出裕量、真实稳压器模型及输入保护能量问题仍未关闭。XAL50xx 与已分配 TDK MLCC 的精确原厂资料入口已经登记，但曲线原始文件尚未 hash-import；C105 / `input_protected` 已绑定 TDK C5750X7R1V476M230KC 作为 47 uF / 35 V / X7R / 2220 精确筛选候选，native C105 已明确 X7R；但通用 KiCad 2220 footprint 尚未完成 TDK exact land-pattern/高度复核，且 >=22 uF effective@15.05 V 尚未由 hash-bound DC-bias 数据证明，因此磁性、MLCC 和实板 thermal 资格仍保持 BLOCKED。
 
 ADC 外部 RC 的简化计算也不等于完整抗混叠设计或 16 位精度证明。
 100 Ω 正腿和 1 MΩ 简化输入负载会引入约 100 ppm 的未校准增益误差，
