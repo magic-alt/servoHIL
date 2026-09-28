@@ -9,7 +9,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_MECHANICAL = {"J101", "SW101", "J5", "J501", "J701"}
 EXPECTED_MAGNETICS = {"XAL5050-103MEC", "XAL5050-682MEC", "XAL5030-472MEC"}
-EXPECTED_MLCC = {"C3225X7R1C226M250AC", "C3225X7R1E106K250AC", "CGA6L2X7R1H105K160AA"}
+EXPECTED_MLCC = {"C3225X7R1C226M250AC", "C3225X7R1E106K250AC", "CGA6L2X7R1H105K160AA", "C5750X7R1V476M230KC"}
 
 
 def _load(path: Path, name: str) -> dict[str, Any]:
@@ -189,15 +189,29 @@ def _validate_sources(
         if "NOT_HASH" not in str(candidate.get("curve_source_status", "")):
             raise ValueError(mpn + ": curve source must remain unqualified until hash-bound")
     unresolved = mlcc.get("unresolved", {})
-    if set(unresolved) != {"input_protected"} or unresolved["input_protected"].get("status") != "BLOCKED_EXACT_MPN_NOT_SELECTED":
-        raise ValueError("input_protected MLCC must remain blocked on exact MPN")
+    if unresolved != {}:
+        raise ValueError("all currently declared MLCC banks must have an exact screening MPN")
+    if capacitor_candidates.get("bank_candidates", {}).get("input_protected") != "C5750X7R1V476M230KC":
+        raise ValueError("input_protected exact MPN drift")
+    input_row = mlcc["exact_parts"].get("C5750X7R1V476M230KC", {})
+    if input_row.get("assigned_banks") != ["input_protected"]:
+        raise ValueError("input_protected source registry assignment drift")
+    requirement = input_row.get("screening_requirement", {})
+    if requirement.get("bias_screen_v") != 15.05 or requirement.get("minimum_effective_capacitance_uf") != 22:
+        raise ValueError("input_protected MLCC screening requirement drift")
+    retention = requirement.get("minimum_dc_bias_retention_after_tolerance_temperature_aging")
+    expected_retention = 22 / (47 * 0.8 * 0.85 * 0.97)
+    if not isinstance(retention, (int, float)) or abs(retention - expected_retention) > 1e-12:
+        raise ValueError("input_protected MLCC retention requirement drift")
     return {
         "registry_status": registry.get("status"),
         "magnetics_source_status": magnetics.get("source_status"),
         "mlcc_source_status": mlcc.get("source_status"),
         "magnetic_mpns": sorted(EXPECTED_MAGNETICS),
         "mlcc_mpns": sorted(EXPECTED_MLCC),
-        "unresolved_mlcc_banks": ["input_protected"],
+        "unresolved_mlcc_banks": [],
+        "input_protected_exact_mpn": "C5750X7R1V476M230KC",
+        "input_protected_curve_status": capacitor_candidates["parts"]["C5750X7R1V476M230KC"]["curve_source_status"],
     }
 
 

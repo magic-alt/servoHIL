@@ -106,11 +106,16 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "magnetic source set drift"):
             _validate_sources(contract, broken, components, capacitors)
 
-    def test_mlcc_input_bank_remains_blocked_on_exact_mpn(self):
+    def test_mlcc_input_bank_has_exact_mpn_but_curve_remains_blocked(self):
         report = check(ROOT)
+        self.assertEqual(report["component_source_state"]["unresolved_mlcc_banks"], [])
         self.assertEqual(
-            report["component_source_state"]["unresolved_mlcc_banks"],
-            ["input_protected"],
+            report["component_source_state"]["input_protected_exact_mpn"],
+            "C5750X7R1V476M230KC",
+        )
+        self.assertIn(
+            "NOT_HASH",
+            report["component_source_state"]["input_protected_curve_status"],
         )
 
     def test_checked_in_verification_plan_cannot_claim_pass_without_raw_evidence(self):

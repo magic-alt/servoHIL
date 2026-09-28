@@ -118,24 +118,55 @@
         "dielectric": "X7R",
         "product_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA6L2X7R1H105K160AA",
         "characterization_sheet_url": "https://product.tdk.com/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/cga6l2x7r1h105k160aa.pdf"
+      },
+      "C5750X7R1V476M230KC": {
+        "assigned_banks": [
+          "input_protected"
+        ],
+        "product_status": "PRODUCTION",
+        "application_grade": "COMMERCIAL",
+        "capacitance_uf": 47,
+        "tolerance_percent": 20,
+        "rated_voltage_v": 35,
+        "dielectric": "X7R",
+        "eia_case": "2220",
+        "dimensions_mm": {
+          "length_nominal": 5.7,
+          "width_nominal": 5,
+          "thickness_nominal": 2.3,
+          "thickness_max": 2.5
+        },
+        "recommended_land_pattern_mm": {
+          "PA": [
+            4.1,
+            4.8
+          ],
+          "PB": [
+            1.2,
+            1.4
+          ],
+          "PC": [
+            4,
+            5
+          ]
+        },
+        "product_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C5750X7R1V476M230KC",
+        "characterization_sheet_url": "https://product.tdk.com/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c5750x7r1v476m230kc_211008.pdf",
+        "evidence_status": "EXACT_MPN_SOURCE_LOCATED_CURVES_NOT_HASH_IMPORTED",
+        "screening_requirement": {
+          "bias_screen_v": 15.05,
+          "minimum_effective_capacitance_uf": 22,
+          "minimum_dc_bias_retention_after_tolerance_temperature_aging": 0.709649949034231,
+          "basis": "47uF nominal, -20% tolerance, 15% temperature sensitivity assumption, 3% aging sensitivity assumption. Requirement only; not proof that the part meets it."
+        }
       }
     },
-    "unresolved": {
-      "input_protected": {
-        "status": "BLOCKED_EXACT_MPN_NOT_SELECTED",
-        "native_requirement": "47uF / 35V / 2220",
-        "next_evidence": [
-          "select exact production MPN",
-          "bind case/height/rating",
-          "archive DC-bias/temperature/ESR/RMS-current evidence"
-        ]
-      }
-    },
+    "unresolved": {},
     "next_evidence": [
-      "download exact manufacturer CSV/PDF/model bytes into a local reviewed evidence pack without redistributing restricted vendor IP",
-      "record SHA-256 and graph conditions",
-      "normalize DC-bias curves with explicit reviewer note",
-      "run no-extrapolation effective-capacitance screening",
+      "archive exact manufacturer CSV/PDF/model bytes into a local reviewed evidence pack without redistributing restricted vendor IP",
+      "record SHA-256 and graph conditions for every assigned exact MPN including C5750X7R1V476M230KC",
+      "normalize DC-bias curves with explicit reviewer note and no extrapolation",
+      "run no-extrapolation effective-capacitance screening at each bank's reviewed voltage, including C105 at 15.05V",
       "review ripple-temperature-rise/ESR at actual frequency and RMS current",
       "retain temperature/aging margin separately"
     ]
