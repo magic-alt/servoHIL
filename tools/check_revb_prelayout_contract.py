@@ -203,7 +203,8 @@ def _validate_sources(
 
 
 def _validate_verification_plan(data: dict[str, Any], name: str) -> None:
-    if data.get("schema_version") != 1:
+    schema = data.get("schema_version")
+    if schema not in {1, 2}:
         raise ValueError(f"{name}: unsupported verification plan schema")
     if data.get("layout_allowed") is not False:
         raise ValueError(f"{name}: verification plan must not authorize Layout")
@@ -212,6 +213,10 @@ def _validate_verification_plan(data: dict[str, Any], name: str) -> None:
     status = str(data.get("status", ""))
     if not status or status == "PASS":
         raise ValueError(f"{name}: verification plan must remain explicitly blocked/not-run")
+    if schema == 2:
+        subresults = data.get("subresults")
+        if not isinstance(subresults, dict) or subresults != {"io_drc": "NOT_RUN", "timing": "NOT_RUN"}:
+            raise ValueError(f"{name}: schema-2 Vivado subresults must remain NOT_RUN")
 
 
 
