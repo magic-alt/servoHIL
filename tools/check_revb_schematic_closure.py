@@ -26,7 +26,8 @@ MECHANICAL_REFS = ("J101", "SW101", "J5", "J501", "J701")
 AD3542_FOOTPRINT_ID = "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R"
 AD3542_DATASHEET = "https://www.analog.com/media/en/technical-documentation/data-sheets/ad3542r.pdf"
 AD3542_GEOMETRY_REL = "hardware/revB/evidence/ad3542r/u1_geometry_review.json"
-AD3542_EVIDENCE_REL = "hardware/revB/ad3542r_footprint_evidence.json"\nAD3542_FOOTPRINT_REL = "hardware/kicad/revB/axu2cgb_expansion/footprints/Package_DFN_QFN.pretty/AnalogDevices_CP-28-15_AD3542R.kicad_mod"
+AD3542_EVIDENCE_REL = "hardware/revB/ad3542r_footprint_evidence.json"
+AD3542_FOOTPRINT_REL = "hardware/kicad/revB/axu2cgb_expansion/footprints/Package_DFN_QFN.pretty/AnalogDevices_CP-28-15_AD3542R.kicad_mod"
 
 SOURCE_HASHES = {
     "datasheet_rev_c_sha256": "a9536b981e1dc140082ddff947487faaaa47874cd8b648966ee9c6b92fa292fa",
