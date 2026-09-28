@@ -16,8 +16,9 @@ This closure includes:
   project-local KiCad land pattern: LT3045/LT3094 MSOP-12+EP, TPS3430 DRC VSON,
   LVC1G74 DCT, AQY212GS SOP-4, Littelfuse 451 fuse, XAL5030 and the reviewed
   TPS259474 RPW/XAL5050 land-pattern bindings;
-- deterministic R/C footprints on all four AD3542R pages while keeping the converter
-  CP-28-15 land pattern explicitly open;
+- exact AD3542RBCPZ16 CP-28-15 bindings on U20..U23 using a locally vendored
+  footprint reconstructed and independently checked against the official
+  EVAL-AD3542RFMCZ IPC-356/top-copper/solder-mask/paste evidence;
 - a fail-closed package/BOM audit in `tools/check_revb_schematic_closure.py`;
 - connector-side clamps for low-energy AI/AO, 3.3 V logic, SSI/BiSS, RS-485 and the
   dry-contact interlock;
@@ -26,32 +27,45 @@ This closure includes:
 ## Deliberate remaining physical bindings
 
 The only blank physical footprints allowed are defined in
-`hardware/revB/schematic_open_items.json`. At this checkpoint there are **9**:
+`hardware/revB/schematic_open_items.json`. At this checkpoint there are **5**,
+all requiring the real mechanical/enclosure/cable/DUT contract:
 
-- exact land pattern still open:
-  - U20, U21, U22, U23 — AD3542RBCPZ16, Analog Devices CP-28-15;
-- mechanical/connector choices that need the real enclosure/cable/DUT contract:
-  - J101 — 12 V field connector;
-  - SW101 — power-reset switch;
-  - J5 — AO connector;
-  - J501 — 3.3 V dry-contact service connector;
-  - J701 — floating DUT-permit connector.
+- J101 — 12 V field connector;
+- SW101 — power-reset switch;
+- J5 — AO connector;
+- J501 — 3.3 V dry-contact service connector;
+- J701 — floating DUT-permit connector.
 
-U101 and L201/L202/L301/L302 are no longer blank-footprint blockers. Their package/
-land-pattern bindings are source-closed, but that **does not** qualify the components
-electrically, thermally or mechanically for production.
+U20..U23 are no longer blank-footprint blockers. The AD3542R package review is
+source-bound through:
 
-L203 likewise uses the exact official `Inductor_SMD:L_Coilcraft_XAL5030` footprint.
-None of these footprint assignments establish L(I,T), AC/core loss, startup saturation,
-board temperature rise, placement clearance or manufacturability.
+- `hardware/revB/ad3542r_footprint_evidence.json`;
+- `hardware/revB/evidence/ad3542r/u1_geometry_review.json`;
+- `Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R`.
+
+The official EVAL BOM binds U1 to AD3542RBCPZ16. The official IPC-356 contains
+exactly pins 1..28, and the EVAL top copper/paste/mask data defines a 28-pad
+perimeter land pattern at 0.40 mm pitch with **no center exposed pad**. The local
+footprint reproduces those copper/paste dimensions and explicit mask apertures.
+A generic nominal 4 mm QFN is still not an acceptable substitute.
+
+U101 and L201/L202/L301/L302 are likewise no longer blank-footprint blockers.
+Their package/land-pattern bindings are source-closed, but that **does not**
+qualify the components electrically, thermally or mechanically for production.
+
+L203 uses the exact official `Inductor_SMD:L_Coilcraft_XAL5030` footprint.
+None of these footprint assignments establish L(I,T), AC/core loss, startup
+saturation, board temperature rise, placement clearance or manufacturability.
 
 ## AD3542R package evidence boundary
 
-The AD3542RBCPZ16 manufacturer ordering guide identifies a 28-lead LFCSP,
-4 mm × 4 mm × 0.95 mm package, option **CP-28-15**. The checked-in schematic keeps
-U20..U23 blank until a reviewed land pattern is vendored and independently checked
-against the package/CAD source. A visually similar generic 4 mm QFN/LFCSP footprint
-must not be substituted merely to reduce the blocker count.
+The AD3542R package blocker is now closed at source level, not by package-name
+guessing. The review pins the exact manufacturer artifact SHA-256 values and retains
+the U1 IPC-356/Gerber geometry needed to reproduce the footprint.
+
+This closure proves the checked-in U20..U23 land-pattern binding. It does **not**
+qualify DAC accuracy, dynamic settling, output stability, thermal behavior, EMC,
+fabrication process or the finished PCB.
 
 ## Protection boundary
 

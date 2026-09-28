@@ -1,0 +1,1222 @@
+{
+  "archive_policy": {
+    "audit_record": "SHA-256 of each official artifact/member plus exact IPC-356 U1 records and Gerber U1 flash/aperture records are retained here.",
+    "raw_binary_files_committed_to_repository": false,
+    "reason": "Manufacturer-distributed binary source files are not redistributed by this repository.",
+    "reverification": "Re-download the named Analog Devices artifacts, verify SHA-256, then compare the retained raw records."
+  },
+  "bom_u1": {
+    "item": 48,
+    "jedec_type": "QFN28_4X4",
+    "location": "U1",
+    "manufacturer": "ANALOG DEVICES",
+    "manufacturer_part_number": "AD3542RBCPZ16",
+    "qty": 1,
+    "source_row": 49,
+    "source_sheet": "05-050892-01-d",
+    "value": "AD3542RBCPZ16",
+    "ww_pn": "E033785"
+  },
+  "canonical_kicad_land_pattern": {
+    "center_pad_present": false,
+    "footprint": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
+    "mask_apertures": "unnumbered F.Mask-only aperture pads reproduce official EVAL mask dimensions",
+    "numbered_pad_layers": [
+      "F.Cu",
+      "F.Paste"
+    ],
+    "orientation": "top view; pin 1 on left side nearest top-left corner; KiCad +Y downward",
+    "origin": "package center",
+    "pads": [
+      {
+        "orientation": "side",
+        "pin": 1,
+        "x_mm": -1.8933,
+        "y_mm": -1.2
+      },
+      {
+        "orientation": "side",
+        "pin": 2,
+        "x_mm": -1.8933,
+        "y_mm": -0.8
+      },
+      {
+        "orientation": "side",
+        "pin": 3,
+        "x_mm": -1.8933,
+        "y_mm": -0.4
+      },
+      {
+        "orientation": "side",
+        "pin": 4,
+        "x_mm": -1.8933,
+        "y_mm": 0
+      },
+      {
+        "orientation": "side",
+        "pin": 5,
+        "x_mm": -1.8933,
+        "y_mm": 0.4
+      },
+      {
+        "orientation": "side",
+        "pin": 6,
+        "x_mm": -1.8933,
+        "y_mm": 0.8
+      },
+      {
+        "orientation": "side",
+        "pin": 7,
+        "x_mm": -1.8933,
+        "y_mm": 1.2
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 8,
+        "x_mm": -1.2,
+        "y_mm": 1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 9,
+        "x_mm": -0.8,
+        "y_mm": 1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 10,
+        "x_mm": -0.4,
+        "y_mm": 1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 11,
+        "x_mm": 0,
+        "y_mm": 1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 12,
+        "x_mm": 0.4,
+        "y_mm": 1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 13,
+        "x_mm": 0.8,
+        "y_mm": 1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 14,
+        "x_mm": 1.2,
+        "y_mm": 1.8933
+      },
+      {
+        "orientation": "side",
+        "pin": 15,
+        "x_mm": 1.8933,
+        "y_mm": 1.2
+      },
+      {
+        "orientation": "side",
+        "pin": 16,
+        "x_mm": 1.8933,
+        "y_mm": 0.8
+      },
+      {
+        "orientation": "side",
+        "pin": 17,
+        "x_mm": 1.8933,
+        "y_mm": 0.4
+      },
+      {
+        "orientation": "side",
+        "pin": 18,
+        "x_mm": 1.8933,
+        "y_mm": 0
+      },
+      {
+        "orientation": "side",
+        "pin": 19,
+        "x_mm": 1.8933,
+        "y_mm": -0.4
+      },
+      {
+        "orientation": "side",
+        "pin": 20,
+        "x_mm": 1.8933,
+        "y_mm": -0.8
+      },
+      {
+        "orientation": "side",
+        "pin": 21,
+        "x_mm": 1.8933,
+        "y_mm": -1.2
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 22,
+        "x_mm": 1.2,
+        "y_mm": -1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 23,
+        "x_mm": 0.8,
+        "y_mm": -1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 24,
+        "x_mm": 0.4,
+        "y_mm": -1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 25,
+        "x_mm": 0,
+        "y_mm": -1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 26,
+        "x_mm": -0.4,
+        "y_mm": -1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 27,
+        "x_mm": -0.8,
+        "y_mm": -1.8933
+      },
+      {
+        "orientation": "top_bottom",
+        "pin": 28,
+        "x_mm": -1.2,
+        "y_mm": -1.8933
+      }
+    ],
+    "side_copper_paste_size_mm": [
+      0.7366,
+      0.2286
+    ],
+    "side_mask_opening_size_mm": [
+      0.8382,
+      0.2794
+    ],
+    "top_bottom_copper_paste_size_mm": [
+      0.2286,
+      0.7366
+    ],
+    "top_bottom_mask_opening_size_mm": [
+      0.2794,
+      0.8382
+    ]
+  },
+  "center_region_review": {
+    "center_exposed_pad_present": false,
+    "decision": "No center/exposed land is part of the official U1 assembly land pattern.",
+    "top_copper_note": "Several unrelated small copper/via flashes occur inside the 4 x 4 mm body projection, but they are not U1 pin flashes in IPC-356.",
+    "top_paste_center_aperture": false,
+    "top_solder_mask_center_aperture": false
+  },
+  "conclusion": "PASS_EXACT_OFFICIAL_EVAL_LAND_PATTERN",
+  "eval_u1_coordinate_frame": {
+    "center_x_mm": -32.5,
+    "center_y_mm": -6,
+    "perimeter_pad_center_offset_mm": 1.8933,
+    "pitch_mm": 0.4
+  },
+  "eval_u1_ipc356_records": [
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "DVDD",
+      "pin": 1,
+      "raw": "327DVDD             U1    -1          A01X-030607Y-007200X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -30.607,
+      "y_mm": -7.2
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "VLOGIC",
+      "pin": 2,
+      "raw": "327VLOGIC           U1    -2          A01X-030607Y-006800X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -30.607,
+      "y_mm": -6.8
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "SPI_/CS",
+      "pin": 3,
+      "raw": "327SPI_/CS          U1    -3          A01X-030607Y-006400X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -30.607,
+      "y_mm": -6.4
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "SPI_SCLK",
+      "pin": 4,
+      "raw": "327SPI_SCLK         U1    -4          A01X-030607Y-006000X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -30.607,
+      "y_mm": -6
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "SPI_SDIO0",
+      "pin": 5,
+      "raw": "327SPI_SDIO0        U1    -5          A01X-030607Y-005600X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -30.607,
+      "y_mm": -5.6
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "SPI_SDIO1",
+      "pin": 6,
+      "raw": "327SPI_SDIO1        U1    -6          A01X-030607Y-005200X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -30.607,
+      "y_mm": -5.2
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "LDAC",
+      "pin": 7,
+      "raw": "327LDAC             U1    -7          A01X-030607Y-004800X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -30.607,
+      "y_mm": -4.8
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "RESET",
+      "pin": 8,
+      "raw": "327RESET            U1    -8          A01X-031300Y-004107X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -31.3,
+      "y_mm": -4.107
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "ALERT",
+      "pin": 9,
+      "raw": "327ALERT            U1    -9          A01X-031700Y-004107X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -31.7,
+      "y_mm": -4.107
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "GND_SIGNAL",
+      "pin": 10,
+      "raw": "327GND_SIGNAL       U1    -10         A01X-032100Y-004107X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -32.1,
+      "y_mm": -4.107
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "CAP1",
+      "pin": 11,
+      "raw": "327CAP1             U1    -11         A01X-032500Y-004107X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -32.5,
+      "y_mm": -4.107
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "VOUT1",
+      "pin": 12,
+      "raw": "327VOUT1            U1    -12  M      A01X-032900Y-004107X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -32.9,
+      "y_mm": -4.107
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "RFB1_CH1",
+      "pin": 13,
+      "raw": "327RFB1_CH1         U1    -13         A01X-033300Y-004107X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -33.3,
+      "y_mm": -4.107
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "RFB2_CH1",
+      "pin": 14,
+      "raw": "327RFB2_CH1         U1    -14         A01X-033700Y-004107X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -33.7,
+      "y_mm": -4.107
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "VOUT1",
+      "pin": 15,
+      "raw": "327VOUT1            U1    -15         A01X-034393Y-004800X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -34.393,
+      "y_mm": -4.8
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "PVDD",
+      "pin": 16,
+      "raw": "327PVDD             U1    -16         A01X-034393Y-005200X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -34.393,
+      "y_mm": -5.2
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "VDD",
+      "pin": 17,
+      "raw": "327VDD              U1    -17         A01X-034393Y-005600X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -34.393,
+      "y_mm": -5.6
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "VREF",
+      "pin": 18,
+      "raw": "327VREF             U1    -18         A01X-034393Y-006000X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -34.393,
+      "y_mm": -6
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "m0007",
+      "pin": 19,
+      "raw": "327m0007            U1    -19         A01X-034393Y-006400X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -34.393,
+      "y_mm": -6.4
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "VOUT0",
+      "pin": 20,
+      "raw": "327VOUT0            U1    -20         A01X-034393Y-006800X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -34.393,
+      "y_mm": -6.8
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "VOUT0",
+      "pin": 21,
+      "raw": "327VOUT0            U1    -21         A01X-034393Y-007200X0229Y0737R270 S1",
+      "rotation_deg": 270,
+      "x_mm": -34.393,
+      "y_mm": -7.2
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "RFB2_CH0",
+      "pin": 22,
+      "raw": "327RFB2_CH0         U1    -22         A01X-033700Y-007893X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -33.7,
+      "y_mm": -7.893
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "RFB1_CH0",
+      "pin": 23,
+      "raw": "327RFB1_CH0         U1    -23         A01X-033300Y-007893X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -33.3,
+      "y_mm": -7.893
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "CAP0",
+      "pin": 24,
+      "raw": "327CAP0             U1    -24         A01X-032900Y-007893X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -32.9,
+      "y_mm": -7.893
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "PVSS",
+      "pin": 25,
+      "raw": "327PVSS             U1    -25         A01X-032500Y-007893X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -32.5,
+      "y_mm": -7.893
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "GND_SIGNAL",
+      "pin": 26,
+      "raw": "327GND_SIGNAL       U1    -26         A01X-032100Y-007893X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -32.1,
+      "y_mm": -7.893
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "GND_SIGNAL",
+      "pin": 27,
+      "raw": "327GND_SIGNAL       U1    -27  M      A01X-031700Y-007893X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -31.7,
+      "y_mm": -7.893
+    },
+    {
+      "ipc_feature_x_mm": 0.229,
+      "ipc_feature_y_mm": 0.737,
+      "net": "N/C",
+      "pin": 28,
+      "raw": "327N/C              U1    -28         A01X-031300Y-007893X0229Y0737R180 S1",
+      "rotation_deg": 180,
+      "x_mm": -31.3,
+      "y_mm": -7.893
+    }
+  ],
+  "gerber_apertures": {
+    "L1_TOP.art": {
+      "side": {
+        "code": "D40",
+        "shape": "obround",
+        "x_mm": 0.7366,
+        "y_mm": 0.2286
+      },
+      "top_bottom": {
+        "code": "D38",
+        "shape": "obround",
+        "x_mm": 0.2286,
+        "y_mm": 0.7366
+      }
+    },
+    "PMT.art": {
+      "side": {
+        "code": "D31",
+        "shape": "obround",
+        "x_mm": 0.7366,
+        "y_mm": 0.2286
+      },
+      "top_bottom": {
+        "code": "D29",
+        "shape": "obround",
+        "x_mm": 0.2286,
+        "y_mm": 0.7366
+      }
+    },
+    "SMT.art": {
+      "side": {
+        "code": "D39",
+        "shape": "obround",
+        "x_mm": 0.8382,
+        "y_mm": 0.2794
+      },
+      "top_bottom": {
+        "code": "D37",
+        "shape": "obround",
+        "x_mm": 0.2794,
+        "y_mm": 0.8382
+      }
+    }
+  },
+  "gerber_members": {
+    "fab_drawing": {
+      "path": "fab/09-050892-01-c.pdf",
+      "sha256": "f064e7f6145e03adcc9a4da9d0993e81214085485563855cdf4ecef82f729fa3"
+    },
+    "ipc356": {
+      "path": "fab/08-050892c-ipc356.ipc",
+      "sha256": "a49a303ec88df607d4ee274ed38fca04365ef6f17ed142f30a5c63ee93fe82ac"
+    },
+    "top_copper": {
+      "path": "fab/L1_TOP.art",
+      "sha256": "0532c246d68346eb38b9458bccc966bb6b14d4fc77575acdb8c55f3a2226a2f5"
+    },
+    "top_paste": {
+      "path": "fab/PMT.art",
+      "sha256": "35bc764741a78a7482bd1733ddddb85357533c4ff886179bcb9cccd629d5fc83"
+    },
+    "top_solder_mask": {
+      "path": "fab/SMT.art",
+      "sha256": "811a289f8c01471350f20f0fb68e0e4606b5ad2d1d46f3a22249c02867390825"
+    }
+  },
+  "gerber_u1_flashes": {
+    "L1_TOP.art": [
+      {
+        "aperture": "D40",
+        "pin": 1,
+        "raw": "X-3060670Y-720000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -7.2
+      },
+      {
+        "aperture": "D40",
+        "pin": 2,
+        "raw": "Y-680000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -6.8
+      },
+      {
+        "aperture": "D40",
+        "pin": 3,
+        "raw": "Y-640000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -6.4
+      },
+      {
+        "aperture": "D40",
+        "pin": 4,
+        "raw": "Y-600000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -6
+      },
+      {
+        "aperture": "D40",
+        "pin": 5,
+        "raw": "Y-560000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -5.6
+      },
+      {
+        "aperture": "D40",
+        "pin": 6,
+        "raw": "Y-520000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -5.2
+      },
+      {
+        "aperture": "D40",
+        "pin": 7,
+        "raw": "X-3060670Y-480000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -4.8
+      },
+      {
+        "aperture": "D38",
+        "pin": 8,
+        "raw": "Y-410670D03*",
+        "x_mm": -31.3,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D38",
+        "pin": 9,
+        "raw": "X-3170000D03*",
+        "x_mm": -31.7,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D38",
+        "pin": 10,
+        "raw": "X-3210000D03*",
+        "x_mm": -32.1,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D38",
+        "pin": 11,
+        "raw": "X-3250000D03*",
+        "x_mm": -32.5,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D38",
+        "pin": 12,
+        "raw": "X-3290000Y-410670D03*",
+        "x_mm": -32.9,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D38",
+        "pin": 13,
+        "raw": "X-3330000D03*",
+        "x_mm": -33.3,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D38",
+        "pin": 14,
+        "raw": "X-3370000Y-410670D03*",
+        "x_mm": -33.7,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D40",
+        "pin": 15,
+        "raw": "Y-480000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -4.8
+      },
+      {
+        "aperture": "D40",
+        "pin": 16,
+        "raw": "Y-520000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -5.2
+      },
+      {
+        "aperture": "D40",
+        "pin": 17,
+        "raw": "Y-560000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -5.6
+      },
+      {
+        "aperture": "D40",
+        "pin": 18,
+        "raw": "Y-600000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -6
+      },
+      {
+        "aperture": "D40",
+        "pin": 19,
+        "raw": "Y-640000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -6.4
+      },
+      {
+        "aperture": "D40",
+        "pin": 20,
+        "raw": "Y-680000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -6.8
+      },
+      {
+        "aperture": "D40",
+        "pin": 21,
+        "raw": "X-3439330Y-720000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -7.2
+      },
+      {
+        "aperture": "D38",
+        "pin": 22,
+        "raw": "X-3370000Y-789330D03*",
+        "x_mm": -33.7,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D38",
+        "pin": 23,
+        "raw": "X-3330000D03*",
+        "x_mm": -33.3,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D38",
+        "pin": 24,
+        "raw": "X-3290000D03*",
+        "x_mm": -32.9,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D38",
+        "pin": 25,
+        "raw": "X-3250000D03*",
+        "x_mm": -32.5,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D38",
+        "pin": 26,
+        "raw": "X-3210000D03*",
+        "x_mm": -32.1,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D38",
+        "pin": 27,
+        "raw": "X-3170000Y-789330D03*",
+        "x_mm": -31.7,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D38",
+        "pin": 28,
+        "raw": "X-3130000D03*",
+        "x_mm": -31.3,
+        "y_mm": -7.8933
+      }
+    ],
+    "SMT.art": [
+      {
+        "aperture": "D39",
+        "pin": 1,
+        "raw": "X-3060670Y-720000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -7.2
+      },
+      {
+        "aperture": "D39",
+        "pin": 2,
+        "raw": "Y-680000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -6.8
+      },
+      {
+        "aperture": "D39",
+        "pin": 3,
+        "raw": "Y-640000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -6.4
+      },
+      {
+        "aperture": "D39",
+        "pin": 4,
+        "raw": "Y-600000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -6
+      },
+      {
+        "aperture": "D39",
+        "pin": 5,
+        "raw": "Y-560000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -5.6
+      },
+      {
+        "aperture": "D39",
+        "pin": 6,
+        "raw": "Y-520000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -5.2
+      },
+      {
+        "aperture": "D39",
+        "pin": 7,
+        "raw": "X-3060670Y-480000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -4.8
+      },
+      {
+        "aperture": "D37",
+        "pin": 8,
+        "raw": "Y-410670D03*",
+        "x_mm": -31.3,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D37",
+        "pin": 9,
+        "raw": "X-3170000D03*",
+        "x_mm": -31.7,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D37",
+        "pin": 10,
+        "raw": "X-3210000D03*",
+        "x_mm": -32.1,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D37",
+        "pin": 11,
+        "raw": "X-3250000D03*",
+        "x_mm": -32.5,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D37",
+        "pin": 12,
+        "raw": "X-3290000Y-410670D03*",
+        "x_mm": -32.9,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D37",
+        "pin": 13,
+        "raw": "X-3330000D03*",
+        "x_mm": -33.3,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D37",
+        "pin": 14,
+        "raw": "X-3370000Y-410670D03*",
+        "x_mm": -33.7,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D39",
+        "pin": 15,
+        "raw": "Y-480000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -4.8
+      },
+      {
+        "aperture": "D39",
+        "pin": 16,
+        "raw": "Y-520000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -5.2
+      },
+      {
+        "aperture": "D39",
+        "pin": 17,
+        "raw": "Y-560000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -5.6
+      },
+      {
+        "aperture": "D39",
+        "pin": 18,
+        "raw": "Y-600000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -6
+      },
+      {
+        "aperture": "D39",
+        "pin": 19,
+        "raw": "Y-640000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -6.4
+      },
+      {
+        "aperture": "D39",
+        "pin": 20,
+        "raw": "Y-680000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -6.8
+      },
+      {
+        "aperture": "D39",
+        "pin": 21,
+        "raw": "X-3439330Y-720000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -7.2
+      },
+      {
+        "aperture": "D37",
+        "pin": 22,
+        "raw": "X-3370000Y-789330D03*",
+        "x_mm": -33.7,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D37",
+        "pin": 23,
+        "raw": "X-3330000D03*",
+        "x_mm": -33.3,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D37",
+        "pin": 24,
+        "raw": "X-3290000D03*",
+        "x_mm": -32.9,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D37",
+        "pin": 25,
+        "raw": "X-3250000D03*",
+        "x_mm": -32.5,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D37",
+        "pin": 26,
+        "raw": "X-3210000D03*",
+        "x_mm": -32.1,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D37",
+        "pin": 27,
+        "raw": "X-3170000Y-789330D03*",
+        "x_mm": -31.7,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D37",
+        "pin": 28,
+        "raw": "X-3130000D03*",
+        "x_mm": -31.3,
+        "y_mm": -7.8933
+      }
+    ],
+    "PMT.art": [
+      {
+        "aperture": "D31",
+        "pin": 1,
+        "raw": "X-3060670Y-720000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -7.2
+      },
+      {
+        "aperture": "D31",
+        "pin": 2,
+        "raw": "Y-680000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -6.8
+      },
+      {
+        "aperture": "D31",
+        "pin": 3,
+        "raw": "Y-640000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -6.4
+      },
+      {
+        "aperture": "D31",
+        "pin": 4,
+        "raw": "Y-600000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -6
+      },
+      {
+        "aperture": "D31",
+        "pin": 5,
+        "raw": "Y-560000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -5.6
+      },
+      {
+        "aperture": "D31",
+        "pin": 6,
+        "raw": "Y-520000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -5.2
+      },
+      {
+        "aperture": "D31",
+        "pin": 7,
+        "raw": "X-3060670Y-480000D03*",
+        "x_mm": -30.6067,
+        "y_mm": -4.8
+      },
+      {
+        "aperture": "D29",
+        "pin": 8,
+        "raw": "Y-410670D03*",
+        "x_mm": -31.3,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D29",
+        "pin": 9,
+        "raw": "X-3170000D03*",
+        "x_mm": -31.7,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D29",
+        "pin": 10,
+        "raw": "X-3210000D03*",
+        "x_mm": -32.1,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D29",
+        "pin": 11,
+        "raw": "X-3250000D03*",
+        "x_mm": -32.5,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D29",
+        "pin": 12,
+        "raw": "X-3290000Y-410670D03*",
+        "x_mm": -32.9,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D29",
+        "pin": 13,
+        "raw": "X-3330000D03*",
+        "x_mm": -33.3,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D29",
+        "pin": 14,
+        "raw": "X-3370000Y-410670D03*",
+        "x_mm": -33.7,
+        "y_mm": -4.1067
+      },
+      {
+        "aperture": "D31",
+        "pin": 15,
+        "raw": "Y-480000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -4.8
+      },
+      {
+        "aperture": "D31",
+        "pin": 16,
+        "raw": "Y-520000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -5.2
+      },
+      {
+        "aperture": "D31",
+        "pin": 17,
+        "raw": "Y-560000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -5.6
+      },
+      {
+        "aperture": "D31",
+        "pin": 18,
+        "raw": "Y-600000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -6
+      },
+      {
+        "aperture": "D31",
+        "pin": 19,
+        "raw": "Y-640000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -6.4
+      },
+      {
+        "aperture": "D31",
+        "pin": 20,
+        "raw": "Y-680000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -6.8
+      },
+      {
+        "aperture": "D31",
+        "pin": 21,
+        "raw": "X-3439330Y-720000D03*",
+        "x_mm": -34.3933,
+        "y_mm": -7.2
+      },
+      {
+        "aperture": "D29",
+        "pin": 22,
+        "raw": "X-3370000Y-789330D03*",
+        "x_mm": -33.7,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D29",
+        "pin": 23,
+        "raw": "X-3330000D03*",
+        "x_mm": -33.3,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D29",
+        "pin": 24,
+        "raw": "X-3290000D03*",
+        "x_mm": -32.9,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D29",
+        "pin": 25,
+        "raw": "X-3250000D03*",
+        "x_mm": -32.5,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D29",
+        "pin": 26,
+        "raw": "X-3210000D03*",
+        "x_mm": -32.1,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D29",
+        "pin": 27,
+        "raw": "X-3170000Y-789330D03*",
+        "x_mm": -31.7,
+        "y_mm": -7.8933
+      },
+      {
+        "aperture": "D29",
+        "pin": 28,
+        "raw": "X-3130000D03*",
+        "x_mm": -31.3,
+        "y_mm": -7.8933
+      }
+    ]
+  },
+  "package_cross_check": {
+    "basis": [
+      "Rev.C datasheet pin configuration enumerates perimeter pins 1..28 without an exposed-pad terminal",
+      "CP-28-15 bottom-view drawing shows only 28 perimeter terminals and no center pad",
+      "official EVAL board IPC-356 contains exactly U1 pins 1..28",
+      "official EVAL top solder-mask and paste files contain exactly 28 U1 perimeter apertures and no center aperture"
+    ],
+    "body_x_mm": 4,
+    "body_y_mm": 4,
+    "center_exposed_pad": false,
+    "manufacturer": "Analog Devices",
+    "mpn": "AD3542RBCPZ16",
+    "nominal_height_mm": 0.95,
+    "package_option": "CP-28-15",
+    "pin_count": 28,
+    "pitch_mm": 0.4
+  },
+  "reviewed_on": "2026-09-28",
+  "scope": "EVAL-AD3542RFMCZ U1 land pattern used to bind Rev.B U20..U23",
+  "source_artifacts": {
+    "datasheet_rev_c": {
+      "filename": "ad3542r.pdf",
+      "revision": "C",
+      "sha256": "a9536b981e1dc140082ddff947487faaaa47874cd8b648966ee9c6b92fa292fa"
+    },
+    "evaluation_bom": {
+      "distribution": "Analog Devices official EVAL-AD3542R download",
+      "filename": "05-050892-01-d.xlsx",
+      "sha256": "4608d8884754e5768424832af2331fa0490ab90e05a990a1292bf8f7bab0f7df"
+    },
+    "evaluation_gerber_zip": {
+      "distribution": "Analog Devices official EVAL-AD3542R download",
+      "filename": "09-050892-01c.zip",
+      "sha256": "87eee7f3ed85e81798918b1977bc0b416d72699a39c771d95e9ea3839ef461e8"
+    },
+    "evaluation_user_guide": {
+      "filename": "eval-ad3542r-ug-2258.pdf",
+      "revision": "A",
+      "sha256": "ed5afa177bce6c907a3981c71f49cc3964078a6b6ff79ecfd24ae78f6a1093b4"
+    },
+    "package_drawing": {
+      "filename": "cp-28-15.pdf",
+      "package": "CP-28-15",
+      "sha256": "f6aab2aa746e79a01b4d9067bde56c886001a4cb1b7ed83e198d480ab0845b73"
+    }
+  },
+  "schema_version": 1
+}

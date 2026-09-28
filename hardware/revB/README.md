@@ -32,17 +32,24 @@ fixtures only test tooling compatibility and do not establish product compatibil
 ## Physical binding state
 
 `hardware/revB/schematic_open_items.json` is the fail-closed source for unresolved
-blank footprints. It currently contains **9** blockers:
+blank footprints. It currently contains **5** blockers, all mechanical/interface
+contracts:
 
-- U20..U23: exact AD3542RBCPZ16 **CP-28-15** land pattern/vendor CAD;
 - J101: 12 V field connector mechanical/cable contract;
 - SW101: reset switch actuator/mechanical contract;
 - J5: AO connector and DUT cable contract;
 - J501: dry-contact service/interlock connector contract;
 - J701: floating DUT-permit connector, actual DUT voltage/current/leakage/isolation and cable contract.
 
-U101 and L201/L202/L301/L302/L203 already have source-level package/footprint
-bindings. Those bindings do **not** constitute electrical, thermal, magnetic,
+U20..U23 are source-bound to the reviewed
+`Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R` footprint. That footprint is
+traceable to the official EVAL-AD3542RFMCZ BOM, IPC-356 and top copper/mask/paste
+Gerber geometry through `hardware/revB/ad3542r_footprint_evidence.json` and
+`hardware/revB/evidence/ad3542r/u1_geometry_review.json`. The reviewed land pattern
+has 28 perimeter pads at 0.40 mm pitch and no center/exposed pad.
+
+U101 and L201/L202/L301/L302/L203 also have source-level package/footprint
+bindings. None of these bindings constitutes electrical, thermal, magnetic,
 mechanical or production qualification.
 
 Run:
@@ -62,7 +69,7 @@ fail-closed. At this checkpoint `layout_allowed=false`.
 
 Before Layout, the project still requires:
 
-1. exact physical closure of the 9 open package/mechanical items;
+1. exact physical closure of the 5 remaining mechanical/interface items;
 2. power margin, thermal, MLCC and magnetic evidence, including XAL5050 L(I,T),
    AC/core/winding losses, startup/short-circuit saturation and mounted-board
    temperature rise;
