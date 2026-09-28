@@ -10,6 +10,11 @@ ROOT = Path(__file__).resolve().parents[1]
 NATIVE = ROOT / "hardware/kicad/revB/axu2cgb_expansion"
 MANIFEST = ROOT / "hardware/revB/schematic_open_items.json"
 AD3542_EVIDENCE = ROOT / "hardware/revB/ad3542r_footprint_evidence.json"
+AD3542_GEOMETRY = ROOT / "hardware/revB/evidence/ad3542r/u1_geometry_review.json"
+AD3542_FOOTPRINT = (
+    NATIVE
+    / "footprints/Package_DFN_QFN.pretty/AnalogDevices_CP-28-15_AD3542R.kicad_mod"
+)
 
 REF_RE = re.compile(r'\(property "Reference" "([^"]+)"')
 FP_RE = re.compile(r'\(property "Footprint" "([^"]*)"')
@@ -18,6 +23,33 @@ VAL_RE = re.compile(r'\(property "Value" "([^"]*)"')
 
 AD3542_REFS = ("U20", "U21", "U22", "U23")
 MECHANICAL_REFS = ("J101", "SW101", "J5", "J501", "J701")
+AD3542_FOOTPRINT_ID = "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R"
+AD3542_DATASHEET = "https://www.analog.com/media/en/technical-documentation/data-sheets/ad3542r.pdf"
+AD3542_GEOMETRY_REL = "hardware/revB/evidence/ad3542r/u1_geometry_review.json"
+AD3542_EVIDENCE_REL = "hardware/revB/ad3542r_footprint_evidence.json"
+
+SOURCE_HASHES = {
+    "datasheet_rev_c_sha256": "a9536b981e1dc140082ddff947487faaaa47874cd8b648966ee9c6b92fa292fa",
+    "package_drawing_sha256": "f6aab2aa746e79a01b4d9067bde56c886001a4cb1b7ed83e198d480ab0845b73",
+    "evaluation_user_guide_sha256": "ed5afa177bce6c907a3981c71f49cc3964078a6b6ff79ecfd24ae78f6a1093b4",
+    "evaluation_gerber_zip_sha256": "87eee7f3ed85e81798918b1977bc0b416d72699a39c771d95e9ea3839ef461e8",
+    "evaluation_bom_sha256": "4608d8884754e5768424832af2331fa0490ab90e05a990a1292bf8f7bab0f7df",
+}
+
+GERBER_MEMBER_HASHES = {
+    "ipc356": "a49a303ec88df607d4ee274ed38fca04365ef6f17ed142f30a5c63ee93fe82ac",
+    "top_copper": "0532c246d68346eb38b9458bccc966bb6b14d4fc77575acdb8c55f3a2226a2f5",
+    "top_solder_mask": "811a289f8c01471350f20f0fb68e0e4606b5ad2d1d46f3a22249c02867390825",
+    "top_paste": "35bc764741a78a7482bd1733ddddb85357533c4ff886179bcb9cccd629d5fc83",
+    "fab_drawing": "f064e7f6145e03adcc9a4da9d0993e81214085485563855cdf4ecef82f729fa3",
+}
+
+PAD_RE = re.compile(
+    r'\(pad\s+(?:"([^"]*)"|([^\s]+))\s+smd\s+oval\s+'
+    r'\(at\s+([-+0-9.]+)\s+([-+0-9.]+)\)\s+'
+    r'\(size\s+([-+0-9.]+)\s+([-+0-9.]+)\)\s+'
+    r'\(layers\s+([^)]+)\)\)'
+)
 
 
 def _field(rx, line, default=""):
@@ -73,96 +105,248 @@ def _resolve_requirement(requirements, ref, stack=()):
     return merged
 
 
-
-def _optional_sha256(value, name):
-    if value is None:
-        return
-    if not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value):
-        raise ValueError(name + " must be null or lowercase SHA-256")
+def _close(a, b, tol=1e-6):
+    return abs(float(a) - float(b)) <= tol
 
 
-def _check_ad3542_evidence(req):
-    expected_rel = "hardware/revB/ad3542r_footprint_evidence.json"
-    if req.get("evidence_manifest") != expected_rel:
-        raise ValueError("AD3542R binding must point to official footprint evidence manifest")
-    data = json.loads(AD3542_EVIDENCE.read_text(encoding="utf-8"))
+def _expected_pad(pin):
+    if 1 <= pin <= 7:
+        return (-1.8933, -1.2 + (pin - 1) * 0.4, 0.7366, 0.2286, 0.8382, 0.2794)
+    if 8 <= pin <= 14:
+        return (-1.2 + (pin - 8) * 0.4, 1.8933, 0.2286, 0.7366, 0.2794, 0.8382)
+    if 15 <= pin <= 21:
+        return (1.8933, 1.2 - (pin - 15) * 0.4, 0.7366, 0.2286, 0.8382, 0.2794)
+    if 22 <= pin <= 28:
+        return (1.2 - (pin - 22) * 0.4, -1.8933, 0.2286, 0.7366, 0.2794, 0.8382)
+    raise ValueError("unexpected AD3542R pin")
+
+
+def _check_geometry_evidence():
+    data = json.loads(AD3542_GEOMETRY.read_text(encoding="utf-8"))
     if data.get("schema_version") != 1:
+        raise ValueError("unsupported AD3542R geometry evidence schema")
+    if data.get("conclusion") != "PASS_EXACT_OFFICIAL_EVAL_LAND_PATTERN":
+        raise ValueError("AD3542R geometry evidence must be explicitly reviewed")
+
+    sources = data.get("source_artifacts", {})
+    source_map = {
+        "datasheet_rev_c_sha256": ("datasheet_rev_c", "sha256"),
+        "package_drawing_sha256": ("package_drawing", "sha256"),
+        "evaluation_user_guide_sha256": ("evaluation_user_guide", "sha256"),
+        "evaluation_gerber_zip_sha256": ("evaluation_gerber_zip", "sha256"),
+        "evaluation_bom_sha256": ("evaluation_bom", "sha256"),
+    }
+    for key, expected in SOURCE_HASHES.items():
+        section, field = source_map[key]
+        if sources.get(section, {}).get(field) != expected:
+            raise ValueError("AD3542R source artifact hash drift: " + key)
+
+    members = data.get("gerber_members", {})
+    for key, expected in GERBER_MEMBER_HASHES.items():
+        if members.get(key, {}).get("sha256") != expected:
+            raise ValueError("AD3542R Gerber member hash drift: " + key)
+
+    bom = data.get("bom_u1", {})
+    if (
+        bom.get("location") != "U1"
+        or bom.get("manufacturer") != "ANALOG DEVICES"
+        or bom.get("manufacturer_part_number") != "AD3542RBCPZ16"
+        or bom.get("jedec_type") != "QFN28_4X4"
+    ):
+        raise ValueError("AD3542R official BOM U1 identity drift")
+
+    pkg = data.get("package_cross_check", {})
+    expected_pkg = {
+        "manufacturer": "Analog Devices",
+        "mpn": "AD3542RBCPZ16",
+        "package_option": "CP-28-15",
+        "pin_count": 28,
+        "pitch_mm": 0.4,
+        "center_exposed_pad": False,
+    }
+    for key, expected in expected_pkg.items():
+        if pkg.get(key) != expected:
+            raise ValueError("AD3542R package cross-check drift: " + key)
+
+    ipc = data.get("eval_u1_ipc356_records", [])
+    if len(ipc) != 28 or {x.get("pin") for x in ipc} != set(range(1, 29)):
+        raise ValueError("AD3542R IPC-356 must contain exactly pins 1..28")
+
+    apertures = data.get("gerber_apertures", {})
+    expected_apertures = {
+        "L1_TOP.art": ((0.7366, 0.2286), (0.2286, 0.7366)),
+        "PMT.art": ((0.7366, 0.2286), (0.2286, 0.7366)),
+        "SMT.art": ((0.8382, 0.2794), (0.2794, 0.8382)),
+    }
+    for layer, (side, top_bottom) in expected_apertures.items():
+        got = apertures.get(layer, {})
+        for group, expected in (("side", side), ("top_bottom", top_bottom)):
+            entry = got.get(group, {})
+            if entry.get("shape") != "obround":
+                raise ValueError(f"AD3542R {layer} {group} aperture must remain obround")
+            if not _close(entry.get("x_mm", -1), expected[0]) or not _close(
+                entry.get("y_mm", -1), expected[1]
+            ):
+                raise ValueError(f"AD3542R {layer} {group} aperture geometry drift")
+
+    flashes = data.get("gerber_u1_flashes", {})
+    for layer in ("L1_TOP.art", "SMT.art", "PMT.art"):
+        rows = flashes.get(layer, [])
+        if len(rows) != 28 or {x.get("pin") for x in rows} != set(range(1, 29)):
+            raise ValueError("AD3542R " + layer + " must retain exactly 28 U1 flashes")
+
+    center = data.get("center_region_review", {})
+    if center.get("center_exposed_pad_present") is not False:
+        raise ValueError("AD3542R center/exposed pad must remain absent")
+    if center.get("top_solder_mask_center_aperture") is not False:
+        raise ValueError("AD3542R center solder-mask aperture must remain absent")
+    if center.get("top_paste_center_aperture") is not False:
+        raise ValueError("AD3542R center paste aperture must remain absent")
+
+    canonical = data.get("canonical_kicad_land_pattern", {})
+    if canonical.get("footprint") != AD3542_FOOTPRINT_ID:
+        raise ValueError("AD3542R canonical footprint identity drift")
+    if canonical.get("center_pad_present") is not False:
+        raise ValueError("AD3542R canonical footprint must not add a center pad")
+    pads = canonical.get("pads", [])
+    if len(pads) != 28 or {x.get("pin") for x in pads} != set(range(1, 29)):
+        raise ValueError("AD3542R canonical geometry must contain 28 pads")
+    for row in pads:
+        pin = row["pin"]
+        ex, ey, _, _, _, _ = _expected_pad(pin)
+        if not _close(row.get("x_mm"), ex) or not _close(row.get("y_mm"), ey):
+            raise ValueError("AD3542R canonical pin coordinate drift: " + str(pin))
+
+    policy = data.get("archive_policy", {})
+    if policy.get("raw_binary_files_committed_to_repository") is not False:
+        raise ValueError("AD3542R evidence policy unexpectedly claims binary redistribution")
+    if "SHA-256" not in str(policy.get("audit_record", "")):
+        raise ValueError("AD3542R evidence must retain hash-bound audit record")
+    return data
+
+
+def _check_footprint_geometry():
+    text = AD3542_FOOTPRINT.read_text(encoding="utf-8")
+    numbered = {}
+    mask = []
+    for m in PAD_RE.finditer(text):
+        number = m.group(1) if m.group(1) is not None else m.group(2)
+        row = {
+            "x": float(m.group(3)),
+            "y": float(m.group(4)),
+            "sx": float(m.group(5)),
+            "sy": float(m.group(6)),
+            "layers": tuple(m.group(7).replace('"', "").split()),
+        }
+        if number == "":
+            mask.append(row)
+        else:
+            try:
+                pin = int(number)
+            except ValueError as exc:
+                raise ValueError("AD3542R footprint has nonnumeric electrical pad") from exc
+            if pin in numbered:
+                raise ValueError("AD3542R footprint has duplicate electrical pad " + str(pin))
+            numbered[pin] = row
+
+    if set(numbered) != set(range(1, 29)):
+        raise ValueError("AD3542R footprint electrical pad set must be exactly 1..28")
+    if len(mask) != 28:
+        raise ValueError("AD3542R footprint must contain exactly 28 explicit mask apertures")
+
+    for pin, row in numbered.items():
+        ex, ey, esx, esy, _, _ = _expected_pad(pin)
+        if row["layers"] != ("F.Cu", "F.Paste"):
+            raise ValueError("AD3542R electrical pads must use exact copper/paste layers")
+        for got, expected, field in (
+            (row["x"], ex, "x"),
+            (row["y"], ey, "y"),
+            (row["sx"], esx, "size-x"),
+            (row["sy"], esy, "size-y"),
+        ):
+            if not _close(got, expected):
+                raise ValueError(f"AD3542R footprint pin {pin} {field} drift")
+
+    expected_mask = []
+    for pin in range(1, 29):
+        ex, ey, _, _, msx, msy = _expected_pad(pin)
+        expected_mask.append((ex, ey, msx, msy))
+    unmatched = list(mask)
+    for expected in expected_mask:
+        hit = None
+        for i, row in enumerate(unmatched):
+            if row["layers"] != ("F.Mask",):
+                continue
+            if all(
+                _close(got, want)
+                for got, want in zip(
+                    (row["x"], row["y"], row["sx"], row["sy"]), expected
+                )
+            ):
+                hit = i
+                break
+        if hit is None:
+            raise ValueError("AD3542R footprint missing exact official solder-mask aperture")
+        unmatched.pop(hit)
+    if unmatched:
+        raise ValueError("AD3542R footprint contains unexpected solder-mask aperture")
+    return {"electrical_pad_count": 28, "mask_aperture_count": 28}
+
+
+def _check_ad3542_evidence():
+    data = json.loads(AD3542_EVIDENCE.read_text(encoding="utf-8"))
+    if data.get("schema_version") != 2:
         raise ValueError("unsupported AD3542R footprint evidence schema")
-    if data.get("release_effect") != "BLOCKER_REMAINS_OPEN":
-        raise ValueError("AD3542R evidence must not silently close the blocker")
-    if data.get("status") != "OFFICIAL_SOURCES_LOCATED_GERBER_AND_CAD_BYTES_NOT_ARCHIVED":
-        raise ValueError("AD3542R evidence status drift")
+    if data.get("status") != "REVIEWED_OFFICIAL_EVAL_GERBER_FOOTPRINT_VENDORED":
+        raise ValueError("AD3542R footprint evidence is not in reviewed state")
+    if data.get("release_effect") != "U20_U23_PACKAGE_BLOCKERS_CLOSED_LAYOUT_STILL_BLOCKED":
+        raise ValueError("AD3542R evidence must not authorize Layout")
 
     part = data.get("part", {})
-    expected = {
+    expected_part = {
         "manufacturer": "Analog Devices",
         "mpn": "AD3542RBCPZ16",
         "package_option": "CP-28-15",
         "pin_count": 28,
         "lead_pitch_mm": 0.4,
     }
-    for key, value in expected.items():
-        if part.get(key) != value:
-            raise ValueError(f"AD3542R evidence part.{key} drift")
-    if "4 mm x 4 mm" not in str(part.get("package_description", "")):
-        raise ValueError("AD3542R evidence must retain 4 mm x 4 mm package identity")
+    for key, expected in expected_part.items():
+        if part.get(key) != expected:
+            raise ValueError("AD3542R evidence part identity drift: " + key)
 
-    sources = data.get("official_sources", {})
-    gerber = sources.get("evaluation_gerber_zip", "")
-    schematic = sources.get("evaluation_schematic", "")
-    bom = sources.get("evaluation_bom", "")
-    if not isinstance(gerber, str) or not gerber.endswith("/09-050892-01c.zip"):
-        raise ValueError("AD3542R official EVAL Gerber source drift")
-    if not isinstance(schematic, str) or not schematic.endswith("/02_050892d_top.pdf"):
-        raise ValueError("AD3542R official EVAL schematic source drift")
-    if not isinstance(bom, str) or not bom.endswith("/05-050892-01-d.xlsx"):
-        raise ValueError("AD3542R official EVAL BOM source drift")
-    doc = sources.get("adi_documentation_source", {})
-    if doc.get("repository") != "analogdevicesinc/system-level":
-        raise ValueError("AD3542R ADI documentation repository drift")
-    if doc.get("commit") != "76eb29d83e6eaca9ce4470921d315938b2b1aa17":
-        raise ValueError("AD3542R ADI documentation commit drift")
-    if doc.get("path") != "docs/solutions/reference-designs/eval-ad35xxr/user-guide.rst":
-        raise ValueError("AD3542R ADI documentation path drift")
-    if doc.get("blob_sha") != "6327c05006caf900728a31445a3c4fdf3d31253a":
-        raise ValueError("AD3542R ADI documentation blob drift")
+    if data.get("geometry_evidence") != AD3542_GEOMETRY_REL:
+        raise ValueError("AD3542R evidence must bind the source geometry transcript")
+    source_hashes = data.get("source_artifact_hashes", {})
+    for key, expected in SOURCE_HASHES.items():
+        if source_hashes.get(key) != expected:
+            raise ValueError("AD3542R evidence source hash drift: " + key)
+
+    footprint = data.get("footprint", {})
+    if footprint.get("library_id") != AD3542_FOOTPRINT_ID:
+        raise ValueError("AD3542R evidence footprint id drift")
+    expected_path = str(AD3542_FOOTPRINT.relative_to(ROOT)).replace("\\", "/")
+    if footprint.get("path") != expected_path:
+        raise ValueError("AD3542R evidence footprint path drift")
+    if footprint.get("center_exposed_pad") is not False:
+        raise ValueError("AD3542R evidence must retain no-center-pad decision")
 
     exposed = data.get("exposed_pad_review", {})
-    if exposed.get("status") != "UNRESOLVED_REQUIRES_CURRENT_CAD_OR_GERBER":
-        raise ValueError("AD3542R exposed/center-pad decision must remain unresolved")
-    resolution = _nonempty_string_list(
-        exposed.get("required_resolution"),
-        "AD3542R exposed_pad_review.required_resolution",
-        minimum=4,
-    )
-    joined = " ".join(resolution).lower()
-    for term in ("cad", "gerber", "center pad", "electrical"):
-        if term not in joined:
-            raise ValueError("AD3542R exposed-pad resolution lost required term: " + term)
-
-    artifacts = data.get("retrieved_artifacts", {})
-    for key, value in artifacts.items():
-        _optional_sha256(value, "AD3542R retrieved_artifacts." + key)
-    if artifacts.get("evaluation_gerber_zip_sha256") is not None:
-        raise ValueError("AD3542R status says Gerber bytes are not archived")
-    if artifacts.get("ultra_librarian_archive_sha256") is not None:
-        raise ValueError("AD3542R status says exact CAD bytes are not archived")
-    if artifacts.get("samacsys_archive_sha256") is not None:
-        raise ValueError("AD3542R status says exact CAD bytes are not archived")
+    if exposed.get("status") != "RESOLVED_NO_CENTER_EXPOSED_PAD_CURRENT_SOURCES":
+        raise ValueError("AD3542R exposed-pad decision is not resolved")
+    if "Do not add" not in str(exposed.get("decision", "")):
+        raise ValueError("AD3542R exposed-pad decision must be explicit")
 
     geometry = data.get("geometry_review", {})
-    if geometry.get("status") != "NOT_RUN_BYTES_NOT_ARCHIVED":
-        raise ValueError("AD3542R geometry review must remain NOT_RUN until bytes are archived")
-    if geometry.get("center_pad_present") is not None:
-        raise ValueError("AD3542R center-pad geometry must not be guessed")
+    if geometry.get("status") != "PASS_OFFICIAL_EVAL_GERBER":
+        raise ValueError("AD3542R geometry review is not PASS_OFFICIAL_EVAL_GERBER")
+    if geometry.get("pad_count") != 28 or geometry.get("center_pad_present") is not False:
+        raise ValueError("AD3542R reviewed geometry identity drift")
+    if not _close(geometry.get("pitch_mm", -1), 0.4):
+        raise ValueError("AD3542R reviewed pitch drift")
 
-    criteria = _nonempty_string_list(data.get("close_criteria"), "AD3542R close_criteria", minimum=8)
-    criteria_text = " ".join(criteria).lower()
-    for term in ("gerber", "pin-1", "0.40", "center-pad", "kicad", "erc"):
-        if term not in criteria_text:
-            raise ValueError("AD3542R close criteria lost required term: " + term)
-
-    return data
+    transcript = _check_geometry_evidence()
+    fp = _check_footprint_geometry()
+    return data, transcript, fp
 
 
 def _check_binding_requirements(manifest, by_ref, allowed):
@@ -174,49 +358,15 @@ def _check_binding_requirements(manifest, by_ref, allowed):
             "binding requirement set changed: missing=%s unexpected=%s"
             % (sorted(allowed - set(requirements)), sorted(set(requirements) - allowed))
         )
+    if set(AD3542_REFS) & allowed:
+        raise ValueError("resolved AD3542R package bindings must not remain open blockers")
 
     resolved = {ref: _resolve_requirement(requirements, ref) for ref in sorted(allowed)}
-    ad3542_evidence = _check_ad3542_evidence(resolved["U20"])
-
-    for ref in AD3542_REFS:
-        req = resolved[ref]
-        row = by_ref.get(ref)
-        if not row:
-            raise ValueError("missing AD3542R instance " + ref)
-        expected = {
-            "kind": "exact_land_pattern",
-            "status": "OPEN_VENDOR_LAND_PATTERN_NOT_VENDORED",
-            "manufacturer": "Analog Devices",
-            "mpn": "AD3542RBCPZ16",
-            "package_option": "CP-28-15",
-        }
-        for key, value in expected.items():
-            if req.get(key) != value:
-                raise ValueError(f"{ref}.{key} drift: {req.get(key)!r} != {value!r}")
-        if row["footprint"]:
-            raise ValueError(ref + " must remain blank until exact reviewed land pattern is vendored")
-        if req.get("datasheet_url") != row["datasheet"]:
-            raise ValueError(ref + " binding datasheet must exactly match native schematic")
-        package_url = req.get("package_drawing_url", "")
-        if not isinstance(package_url, str) or "cp-28-15" not in package_url.lower():
-            raise ValueError(ref + " must bind the CP-28-15 package drawing source")
-        if "4 mm x 4 mm" not in str(req.get("package_description", "")):
-            raise ValueError(ref + " must retain the reviewed 4 mm x 4 mm package identity")
-        _nonempty_string_list(req.get("cad_sources"), ref + ".cad_sources", minimum=1)
-        evidence = _nonempty_string_list(
-            req.get("required_evidence"), ref + ".required_evidence", minimum=4
-        )
-        if not any("independent" in x.lower() for x in evidence):
-            raise ValueError(ref + " requires an independent land-pattern check")
-        reason = manifest["open_footprints"].get(ref, "")
-        if "CP-28-15" not in reason or "land pattern" not in reason.lower():
-            raise ValueError(ref + " must retain the exact CP-28-15 land-pattern blocker")
-
     for ref in MECHANICAL_REFS:
-        req = resolved[ref]
+        req = resolved.get(ref)
         row = by_ref.get(ref)
-        if not row:
-            raise ValueError("missing mechanical instance " + ref)
+        if req is None or not row:
+            raise ValueError("missing mechanical blocker " + ref)
         if req.get("kind") != "mechanical_selection":
             raise ValueError(ref + " must remain a mechanical_selection blocker")
         if req.get("status") != "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED":
@@ -235,18 +385,57 @@ def _check_binding_requirements(manifest, by_ref, allowed):
     for term in ("dut", "leakage", "isolation", "cable"):
         if term not in required_terms:
             raise ValueError("J701 physical contract must retain " + term + " requirement")
+    return resolved
 
-    return resolved, ad3542_evidence
+
+def _check_resolved_ad3542(manifest, by_ref):
+    bindings = manifest.get("resolved_bindings")
+    if not isinstance(bindings, dict) or set(bindings) != set(AD3542_REFS):
+        raise ValueError("resolved_bindings must contain exactly U20..U23")
+    resolved = {ref: _resolve_requirement(bindings, ref) for ref in AD3542_REFS}
+
+    for ref in AD3542_REFS:
+        req = resolved[ref]
+        expected = {
+            "kind": "exact_land_pattern",
+            "status": "RESOLVED_REVIEWED_OFFICIAL_EVAL_LAND_PATTERN",
+            "manufacturer": "Analog Devices",
+            "mpn": "AD3542RBCPZ16",
+            "package_option": "CP-28-15",
+            "footprint": AD3542_FOOTPRINT_ID,
+            "evidence_manifest": AD3542_EVIDENCE_REL,
+            "geometry_evidence": AD3542_GEOMETRY_REL,
+        }
+        for key, value in expected.items():
+            if req.get(key) != value:
+                raise ValueError(f"{ref} resolved binding drift: {key}")
+        row = by_ref.get(ref)
+        if not row:
+            raise ValueError("missing resolved AD3542R instance " + ref)
+        if row["value"] != "AD3542RBCPZ16":
+            raise ValueError(ref + " must use exact AD3542RBCPZ16 value")
+        if row["footprint"] != AD3542_FOOTPRINT_ID:
+            raise ValueError(ref + " must bind the reviewed CP-28-15 footprint")
+        if row["datasheet"] != AD3542_DATASHEET:
+            raise ValueError(ref + " datasheet binding drift")
+        if manifest.get("bound_packages", {}).get(ref) != AD3542_FOOTPRINT_ID:
+            raise ValueError(ref + " bound_packages entry drift")
+        if ref in manifest.get("open_footprints", {}):
+            raise ValueError(ref + " cannot be both resolved and open")
+
+    evidence, transcript, fp = _check_ad3542_evidence()
+    return resolved, evidence, transcript, fp
 
 
 def check():
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("schema_version") != 2:
+    if manifest.get("schema_version") != 3:
         raise ValueError("unsupported schematic-open-items schema")
     if manifest.get("layout_allowed") is not False:
         raise ValueError("schematic closure manifest must not authorize Layout")
-    if not isinstance(manifest.get("close_policy"), str) or "insufficient" not in manifest["close_policy"]:
-        raise ValueError("close_policy must explicitly prevent evidence-free blocker closure")
+    close_policy = manifest.get("close_policy", "")
+    if not isinstance(close_policy, str) or "insufficient" not in close_policy or "source-bound" not in close_policy:
+        raise ValueError("close_policy must prevent evidence-free closure and retain source binding")
 
     rows = placed_symbols()
     by_ref = {r["reference"]: r for r in rows}
@@ -291,22 +480,22 @@ def check():
         if not local.is_file():
             raise ValueError("missing locally vendored footprint for %s: %s" % (ref, local))
 
-    resolved, ad3542_evidence = _check_binding_requirements(manifest, by_ref, allowed)
+    mechanical = _check_binding_requirements(manifest, by_ref, allowed)
+    ad_bindings, ad_evidence, transcript, fp = _check_resolved_ad3542(manifest, by_ref)
 
     return {
         "status": "PASS_SOURCE_CLOSURE_CONTRACT",
         "physical_components": len(physical),
         "blank_footprints": sorted(missing),
         "blank_footprint_count": len(missing),
-        "binding_requirement_count": len(resolved),
-        "land_pattern_blockers": sorted(
-            ref for ref, req in resolved.items() if req["kind"] == "exact_land_pattern"
-        ),
-        "mechanical_blockers": sorted(
-            ref for ref, req in resolved.items() if req["kind"] == "mechanical_selection"
-        ),
-        "ad3542r_footprint_evidence_status": ad3542_evidence["status"],
-        "ad3542r_exposed_pad_status": ad3542_evidence["exposed_pad_review"]["status"],
+        "binding_requirement_count": len(mechanical),
+        "land_pattern_blockers": [],
+        "resolved_land_patterns": sorted(ad_bindings),
+        "mechanical_blockers": sorted(mechanical),
+        "ad3542r_footprint_evidence_status": ad_evidence["status"],
+        "ad3542r_geometry_conclusion": transcript["conclusion"],
+        "ad3542r_electrical_pad_count": fp["electrical_pad_count"],
+        "ad3542r_mask_aperture_count": fp["mask_aperture_count"],
         "layout_allowed": False,
     }
 
