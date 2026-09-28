@@ -11,6 +11,7 @@ import csv
 from datetime import date
 import hashlib
 import json
+import re
 from pathlib import Path
 import shutil
 import sys
@@ -91,6 +92,14 @@ def validate_run(run_dir: str | Path, root: str | Path = ROOT) -> dict[str, Any]
         raise ValueError("run_identity vivado_version missing")
     if not ident.get("source_commit") or ident["source_commit"] == "UNBOUND":
         raise ValueError("run_identity source_commit must be bound")
+    digest = ident.get("source_digest")
+    if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+        raise ValueError("run_identity source_digest must be a bound lowercase SHA-256")
+
+    from revb import source_digest
+    current_digest = source_digest(root)
+    if digest != current_digest:
+        raise ValueError("Vivado raw run source_digest is stale for current source")
 
     summary = json.loads((run_dir / "drc_summary.json").read_text(encoding="utf-8"))
     if not isinstance(summary, dict) or summary.get("schema_version") != 1:
@@ -129,6 +138,7 @@ def validate_run(run_dir: str | Path, root: str | Path = ROOT) -> dict[str, Any]
         "gate": GATE,
         "carrier": CARRIER,
         "source_commit": ident["source_commit"],
+        "source_digest": digest,
         "vivado_version": ident["vivado_version"],
         "target_part": PART,
         "top_module": TOP,
@@ -203,8 +213,6 @@ def prepare(
     manifest_path = output_dir / "raw_manifest.json"
     manifest_path.write_text(json.dumps(raw_manifest, indent=2) + "\n", encoding="utf-8")
 
-    from revb import source_digest
-
     source_files = [
         "hardware/revB/io_contract.json",
         "hardware/carriers/axu2cgb/profile.json",
@@ -231,7 +239,7 @@ def prepare(
         "target_part": validated["target_part"],
         "top_module": validated["top_module"],
         "source_commit": source_commit,
-        "source_digest": source_digest(root),
+        "source_digest": validated["source_digest"],
         "source_artifacts": source_artifacts,
         "raw_report": _repo_relative(root, manifest_path, "raw manifest"),
         "raw_sha256": sha256(manifest_path),
@@ -254,6 +262,7 @@ def prepare(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("source-digest")
     validate = sub.add_parser("validate-run")
     validate.add_argument("run_dir", type=Path)
 
@@ -266,6 +275,10 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     try:
+        if args.command == "source-digest":
+            from revb import source_digest
+            print(source_digest(ROOT))
+            return 0
         if args.command == "validate-run":
             result = validate_run(args.run_dir)
         else:
