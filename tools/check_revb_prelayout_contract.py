@@ -147,6 +147,19 @@ def _validate_sources(
     }
 
 
+
+def _validate_verification_plan(data: dict[str, Any], name: str) -> None:
+    if data.get("schema_version") != 1:
+        raise ValueError(f"{name}: unsupported verification plan schema")
+    if data.get("layout_allowed") is not False:
+        raise ValueError(f"{name}: verification plan must not authorize Layout")
+    if data.get("result") != "NOT_RUN":
+        raise ValueError(f"{name}: checked-in plan result must remain NOT_RUN until raw evidence exists")
+    status = str(data.get("status", ""))
+    if not status or status == "PASS":
+        raise ValueError(f"{name}: verification plan must remain explicitly blocked/not-run")
+
+
 def _active_vivado_inputs(root: Path) -> dict[str, list[str]]:
     root = root.resolve()
     xdc: list[str] = []
@@ -211,6 +224,17 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
         data = _load(_repo_file(root, rel, "evidence template"), "evidence template")
         _validate_template(data, rel)
 
+    plan_paths = sorted({
+        row.get("verification_plan")
+        for row in contract.get("workstreams", {}).values()
+        if isinstance(row, dict) and row.get("verification_plan")
+    })
+    if len(plan_paths) != 5:
+        raise ValueError("prelayout contract must bind exactly five physical/tool verification plans")
+    for rel in plan_paths:
+        data = _load(_repo_file(root, rel, "verification plan"), "verification plan")
+        _validate_verification_plan(data, rel)
+
     dut = _load(root / "hardware/revB/dut_adapter_profile.json", "DUT adapter profile")
     if dut.get("status") != "UNBOUND" or dut.get("adapter_id") is not None:
         raise ValueError("DUT adapter must remain UNBOUND until real measurements are imported")
@@ -238,6 +262,8 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
         "mechanical_open_count": len(mechanical_open),
         "component_source_state": source_state,
         "template_count": len(template_paths),
+        "verification_plan_count": len(plan_paths),
+        "verification_plans": plan_paths,
         "dut_adapter_status": dut.get("status"),
         "vivado_status": vivado_status,
         "active_vivado_inputs": vivado,

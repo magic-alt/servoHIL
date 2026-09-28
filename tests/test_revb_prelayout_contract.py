@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 from check_revb_prelayout_contract import (
     EXPECTED_MECHANICAL,
+    _validate_verification_plan,
     _validate_mechanical,
     _validate_sources,
     _validate_template,
@@ -30,6 +31,7 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         self.assertEqual(report["vivado_status"], "BLOCKED_NO_ACTIVE_XDC_OR_XPR")
         self.assertEqual(report["active_vivado_inputs"], {"xdc": [], "project": []})
         self.assertGreaterEqual(report["template_count"], 4)
+        self.assertEqual(report["verification_plan_count"], 5)
 
     def test_mechanical_interface_cannot_disappear_without_close_workflow(self):
         contract = self.load("hardware/revB/prelayout_qualification_contract.json")
@@ -70,6 +72,13 @@ class RevBPrelayoutContractTests(unittest.TestCase):
             report["component_source_state"]["unresolved_mlcc_banks"],
             ["input_protected"],
         )
+
+    def test_checked_in_verification_plan_cannot_claim_pass_without_raw_evidence(self):
+        plan = self.load("hardware/revB/verification_plans/partial_power_backfeed.json")
+        plan["status"] = "PASS"
+        plan["result"] = "PASS"
+        with self.assertRaisesRegex(ValueError, "result must remain NOT_RUN"):
+            _validate_verification_plan(plan, "partial-power")
 
     def test_source_location_does_not_equal_qualification_pass(self):
         report = check(ROOT)

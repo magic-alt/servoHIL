@@ -69,23 +69,28 @@
     "DUT_ADAPTER": {
       "status": "BLOCKED_UNBOUND",
       "profile": "hardware/revB/dut_adapter_profile.json",
-      "evidence_template": "hardware/revB/evidence/templates/dut_adapter_measurement_record.json"
+      "evidence_template": "hardware/revB/evidence/templates/dut_adapter_measurement_record.json",
+      "verification_plan": "hardware/revB/verification_plans/dut_adapter_acceptance.json"
     },
     "PARTIAL_POWER_BACKFEED": {
       "status": "NOT_RUN",
-      "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json"
+      "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json",
+      "verification_plan": "hardware/revB/verification_plans/partial_power_backfeed.json"
     },
     "BOARD_THERMAL": {
       "status": "NOT_RUN",
-      "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json"
+      "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json",
+      "verification_plan": "hardware/revB/verification_plans/board_thermal.json"
     },
     "VIVADO_IO_DRC_TIMING": {
       "status": "BLOCKED_INPUTS_NOT_BOUND",
-      "evidence_template": "hardware/revB/evidence/templates/vivado_report_record.json"
+      "evidence_template": "hardware/revB/evidence/templates/vivado_report_record.json",
+      "verification_plan": "hardware/revB/verification_plans/vivado_io_timing.json"
     },
     "LOW_ENERGY_FIXTURE": {
       "status": "NOT_RUN",
-      "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json"
+      "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json",
+      "verification_plan": "hardware/revB/verification_plans/low_energy_fixture.json"
     }
   },
   "release_boundary": {

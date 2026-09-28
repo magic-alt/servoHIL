@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "plan_id": "BOARD_THERMAL",
+  "revision": "Rev.B",
+  "status": "NOT_RUN_NO_PHYSICAL_BOARD_EVIDENCE",
+  "result": "NOT_RUN",
+  "layout_allowed": false,
+  "policy": "Analytical junction-temperature screening and catalog Irms do not close this plan. Use the actual assembled PCB, intended copper/airflow/enclosure and measured electrical load.",
+  "hotspots": [
+    "U101",
+    "L201",
+    "L202",
+    "L203",
+    "L301",
+    "L302",
+    "U211",
+    "U212",
+    "U302",
+    "AD3542R U20..U23 vicinity"
+  ],
+  "operating_points": [
+    {
+      "id": "THERM-IDLE",
+      "load_point_source": "real powered board at idle",
+      "purpose": "baseline thermal map"
+    },
+    {
+      "id": "THERM-POWER",
+      "load_point_source": "worst reviewed rail-load operating point from sim/power analytical screening",
+      "purpose": "power-stage hotspot validation"
+    },
+    {
+      "id": "THERM-AO",
+      "load_point_source": "reviewed simultaneous AO output/load condition",
+      "purpose": "DAC/LDO/disconnect path thermal validation"
+    },
+    {
+      "id": "THERM-CUK",
+      "load_point_source": "reviewed negative-rail/Cuk stress condition",
+      "purpose": "L301/L302 and negative-rail thermal validation"
+    }
+  ],
+  "required_measurements": [
+    "ambient and enclosure condition",
+    "input/rail voltage and current",
+    "hotspot temperatures versus time",
+    "steady-state criterion used",
+    "airflow state",
+    "PCB revision and copper stackup",
+    "thermal-camera/emissivity or thermocouple method"
+  ],
+  "acceptance_limit_sources": [
+    "component maximum junction/part temperatures with engineering margin",
+    "board temperature-rise requirement",
+    "connector/cable material limits",
+    "actual product ambient requirement"
+  ]
+}

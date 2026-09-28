@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "plan_id": "VIVADO_IO_DRC_TIMING",
+  "revision": "Rev.B",
+  "status": "BLOCKED_INPUTS_NOT_BOUND",
+  "result": "NOT_RUN",
+  "layout_allowed": false,
+  "inputs": {
+    "vivado_version": null,
+    "target_part": null,
+    "top_module": null,
+    "xdc_files": [],
+    "rtl_sources": [],
+    "clock_definitions": [],
+    "source_commit": null
+  },
+  "required_reports": [
+    "report_drc",
+    "report_io or equivalent package-pin/IO-standard report",
+    "report_timing_summary with setup/hold",
+    "unconstrained path/clock review"
+  ],
+  "pass_contract": [
+    "exact target part/top/XDC/source revision bound",
+    "all intended top-level IO ports constrained to reviewed package pins and I/O standards",
+    "declared clocks match the design contract",
+    "no failing DRC items accepted by suppression without engineering rationale",
+    "setup/hold timing meets declared clocks",
+    "unconstrained paths/clocks explicitly reviewed",
+    "raw report bytes retained with SHA-256"
+  ],
+  "current_blocker": "Repository contains RTL/revb sources but no active non-archive .xdc or .xpr binding; therefore no source-bound IO DRC/STA claim can be made."
+}
