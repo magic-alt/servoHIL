@@ -90,8 +90,9 @@ def validate_run(run_dir: str | Path, root: str | Path = ROOT) -> dict[str, Any]
             raise ValueError(f"run_identity {key} mismatch")
     if not ident.get("vivado_version"):
         raise ValueError("run_identity vivado_version missing")
-    if not ident.get("source_commit") or ident["source_commit"] == "UNBOUND":
-        raise ValueError("run_identity source_commit must be bound")
+    source_commit = ident.get("source_commit")
+    if not isinstance(source_commit, str) or not re.fullmatch(r"[0-9a-f]{40}", source_commit):
+        raise ValueError("run_identity source_commit must be a full lowercase 40-hex Git SHA")
     digest = ident.get("source_digest")
     if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
         raise ValueError("run_identity source_digest must be a bound lowercase SHA-256")
@@ -137,7 +138,7 @@ def validate_run(run_dir: str | Path, root: str | Path = ROOT) -> dict[str, Any]
         "layout_allowed": False,
         "gate": GATE,
         "carrier": CARRIER,
-        "source_commit": ident["source_commit"],
+        "source_commit": source_commit,
         "source_digest": digest,
         "vivado_version": ident["vivado_version"],
         "target_part": PART,

@@ -1,7 +1,7 @@
 # Rev.B AXU2CGB package-pin / IOSTANDARD DRC harness.
 # Usage:
 #   vivado -mode batch -source fpga/revb/io_drc/run_io_drc.tcl \
-#     -tclargs build/revb-vivado-io-drc <source_commit>
+#     -tclargs build/revb-vivado-io-drc <source_commit> <source_digest>
 #
 # This run does NOT perform or claim functional STA.
 

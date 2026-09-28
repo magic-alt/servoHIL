@@ -40,6 +40,8 @@ Expected raw outputs:
 - `report_io.rpt`
 - `report_utilization.rpt`
 - `io_drc_placed.dcp`
+- `io_runtime.csv`
+- `drc_summary.json`
 - `run_identity.txt`
 
 The Tcl exits non-zero when Vivado reports an Error or Critical Warning DRC violation.

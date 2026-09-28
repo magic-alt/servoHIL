@@ -170,11 +170,19 @@ def validate(d, p, physical, assignments):
             'unused_gpio':len(balls)-len(assignments), 'hardware_verified':False}
 
 def source_digest(root: Path):
-    """Bind evidence to content, not a moving branch name or inherited Rev.A verdict."""
+    """Bind evidence to immutable design/source content, not mutable gate registries."""
     h=hashlib.sha256()
     files=[]
+    excluded={
+        'hardware/revB/gates.json',
+        'hardware/revB/prelayout_evidence_status.json',
+    }
     for directory in ['hardware/revB','hardware/carriers','tools','bom','references','fpga/revb','rtl/revb']:
-        files += [p for p in (root/directory).rglob('*') if p.is_file() and '__pycache__' not in str(p) and p.suffix!='.pyc' and p.name!='gates.json']
+        files += [
+            p for p in (root/directory).rglob('*')
+            if (p.is_file() and '__pycache__' not in str(p) and p.suffix!='.pyc'
+                and p.relative_to(root).as_posix() not in excluded)
+        ]
     for p in sorted(files):
         h.update(str(p.relative_to(root)).encode()+b'\0'+p.read_bytes()+b'\0')
     return h.hexdigest()
