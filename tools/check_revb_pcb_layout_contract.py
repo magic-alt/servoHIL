@@ -76,8 +76,18 @@ def _validate_layout_contract(root: Path, data: dict[str, Any]) -> dict[str, Any
     if not isinstance(mech, dict) or mech.get("carrier_id") != "axu2cgb":
         raise ValueError("carrier mechanical reference drift")
     facts = mech.get("documented_facts")
-    if not isinstance(facts, dict) or set(facts) != {"J12", "J15"}:
+    if not isinstance(facts, dict) or not {"J12", "J15"}.issubset(facts):
         raise ValueError("carrier J12/J15 mechanical facts missing")
+    if facts.get("host_form_factor_mm") != [100, 85]:
+        raise ValueError("AXU2CGB documented host form factor drift")
+    source_manifest = _load(
+        _repo_path(root, mech.get("mechanical_source_manifest"), "carrier mechanical source"),
+        "carrier mechanical source",
+    )
+    if source_manifest.get("source_commit") != "43effb3dacf1f9c7e76ac801d21f14a66f14d24e":
+        raise ValueError("carrier mechanical source commit drift")
+    if source_manifest.get("cad_sources", {}).get("dxf", {}).get("github_blob_sha") != "3d3e2af818db5514c503d16d592db3629b0ff00f":
+        raise ValueError("carrier mechanical DXF blob drift")
     for ref, voltage in (("J12", 1.8), ("J15", 3.3)):
         row = facts[ref]
         if row.get("pins") != 40 or row.get("rows") != 2 or row.get("columns") != 20:
