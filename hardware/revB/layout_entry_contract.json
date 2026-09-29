@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "checked_on": "2026-09-29",
+  "status": "READY_FOR_PCB_LAYOUT",
+  "layout_allowed": true,
+  "fabrication_allowed": false,
+  "release_allowed": false,
+  "scope": "PCB placement/routing entry gate only",
+  "source_contracts": {
+    "schematic": "hardware/revB/schematic_open_items.json",
+    "mechanical": "hardware/revB/mechanical_binding_plan.json",
+    "cable_fault": "hardware/revB/cable_fault_architecture.json",
+    "footprint_table": "hardware/kicad/revB/axu2cgb_expansion/fp-lib-table"
+  },
+  "required_source_state": {
+    "blank_on_board_footprints": 0,
+    "resolved_layout_refs": [
+      "J101",
+      "SW101",
+      "C105",
+      "J5",
+      "J501",
+      "J701"
+    ],
+    "ad3542r_exact_refs": [
+      "U20",
+      "U21",
+      "U22",
+      "U23"
+    ],
+    "cable_fault_resolution": {
+      "J501": "ACCEPT_NON_SAFETY_RESIDUAL_RISK",
+      "J701": "ACCEPT_NON_SAFETY_RESIDUAL_RISK"
+    }
+  },
+  "deferred_fabrication_or_release_gates": [
+    "manufacturer DC-bias / temperature / ESR and magnetics curves hash-bound review",
+    "real DUT adapter thresholds, leakage and shutdown-time measurements",
+    "partial-power/backfeed and power-off measurements",
+    "assembled-board thermal evidence",
+    "low-energy fixture acceptance and cable-fault injection",
+    "Vivado I/O DRC raw evidence and functional STA/CDC closure",
+    "EMC, power-down, fault injection and FOC closed-loop acceptance"
+  ],
+  "note": "READY_FOR_PCB_LAYOUT is not fabrication approval, a functional-safety claim, or production release. Any later evidence that invalidates a selected part or footprint forces the affected Layout back to review."
+}
