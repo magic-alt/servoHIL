@@ -193,8 +193,8 @@ def _validate_sources(
     component_candidates: dict[str, Any],
     capacitor_candidates: dict[str, Any],
 ) -> dict[str, Any]:
-    if registry.get("schema_version") != 1 or registry.get("layout_allowed") is not True:
-        raise ValueError("component source registry schema/layout policy drift")
+    if registry.get("schema_version") != 1 or registry.get("layout_allowed") is not False:
+        raise ValueError("component source registry must remain non-authorizing for Layout")
     if registry.get("fabrication_allowed") is not False:
         raise ValueError("component source registry must not authorize fabrication")
     if registry.get("status") == "PASS":
