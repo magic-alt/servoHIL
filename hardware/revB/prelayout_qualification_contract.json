@@ -1,22 +1,24 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "revision": "Rev.B",
-  "checked_on": "2026-09-28",
-  "status": "BLOCKED_PRE_LAYOUT_EVIDENCE_REQUIRED",
-  "layout_allowed": false,
-  "policy": "This contract coordinates pre-layout qualification work. A located datasheet, analytical screen, template, or empty evidence directory is progress only and never a PASS.",
+  "checked_on": "2026-09-29",
+  "status": "LAYOUT_ENTRY_COMPLETE_FABRICATION_QUALIFICATION_OPEN",
+  "layout_allowed": true,
+  "policy": "PCB Layout entry is a source-design gate: exact physical parts/footprints, pinouts and residual-risk semantics must be bound. Manufacturer curves, real DUT measurements, mounted-board thermal, backfeed, fixture acceptance and Vivado runtime/STA evidence remain fail-closed fabrication/release gates and do not prevent initial placement/routing.",
   "mechanical_bindings": {
     "manifest": "hardware/revB/schematic_open_items.json",
     "plan": "hardware/revB/mechanical_binding_plan.json",
-    "required_open_refs": [
+    "required_open_refs": [],
+    "close_rule": "All five board-side mechanical interfaces are exact-part/footprint bound for Layout. Any later source or fit evidence that invalidates a part forces the affected PCB placement back to review.",
+    "cable_fault_architecture": "hardware/revB/cable_fault_architecture.json",
+    "resolved_refs": [
       "J101",
       "SW101",
       "J5",
       "J501",
       "J701"
     ],
-    "close_rule": "A reference may leave open_footprints only after an exact selected part, exact mating/cable contract, locally reviewable footprint/mechanical data and the ref-specific evidence pack are complete.",
-    "cable_fault_architecture": "hardware/revB/cable_fault_architecture.json"
+    "layout_sources": "hardware/revB/layout_entry_sources.json"
   },
   "component_evidence": {
     "source_registry": "hardware/revB/component_evidence_sources.json",
@@ -36,18 +38,19 @@
   },
   "workstreams": {
     "MECHANICAL_BINDINGS": {
-      "status": "BLOCKED",
-      "required": [
+      "status": "RESOLVED_FOR_LAYOUT",
+      "required": [],
+      "evidence_template": "hardware/revB/evidence/templates/mechanical_binding_record.json",
+      "resolved": [
         "J101",
         "SW101",
         "J5",
         "J501",
         "J701"
-      ],
-      "evidence_template": "hardware/revB/evidence/templates/mechanical_binding_record.json"
+      ]
     },
     "MAGNETICS": {
-      "status": "BLOCKED",
+      "status": "BLOCKED_FOR_FABRICATION",
       "required": [
         "L_I_T_CURVES",
         "AC_CORE_AND_WINDING_LOSS",
@@ -57,7 +60,7 @@
       "evidence_template": "hardware/revB/evidence/templates/manufacturer_curve_record.json"
     },
     "MLCC": {
-      "status": "BLOCKED",
+      "status": "LAYOUT_GEOMETRY_BOUND_ELECTRICAL_QUALIFICATION_OPEN",
       "required": [
         "EXACT_MPN_DC_BIAS",
         "TEMPERATURE_AGING",
@@ -67,35 +70,44 @@
       "evidence_template": "hardware/revB/evidence/templates/manufacturer_curve_record.json"
     },
     "DUT_ADAPTER": {
-      "status": "BLOCKED_UNBOUND",
+      "status": "BLOCKED_FOR_FABRICATION_UNBOUND",
       "profile": "hardware/revB/dut_adapter_profile.json",
       "evidence_template": "hardware/revB/evidence/templates/dut_adapter_measurement_record.json",
       "verification_plan": "hardware/revB/verification_plans/dut_adapter_acceptance.json"
     },
     "PARTIAL_POWER_BACKFEED": {
-      "status": "NOT_RUN",
+      "status": "NOT_RUN_BLOCKS_FABRICATION",
       "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json",
       "verification_plan": "hardware/revB/verification_plans/partial_power_backfeed.json"
     },
     "BOARD_THERMAL": {
-      "status": "NOT_RUN",
+      "status": "NOT_RUN_BLOCKS_FABRICATION",
       "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json",
       "verification_plan": "hardware/revB/verification_plans/board_thermal.json"
     },
     "VIVADO_IO_DRC_TIMING": {
-      "status": "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED",
+      "status": "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED_FOR_FABRICATION",
       "evidence_template": "hardware/revB/evidence/templates/vivado_report_record.json",
       "verification_plan": "hardware/revB/verification_plans/vivado_io_timing.json",
       "input_contract": "hardware/revB/vivado_input_contract.json"
     },
     "LOW_ENERGY_FIXTURE": {
-      "status": "NOT_RUN",
+      "status": "NOT_RUN_BLOCKS_FABRICATION",
       "evidence_template": "hardware/revB/evidence/templates/physical_measurement_record.json",
       "verification_plan": "hardware/revB/verification_plans/low_energy_fixture.json"
     }
   },
   "release_boundary": {
-    "pre_layout_required": true,
+    "layout_entry_complete": true,
+    "fabrication_required": true,
+    "fabrication_blockers": [
+      "manufacturer curve qualification",
+      "real DUT adapter acceptance",
+      "partial-power/backfeed measurements",
+      "assembled-board thermal evidence",
+      "low-energy fixture and cable-fault acceptance",
+      "Vivado package-I/O DRC raw evidence and functional STA/CDC closure"
+    ],
     "post_layout_still_required": [
       "EMC",
       "THERMAL",
@@ -103,6 +115,8 @@
       "FAULT_INJECTION",
       "FOC_CLOSED_LOOP"
     ],
-    "note": "Completing this contract can make the design ready for an engineering layout review; it is not fabrication, safety, EMC, or production approval."
-  }
+    "note": "READY_FOR_PCB_LAYOUT authorizes placement/routing only. It is not fabrication, safety, EMC or production approval."
+  },
+  "fabrication_allowed": false,
+  "release_allowed": false
 }
