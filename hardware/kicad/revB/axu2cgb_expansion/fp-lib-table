@@ -12,4 +12,8 @@
   (lib (name "Fuse") (type "KiCad") (uri "${KIPRJMOD}/footprints/Fuse.pretty") (options "") (descr "KiCad installed footprint snapshot; see COPYRIGHT"))
   (lib (name "Inductor_SMD") (type "KiCad") (uri "${KIPRJMOD}/footprints/Inductor_SMD.pretty") (options "") (descr "KiCad installed footprint snapshot; see COPYRIGHT"))
   (lib (name "Package_DFN_QFN") (type "KiCad") (uri "${KIPRJMOD}/footprints/Package_DFN_QFN.pretty") (options "") (descr "Project-local reviewed DFN/QFN land patterns"))
+  (lib (name "Connector_Phoenix_MSTB") (type "KiCad") (uri "${KIPRJMOD}/footprints/Connector_Phoenix_MSTB.pretty") (options "") (descr "KiCad 10 footprint snapshot for Phoenix Contact MSTB family"))
+  (lib (name "Connector_Phoenix_MC") (type "KiCad") (uri "${KIPRJMOD}/footprints/Connector_Phoenix_MC.pretty") (options "") (descr "KiCad 10 footprint snapshot for Phoenix Contact MC family"))
+  (lib (name "Connector_Molex") (type "KiCad") (uri "${KIPRJMOD}/footprints/Connector_Molex.pretty") (options "") (descr "KiCad 10 footprint snapshot for Molex connectors"))
+  (lib (name "Button_Switch_SMD") (type "KiCad") (uri "${KIPRJMOD}/footprints/Button_Switch_SMD.pretty") (options "") (descr "Project-local reviewed switch footprints"))
 )
