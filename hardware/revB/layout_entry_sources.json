@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "checked_on": "2026-09-29",
+  "status": "SOURCE_BOUND_LAYOUT_PARTS",
+  "scope": "Exact board-side part identity, mating family, footprint and placement geometry for PCB Layout entry. This is not assembled-board or production qualification.",
+  "interfaces": {
+    "J101": {
+      "manufacturer": "Phoenix Contact",
+      "board_part": {
+        "mpn": "MSTBA 2,5/2-G-5,08",
+        "order_number": "1757242"
+      },
+      "mating_part": {
+        "mpn": "MSTB 2,5/2-ST-5,08",
+        "order_number": "1757019"
+      },
+      "source_url": "https://www.phoenixcontact.com/en-us/products/pcb-header-mstba-25-2-g-508-1757242",
+      "footprint": "Connector_Phoenix_MSTB:PhoenixContact_MSTBA_2,5_2-G-5,08_1x02_P5.08mm_Horizontal",
+      "footprint_path": "hardware/kicad/revB/axu2cgb_expansion/footprints/Connector_Phoenix_MSTB.pretty/PhoenixContact_MSTBA_2,5_2-G-5,08_1x02_P5.08mm_Horizontal.kicad_mod",
+      "geometry_basis": "5.08 mm pitch, THT angled two-position Phoenix MSTBA family; footprint is a vendored KiCad generator output tied to order 1757242."
+    },
+    "SW101": {
+      "manufacturer": "C&K / Littelfuse",
+      "board_part": {
+        "mpn": "PTS645SM43SMTR92 LFS"
+      },
+      "source_url": "https://www.digikey.com/en/products/detail/c-k/PTS645SM43SMTR92-LFS/1146840",
+      "footprint": "Button_Switch_SMD:SW_Push_PTS645SM43SMTR92",
+      "footprint_path": "hardware/kicad/revB/axu2cgb_expansion/footprints/Button_Switch_SMD.pretty/SW_Push_PTS645SM43SMTR92.kicad_mod",
+      "geometry_basis": "PTS645 6 x 6 mm SMT family geometry; exact 4.3 mm-height SPST-NO production variant is bound in the native schematic."
+    },
+    "C105": {
+      "manufacturer": "TDK",
+      "board_part": {
+        "mpn": "C5750X7R1V476M230KC"
+      },
+      "source_url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C5750X7R1V476M230KC",
+      "footprint": "Capacitor_SMD:TDK_C5750X7R1V476M230KC",
+      "footprint_path": "hardware/kicad/revB/axu2cgb_expansion/footprints/Capacitor_SMD.pretty/TDK_C5750X7R1V476M230KC.kicad_mod",
+      "package_mm": {
+        "length": 5.7,
+        "width": 5,
+        "height_nominal": 2.3,
+        "height_max": 2.5
+      },
+      "manufacturer_land_range_mm": {
+        "PA": [
+          4.1,
+          4.8
+        ],
+        "PB": [
+          1.2,
+          1.4
+        ],
+        "PC": [
+          4,
+          5
+        ]
+      },
+      "implemented_nominal_mm": {
+        "PA": 4.45,
+        "PB": 1.3,
+        "PC": 4.5
+      },
+      "qualification_note": "Exact placement geometry is closed for Layout. Effective capacitance under DC bias, ESR/RMS current, temperature and aging remain fabrication/release qualification evidence."
+    },
+    "J5": {
+      "manufacturer": "Phoenix Contact",
+      "board_part": {
+        "mpn": "MC 1,5/10-G-3,5",
+        "order_number": "1844294"
+      },
+      "mating_part": {
+        "mpn": "FMC 1,5/10-ST-3,5",
+        "order_number": "1952348"
+      },
+      "source_url": "https://www.phoenixcontact.com/en-us/products/pcb-header-mc-1510-g-35-1844294",
+      "footprint": "Connector_Phoenix_MC:PhoenixContact_MC_1,5_10-G-3.5_1x10_P3.50mm_Horizontal",
+      "footprint_path": "hardware/kicad/revB/axu2cgb_expansion/footprints/Connector_Phoenix_MC.pretty/PhoenixContact_MC_1,5_10-G-3.5_1x10_P3.50mm_Horizontal.kicad_mod",
+      "geometry_basis": "3.50 mm pitch, THT angled ten-position Phoenix MC family; pins 1-8 are AO and 9-10 are signal GND."
+    },
+    "J501": {
+      "manufacturer": "Phoenix Contact",
+      "board_part": {
+        "mpn": "MC 1,5/2-G-3,5",
+        "order_number": "1844210"
+      },
+      "mating_part": {
+        "mpn": "MC 1,5/2-ST-3,5",
+        "order_number": "1840366"
+      },
+      "source_url": "https://www.phoenixcontact.com/en-us/products/pcb-header-mc-15-2-g-35-1844210",
+      "footprint": "Connector_Phoenix_MC:PhoenixContact_MC_1,5_2-G-3.5_1x02_P3.50mm_Horizontal",
+      "footprint_path": "hardware/kicad/revB/axu2cgb_expansion/footprints/Connector_Phoenix_MC.pretty/PhoenixContact_MC_1,5_2-G-3.5_1x02_P3.50mm_Horizontal.kicad_mod",
+      "geometry_basis": "3.50 mm pitch polarized two-position dry-contact service connector."
+    },
+    "J701": {
+      "manufacturer": "Molex",
+      "board_part": {
+        "mpn": "43045-0212",
+        "order_number": "430450212"
+      },
+      "mating_part": {
+        "mpn": "Micro-Fit 3.0 receptacle housing",
+        "order_number": "430250200"
+      },
+      "source_url": "https://www.molex.com/en-us/products/part-detail/430450212",
+      "footprint": "Connector_Molex:Molex_Micro-Fit_3.0_43045-0212_2x01_P3.00mm_Vertical",
+      "footprint_path": "hardware/kicad/revB/axu2cgb_expansion/footprints/Connector_Molex.pretty/Molex_Micro-Fit_3.0_43045-0212_2x01_P3.00mm_Vertical.kicad_mod",
+      "geometry_basis": "Polarized/latching Micro-Fit 3.0 two-circuit interface intentionally kept physically distinct from the Phoenix service connectors."
+    }
+  },
+  "source_boundary": "Catalog/manufacturer geometry and exact part identity are sufficient to enter placement/routing. Cable assembly, enclosure fit, mounted-board thermal, DUT electrical thresholds, fault injection and production qualification remain later evidence gates."
+}
