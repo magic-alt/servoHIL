@@ -91,7 +91,7 @@ def _points(groups: dict[int, list[str]], xcode: int = 10, ycode: int = 20) -> l
     return pts
 
 
-def inspect(text: str) -> dict[str, Any]:
+def inspect(text: str, *, source_encoding: str = "unknown") -> dict[str, Any]:
     pairs = _pairs(text)
     entities = _entities(pairs)
     type_counts = Counter(e["type"] for e in entities)
@@ -159,6 +159,7 @@ def inspect(text: str) -> dict[str, Any]:
 
     return {
         "format": "ASCII_DXF",
+        "source_encoding": source_encoding,
         "entity_count": len(entities),
         "entity_type_counts": dict(sorted(type_counts.items())),
         "geometry_bounds": bounds(geometry_points),
@@ -181,8 +182,19 @@ def main() -> None:
     parser.add_argument("dxf", type=Path)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    raw = args.dxf.read_text(encoding="utf-8", errors="strict")
-    report = inspect(raw)
+    payload = args.dxf.read_bytes()
+    source_encoding = None
+    raw = None
+    for encoding in ("utf-8", "gb18030", "cp1252", "latin-1"):
+        try:
+            raw = payload.decode(encoding, errors="strict")
+            source_encoding = encoding
+            break
+        except UnicodeDecodeError:
+            continue
+    if raw is None or source_encoding is None:
+        raise ValueError("unable to decode ASCII DXF text stream")
+    report = inspect(raw, source_encoding=source_encoding)
     rendered = json.dumps(report, indent=2, sort_keys=True)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
