@@ -4,24 +4,24 @@
 
 ServoHIL 面向伺服驱动器和关节模组的实时 Hardware-in-the-Loop 验证。
 当前原生 KiCad 已从接口占位推进到电源、DAC、安全链、ADC 与数字接口器件电路；
-**仍是工程开发版，不是可生产、可直接打板或通过功能安全认证的完整 HIL 板。**
-`hardware/revB/gates.json` 的 `layout_allowed=false` 保持不变。
+**仍是工程开发版；原理图与物理器件绑定已达到 PCB Layout entry，但尚未获得 fabrication、采购、生产或功能安全放行。**
+`hardware/revB/gates.json` 当前明确为 `layout_allowed=true`、`fabrication_allowed=false`、`release_allowed=false`。
 
 ## 当前实现与资格状态
 
 | 模块 | 已实现 | 尚未完成 / 不能据此声称 |
 |---|---|---|
-| 单 ZU2CG / 原生工程 | 15 页原生 KiCad，可直接编辑；AD3542R U20~U23 已绑定经官方 EVAL Gerber/IPC-356 复核的 CP-28-15 footprint；载板分配保持 64 路信号 | 仅剩 J101/SW101/J5/J501/J701 五个真实机械/接口绑定；Vivado target part 已绑定，但 active XDC、top、clock/timing contract 与 STA/IO DRC 仍未验收 |
+| 单 ZU2CG / 原生工程 | 15 页原生 KiCad，可直接编辑；U20~U23 exact AD3542R footprint、J101/SW101/J5/J501/J701 exact physical part/footprint 与 C105 TDK exact land pattern 均已绑定；载板分配保持 64 路信号 | Vivado target part 已绑定，但 I/O DRC raw evidence、functional active XDC/top/clocks、STA/CDC 仍未关闭 fabrication/release gate |
 | 输入保护 / 正负电源 / 参考 | 实际器件、原生值驱动计算与 ngspice 矩阵；XAL50xx 与已分配 TDK MLCC 的精确厂家资料入口已登记 | 原厂曲线原始字节尚未 hash-import；XAL AC/core/winding loss、启动/短路饱和、MLCC DC-bias/温度/老化/RMS/ESR、实板热与反灌门禁仍未关闭 |
 | 独立 watchdog / AO disconnect / DUT permit | PR #21 的窗口 watchdog、八路 ADG5412F、常开 PhotoMOS 许可触点；J501/J701 的原理图电气语义已绑定进机械计划 | 实际 DUT 的安全偏置、漏电流、断线与最大关断时间未验收；当前两线 J501/J701 对“跨触点短路”不能天然 fail-safe，必须由真实 DUT 线监测或接口重构处理；不是 STO |
 | 有效进度心跳 RTL | PR #23 已把完成的 Plant/ADC 序号与主机租约续期接入 completion-only health wrapper；超时锁存、显式恢复/重新 ARM 保留 | AXI/CDC/顶层/XDC 与实板故障注入尚未验收 |
 | ADC 输入前端 | AD7606C-16、8 路低能量输入；PR #23 已实现 CONFIG 0x02 八线模式写入/读回、BUSY 流程与 8×16-bit 完成采样序号 | 模拟精度、抗混叠、校准、CDC/板级时序和实测 1 MSPS 未验收 |
 | 数字 PHY / 外部保护 | 六路 PWM、双 SSI/BiSS、RS-485、AUX/I2C；在对应接口页就地加入 AI/AO/逻辑/差分线 TVS | 保护拓扑不等于 IEC ESD/浪涌 PASS；不代表任意编码器或工业 24 V 输入兼容 |
 | EtherCAT / CAN | 本扩展板没有独立引脚分配或对应板载实现 | 不借用 AUX 来假装已实现；新增接口需独立分配、控制器和 PHY 审查 |
-| PCB Layout / 生产资格 | 门禁与验收路径保留 | 未授权 Layout/Gerber/采购/生产，无实板、EMC 或完整故障验证证据 |
+| PCB Layout / 生产资格 | `hardware/revB/layout_entry_contract.json` = `READY_FOR_PCB_LAYOUT`，允许开始 placement/routing | **仅授权 Layout**；Gerber/fabrication/采购/生产仍禁止，直到厂商曲线、真实 DUT、反灌/thermal、fixture、Vivado 与后续实板门禁关闭 |
 
 PR #22 完成原生 ADC/PHY 电路；PR #23 完成资格门禁、AD7606C-16 初始化/采样 RTL、completion-only health 集成和 Vivado 证据导入框架。PR #27 已用 ADI Rev.C、CP-28-15 package drawing 与官方 EVAL Gerber/IPC-356/BOM 关闭 U20~U23 四个 exact land-pattern blocker，使 source-level physical blocker 从 9 降为 5。
-当前 PR #28 把后续工作转为 pre-layout qualification：五个机械接口、XAL/MLCC 原厂证据、真实 DUT adapter、partial-power/backfeed、板级 thermal、Vivado IO DRC/STA 与低能量夹具分别有 fail-closed contract / verification plan。PR #21 的 13 页 / 144 项测试仅保留为历史检查点。
+PR #28 建立了 fail-closed qualification contract；PR #29 增加了 AXU2CGB Vivado package-pin/IOSTANDARD DRC harness。当前 Layout-entry 收尾分支进一步关闭五个机械接口与 C105 exact land pattern，并把 Layout entry 与 fabrication/release qualification 分层，避免用“必须先有实板证据”反向阻塞 PCB Layout。PR #21 的 13 页 / 144 项测试仅保留为历史检查点。
 
 ## 打开工程与查阅证据
 
@@ -40,29 +40,26 @@ hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_pro
 ADC 输入前端和双编码器 PHY。`70_adc_frontend`、`80_encoder_phy` 是新增页；
 `03_peripheral_boundaries` 已替换 J3/J4 预留模块接口；连接器保护器件就地放在 `03/06/50/70/80` 对应接口页，避免把 page-local 网络升级为 global label。
 
-当前源审计统计 **439 个 `in_bom=yes && on_board=yes` 物理器件**，并明确把购买的 AXU2CGB J12/J15 载板边界排除出扩展板 BOM/placement。新增连接器保护器件 37 个。`hardware/revB/schematic_open_items.json` 现在只允许 **5 个**空 footprint：J101、SW101、J5、J501、J701；CI 要求实际空集合与 blocker 清单完全一致。U20~U23 已绑定 `Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R`，不得回退为通用 QFN。
+当前源审计统计 **439 个 `in_bom=yes && on_board=yes` 物理器件**，并明确把购买的 AXU2CGB J12/J15 载板边界排除出扩展板 BOM/placement。新增连接器保护器件 37 个。`hardware/revB/schematic_open_items.json` 现在要求 **0 个** on-board 空 footprint；J101、SW101、C105、J5、J501、J701 已全部 source-bound，U20~U23 继续绑定 `Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R`，不得回退为通用 QFN。
 实际 KiCad 网表、ERC、PDF 与回归结果以当前 PR 的 `native-schematic-readability` artifact 为准。
 
 **当前 PDF 不在历史目录中。** 最新 `native-schematic-readability` artifact 包含
 原理图 PDF、原生 source ZIP、XML、ERC、测试日志与确切 source commit。
 [旧 11 页 PDF](docs/review/revb-readability/schematic-review.pdf) 只作历史参考。
 
-## Pre-layout qualification 状态
+## Layout entry 与 fabrication qualification 状态
 
-`hardware/revB/prelayout_qualification_contract.json` 是当前 pre-layout 工作的总合同，
-状态保持 `BLOCKED_PRE_LAYOUT_EVIDENCE_REQUIRED`，`layout_allowed=false`。
+`hardware/revB/layout_entry_contract.json` 当前状态为 `READY_FOR_PCB_LAYOUT`；`hardware/revB/prelayout_qualification_contract.json` 则转为 `LAYOUT_ENTRY_COMPLETE_FABRICATION_QUALIFICATION_OPEN`。也就是说 source-level 设计已经允许进入 placement/routing，但 fabrication/release 仍 fail-closed。
 机械、电气与实测工作分别由以下文件约束：
 
-- `hardware/revB/mechanical_binding_plan.json`：J101 / SW101 / J5 / J501 / J701 五个实际机械接口；已从原生原理图绑定能够证明的 pinout/电气事实，但具体厂家料号、配套端子、线束、机箱和 derating 仍为空；
+- `hardware/revB/mechanical_binding_plan.json`：J101=Phoenix 1757242、SW101=PTS645SM43SMTR92 LFS、J5=Phoenix 1844294、J501=Phoenix 1844210、J701=Molex 43045-0212 均已绑定 exact board-side part、mating family 与本地 footprint；线束工艺、机箱集成和真实 DUT 仍属于 fabrication/release evidence；
 - `hardware/revB/component_evidence_sources.json`：Coilcraft XAL50xx 与 TDK exact-MPN characterization source 已定位，但原始 bytes/曲线尚未 SHA-256 归档并导入，因此只是 provenance discovery，不是 qualification PASS；
 - `hardware/revB/dut_adapter_profile.json`：仍为 `UNBOUND`，AO neutral、permit 阈值/漏电、线缆故障和最大端到端 disable time 必须来自真实 DUT/adapter 实测；
 - `hardware/revB/verification_plans/`：已给出 DUT adapter、partial-power/backfeed、board thermal、low-energy fixture 与 Vivado IO/STA 的可执行验证计划，checked-in result 全部保持 `NOT_RUN`；
 - `hardware/revB/vivado_input_contract.json`：AXU2CGB target 已绑定到 `xczu2cg-sfvc784-1-e` / `XCZU2CG-1SFVC784E`；现有 `carrier.xdc.preview` 仍是 review preview，不能关闭 gate，仍需 reviewed top、active XDC、clocks/generated clocks、I/O delays/CDC timing policy 和原始 Vivado reports。
 
 特别需要保留的故障语义：当前两线 J501 dry-contact 与 J701 floating permit，
-“开路→inhibit”可以作为设计意图验证，但**跨两线短路会等效于闭合触点**；
-如果产品要求 cable-short 也 fail-safe，必须依赖真实 DUT 的线路诊断/独立监测，
-或修改接口架构，不能靠选一个连接器解决。
+“开路→inhibit”可以作为设计意图验证，但**跨两线短路会等效于闭合触点**。本版已明确选择 `ACCEPT_NON_SAFETY_RESIDUAL_RISK` 作为 Layout 方案，因此这两个接口只能用于实验室非安全 inhibit/permit，不能声称 STO、冗余安全输出或 cable-short fail-safe；fabrication/release 前仍必须在真实 DUT/fixture 上做故障注入与关断时间验证。
 
 本地可直接运行：
 
@@ -72,7 +69,7 @@ python tools/check_revb_prelayout_contract.py
 python tools/revb_qualification.py
 ```
 
-contract checker 通过只代表“阻塞项和证据边界没有漂移”，不代表任何 physical gate 已 PASS。
+contract checker 通过现在代表“source-level Layout entry 已闭合，且 fabrication/release 阻塞项和证据边界没有漂移”；不代表任何 physical gate 已 PASS。
 
 ## ADC 与数字接口范围
 
@@ -129,7 +126,7 @@ RS-485 同样经过安全许可门控；120 Ω 终端通过跳线接入，默认
 
 这不是额定电流认证或实际功耗量测。新的预算用于重跑原有 25 工况 ngspice 和
 热/磁性筛查；AON 安全链预算、同时短路、动态损耗和真实板级热仍开放。
-原 DAC 电源跨度/输出裕量、真实稳压器模型及输入保护能量问题仍未关闭。XAL50xx 与已分配 TDK MLCC 的精确原厂资料入口已经登记，但曲线原始文件尚未 hash-import；C105 / `input_protected` 已绑定 TDK C5750X7R1V476M230KC 作为 47 uF / 35 V / X7R / 2220 精确筛选候选，native C105 已明确 X7R；但通用 KiCad 2220 footprint 尚未完成 TDK exact land-pattern/高度复核，且 >=22 uF effective@15.05 V 尚未由 hash-bound DC-bias 数据证明，因此磁性、MLCC 和实板 thermal 资格仍保持 BLOCKED。
+原 DAC 电源跨度/输出裕量、真实稳压器模型及输入保护能量问题仍未关闭。XAL50xx 与已分配 TDK MLCC 的精确原厂资料入口已经登记，但曲线原始文件尚未 hash-import；C105 / `input_protected` 已绑定 TDK C5750X7R1V476M230KC，项目本地 footprint 按 TDK PA/PB/PC 推荐范围中值实现，exact land-pattern/高度的 **Layout 子门禁已关闭**。但 >=22 uF effective@15.05 V、RMS/ESR、温度/老化与实板 thermal 尚无 hash-bound/physical evidence，因此这些仍阻塞 fabrication/release，而不再阻塞 placement/routing。
 
 ADC 外部 RC 的简化计算也不等于完整抗混叠设计或 16 位精度证明。
 100 Ω 正腿和 1 MΩ 简化输入负载会引入约 100 ppm 的未校准增益误差，
@@ -186,7 +183,7 @@ PowerShell 中运行测试前设 `$env:NATIVE_NETLIST='build/native/canonical.xm
 
 ## 继续推进的顺序
 
-原理图功能拓扑已经收口到 15 页，U20~U23 exact AD3542R footprint 已关闭；当前 source-level 只剩 **5 个真实机械/接口 blocker**：J101、SW101、J5、J501、J701。下一步优先绑定实际连接器/开关/机箱/线束并处理 J501/J701 两线短路语义，同时把 Coilcraft/TDK 原厂曲线做成 hash-bound evidence；C105 exact MPN 已选为 TDK C5750X7R1V476M230KC，但其有效电容/RMS/ESR 资格仍待原厂曲线证据。随后完成实板 thermal、真实 DUT adapter、partial-power/backfeed、Vivado functional active XDC/top/clocks + STA（独立 I/O DRC harness 另行验证）和低能量夹具实测。只有这些 pre-layout gate 和工程审签通过后才进入 Layout；样机后仍需真实 EMC、热、掉电、故障注入及 FOC 闭环验收。
+原理图功能拓扑已经收口到 15 页，U20~U23 exact AD3542R footprint、五个机械接口和 C105 exact land pattern 均已关闭，native on-board blank footprint 数量为 **0**。**下一步可以正式进入 PCB Layout：先建立板框/安装孔/连接器 keepout 与层叠/规则，再做电源与模拟关键器件 placement、回流路径/地分区、敏感模拟和高速数字布线。** Layout 过程中不得删除当前 exact-part/source binding。并行继续把 Coilcraft/TDK 原厂曲线做成 hash-bound evidence；完成真实 DUT adapter、partial-power/backfeed、Vivado functional active XDC/top/clocks + STA/CDC 与低能量夹具计划。板子完成后再执行 mounted-board thermal、真实 EMC、掉电、故障注入及 FOC 闭环验收；这些项目继续阻塞 Gerber/fabrication/release，而不是阻塞开始 Layout。
 
 **AO 断开为高阻而非安全零位；单个许可触点不是冗余 STO，元件额定值不是板级认证。
 没有匹配实际硬件和 DUT 的原始实测证据，就不把生产资格或安全门禁改成 PASS。**
