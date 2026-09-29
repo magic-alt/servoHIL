@@ -48,7 +48,7 @@
       "clearance_mm": 0.20
     },
     "PRECISION_ANALOG": {
-      "patterns": ["DUT_AO*", "ADC_IN*", "VREF*", "REF*"],
+      "patterns": ["AO*", "DUT_AO*", "AI*", "ADC_REF*", "VREF*", "REF*"],
       "trace_width_mm": 0.20,
       "clearance_mm": 0.25,
       "reference_plane": "continuous_GND",
@@ -63,7 +63,7 @@
       "routing_policy": "Route as compact groups over an uninterrupted GND reference, avoid stubs, and minimize vias. Numeric skew limits remain a timing-analysis item rather than an invented fabrication rule."
     },
     "EXTERNAL_DIFFERENTIAL": {
-      "patterns": ["ENC*_A", "ENC*_B", "RS485_A", "RS485_B"],
+      "patterns": ["ENC*_P*_A", "ENC*_P*_B", "RS485_A", "RS485_B"],
       "impedance_target_ohm": 120,
       "impedance_tolerance_percent": 10,
       "geometry_status": "TARGET_ONLY_PENDING_FABRICATOR_STACKUP",
