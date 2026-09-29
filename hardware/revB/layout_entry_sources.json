@@ -25,10 +25,10 @@
       "board_part": {
         "mpn": "PTS645SM43SMTR92 LFS"
       },
-      "source_url": "https://www.digikey.com/en/products/detail/c-k/PTS645SM43SMTR92-LFS/1146840",
+      "source_url": "https://www.littelfuse.com/assetdocs/littelfuse-c-k-tactile-pts645-series-datasheet?assetguid=d58fc8a8-f6e1-4527-ab68-27635e632e39",
       "footprint": "Button_Switch_SMD:SW_Push_PTS645SM43SMTR92",
       "footprint_path": "hardware/kicad/revB/axu2cgb_expansion/footprints/Button_Switch_SMD.pretty/SW_Push_PTS645SM43SMTR92.kicad_mod",
-      "geometry_basis": "PTS645 6 x 6 mm SMT family geometry; exact 4.3 mm-height SPST-NO production variant is bound in the native schematic."
+      "geometry_basis": "Littelfuse/C&K PTS645 SMT G Type recommended PCB layout: outer X span 9.5 mm, inner X gap 6.4 mm => 1.55 mm pad width and centers at +/-3.975 mm; outer Y span 5.8 mm, inner Y gap 3.2 mm => 1.30 mm pad height and centers at +/-2.25 mm. Exact 4.3 mm actuator-height option is bound by PTS645SM43SMTR92 LFS."
     },
     "C105": {
       "manufacturer": "TDK",
