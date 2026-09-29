@@ -50,29 +50,42 @@ def _validate_mechanical(root: Path, contract: dict[str, Any], manifest: dict[st
     mechanical = contract.get("mechanical_bindings")
     if not isinstance(mechanical, dict):
         raise ValueError("prelayout mechanical_bindings missing")
-    refs = mechanical.get("required_open_refs")
+    if mechanical.get("required_open_refs") != []:
+        raise ValueError("layout entry must have zero required-open mechanical refs")
+    refs = mechanical.get("resolved_refs")
     if not isinstance(refs, list) or set(refs) != EXPECTED_MECHANICAL or len(refs) != 5:
-        raise ValueError("prelayout mechanical reference set drift")
-    if set(manifest.get("open_footprints", {})) != EXPECTED_MECHANICAL:
-        raise ValueError("schematic open-footprint set must remain the five mechanical interfaces")
-    if set(manifest.get("binding_requirements", {})) != EXPECTED_MECHANICAL:
-        raise ValueError("schematic mechanical binding requirements drift")
-    if manifest.get("layout_allowed") is not False:
-        raise ValueError("schematic manifest must not authorize Layout")
-    if plan.get("schema_version") != 2 or plan.get("layout_allowed") is not False:
+        raise ValueError("prelayout resolved mechanical reference set drift")
+    if manifest.get("schema_version") != 4 or manifest.get("layout_allowed") is not True:
+        raise ValueError("schematic manifest must be layout-entry ready")
+    if manifest.get("open_footprints") != {} or manifest.get("binding_requirements") != {}:
+        raise ValueError("schematic manifest must contain zero open mechanical bindings")
+    if plan.get("schema_version") != 3 or plan.get("layout_allowed") is not True:
         raise ValueError("mechanical plan schema/layout policy drift")
+    if plan.get("fabrication_allowed") is not False:
+        raise ValueError("mechanical plan must not authorize fabrication")
+
+    source_rel = mechanical.get("layout_sources")
+    source_path = _repo_file(root, source_rel, "layout source bindings")
+    sources = _load(source_path, "layout source bindings")
+    if sources.get("status") != "SOURCE_BOUND_LAYOUT_PARTS":
+        raise ValueError("layout source bindings status drift")
+
     interfaces = plan.get("interfaces")
     if not isinstance(interfaces, dict) or set(interfaces) != EXPECTED_MECHANICAL:
         raise ValueError("mechanical plan must contain exactly five interfaces")
     for ref, item in interfaces.items():
         if not isinstance(item, dict):
             raise ValueError(ref + ": mechanical plan entry must be an object")
-        if item.get("selection_status") != "OPEN_NO_PART_SELECTED":
-            raise ValueError(ref + ": selection must remain explicitly open until exact evidence exists")
-        if item.get("selected_part") is not None:
-            raise ValueError(ref + ": selected_part cannot be populated without closing workflow")
-        if item.get("evidence_pack") is not None:
-            raise ValueError(ref + ": evidence_pack cannot be declared before a real selection")
+        if item.get("selection_status") != "RESOLVED_FOR_LAYOUT":
+            raise ValueError(ref + ": selection must remain resolved for Layout")
+        if not isinstance(item.get("selected_part"), dict) or not item["selected_part"].get("mpn"):
+            raise ValueError(ref + ": selected_part must bind an exact MPN")
+        if item.get("evidence_pack") != source_rel:
+            raise ValueError(ref + ": layout source evidence binding drift")
+        source_item = sources.get("interfaces", {}).get(ref)
+        if not isinstance(source_item, dict) or source_item.get("footprint") is None:
+            raise ValueError(ref + ": layout source footprint missing")
+
     expected_connections = _load(
         _repo_file(root, plan.get("native_sources", {}).get("expected_connections"), "native expected connections"),
         "native expected connections",
@@ -118,29 +131,26 @@ def _validate_mechanical(root: Path, contract: dict[str, Any], manifest: dict[st
     if j5.get("disconnect_state") != "HIGH_IMPEDANCE_NOT_GUARANTEED_ZERO":
         raise ValueError("J5 disconnect semantics must remain high-impedance, not safe zero")
     j501 = plan["interfaces"]["J501"]
-    if "BLOCKER" not in str(j501.get("cable_short_behavior", "")):
-        raise ValueError("J501 cable-short semantics must remain an explicit blocker")
+    if "NON_SAFETY_RESIDUAL_RISK" not in str(j501.get("cable_short_behavior", "")):
+        raise ValueError("J501 cable-short semantics must retain explicit non-safety residual risk")
     j701 = plan["interfaces"]["J701"]
-    if "BLOCKER" not in str(j701.get("cable_short_behavior", "")):
-        raise ValueError("J701 cable-short semantics must remain an explicit blocker")
+    if "NON_SAFETY_RESIDUAL_RISK" not in str(j701.get("cable_short_behavior", "")):
+        raise ValueError("J701 cable-short semantics must retain explicit non-safety residual risk")
     if j701.get("lab_interface_envelope") != {"max_voltage_v": 24, "max_current_a": 0.01}:
         raise ValueError("J701 lab envelope drift")
     if j701.get("optorelay_off_state_leakage_component_limit_a") != 0.000001:
         raise ValueError("J701 component leakage limit drift")
-    close_rule = str(mechanical.get("close_rule", ""))
-    for term in ("exact selected part", "mating/cable", "evidence pack"):
-        if term not in close_rule:
-            raise ValueError("mechanical close rule lost required term: " + term)
     return sorted(EXPECTED_MECHANICAL)
-
 
 def _validate_cable_fault_architecture(root: Path, mechanical: dict[str, Any]) -> dict[str, Any]:
     path = mechanical.get("cable_fault_architecture")
     data = _load(_repo_file(root, path, "cable-fault architecture"), "cable-fault architecture")
-    if data.get("schema_version") != 1 or data.get("layout_allowed") is not False:
+    if data.get("schema_version") != 1 or data.get("layout_allowed") is not True:
         raise ValueError("cable-fault architecture schema/layout policy drift")
-    if data.get("status") != "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS":
-        raise ValueError("cable-fault architecture must remain decision-required")
+    if data.get("fabrication_allowed") is not False:
+        raise ValueError("cable-fault architecture must not authorize fabrication")
+    if data.get("status") != "NON_SAFETY_RESIDUAL_RISK_PATH_SELECTED_FOR_LAYOUT":
+        raise ValueError("cable-fault architecture resolution status drift")
     interfaces = data.get("interfaces")
     if not isinstance(interfaces, dict) or set(interfaces) != {"J501", "J701"}:
         raise ValueError("cable-fault architecture must cover exactly J501/J701")
@@ -150,8 +160,8 @@ def _validate_cable_fault_architecture(root: Path, mechanical: dict[str, Any]) -
     }
     for ref, options in expected_options.items():
         item = interfaces[ref]
-        if item.get("selected_resolution") is not None:
-            raise ValueError(ref + ": cable-short resolution cannot be selected without design/evidence closure")
+        if item.get("selected_resolution") != "ACCEPT_NON_SAFETY_RESIDUAL_RISK":
+            raise ValueError(ref + ": non-safety residual-risk layout resolution drift")
         if set(item.get("allowed_resolutions", {})) != options:
             raise ValueError(ref + ": cable-short resolution option drift")
         if "NOT_DETECTABLE" not in str(item.get("cable_short_detectability", "")):
@@ -171,7 +181,6 @@ def _validate_cable_fault_architecture(root: Path, mechanical: dict[str, Any]) -
         },
     }
 
-
 def _https(value: Any, name: str) -> str:
     if not isinstance(value, str) or not value.startswith("https://"):
         raise ValueError(name + ": HTTPS manufacturer source required")
@@ -184,8 +193,10 @@ def _validate_sources(
     component_candidates: dict[str, Any],
     capacitor_candidates: dict[str, Any],
 ) -> dict[str, Any]:
-    if registry.get("schema_version") != 1 or registry.get("layout_allowed") is not False:
+    if registry.get("schema_version") != 1 or registry.get("layout_allowed") is not True:
         raise ValueError("component source registry schema/layout policy drift")
+    if registry.get("fabrication_allowed") is not False:
+        raise ValueError("component source registry must not authorize fabrication")
     if registry.get("status") == "PASS":
         raise ValueError("manufacturer source discovery cannot be a qualification PASS")
 
@@ -234,9 +245,9 @@ def _validate_sources(
     input_row = mlcc["exact_parts"].get("C5750X7R1V476M230KC", {})
     if input_row.get("assigned_banks") != ["input_protected"]:
         raise ValueError("input_protected source registry assignment drift")
-    if input_row.get("land_pattern_status") != "MANUFACTURER_RECOMMENDATION_LOCATED_LOCAL_FOOTPRINT_NOT_EXACTLY_QUALIFIED":
+    if input_row.get("land_pattern_status") != "RESOLVED_TDK_RECOMMENDED_RANGE_PROJECT_FOOTPRINT_BOUND":
         raise ValueError("input_protected exact land-pattern status drift")
-    if input_row.get("local_footprint") != "Capacitor_SMD:C_2220_5750Metric":
+    if input_row.get("local_footprint") != "Capacitor_SMD:TDK_C5750X7R1V476M230KC":
         raise ValueError("input_protected local footprint binding drift")
     requirement = input_row.get("screening_requirement", {})
     if requirement.get("bias_screen_v") != 15.05 or requirement.get("minimum_effective_capacitance_uf") != 22:
