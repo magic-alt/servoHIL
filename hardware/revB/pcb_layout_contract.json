@@ -53,8 +53,14 @@
       }
     },
     "exact_mechanical_inputs_required_before_edge_cuts_freeze": {
-      "J12_center_xy_mm": null,
-      "J15_center_xy_mm": null,
+      "J12_center_xy_mm": [
+        5.2578,
+        42.5069
+      ],
+      "J15_center_xy_mm": [
+        94.742,
+        42.5069
+      ],
       "J12_pin1_orientation": null,
       "J15_pin1_orientation": null,
       "host_connector_manufacturer_and_mpn": null,
@@ -87,7 +93,7 @@
     "resolution_policy": "Use the pinned manufacturer DXF/STEP in hardware/carriers/axu2cgb/mechanical_source.json as the primary datum; direct caliper/CMM measurement of the actual board is an independent cross-check. Product photographs are review aids only and must not be converted into manufacturing coordinates.",
     "schematic_boundary_note": "J12/J15 are intentionally modelled as purchased-host logical boundaries with on_board=no. If direct mezzanine mating is selected, add only the minimum reviewed expansion-board mating connector representation needed for PCB connectivity; do not reopen unrelated schematic topology.",
     "mechanical_source_manifest": "hardware/carriers/axu2cgb/mechanical_source.json",
-    "source_status": "OFFICIAL_DXF_STEP_PINNED_OUTLINE_AND_MOUNTING_HOLES_BOUND_CONNECTORS_PENDING",
+    "source_status": "OFFICIAL_DXF_BOUND_OUTLINE_HOLES_AND_J12_J15_PIN_GRIDS_ORIENTATION_STACK_HEIGHT_PENDING",
     "extracted_geometry": {
       "mounting_holes": [
         {
@@ -110,7 +116,37 @@
           "y_mm": 80.5688,
           "drill_diameter_mm": 3.175
         }
-      ]
+      ],
+      "expansion_header_pin_grids": {
+        "J12": {
+          "columns_x_mm": [
+            3.9878,
+            6.5278
+          ],
+          "first_row_y_mm": 18.3769,
+          "last_row_y_mm": 66.6369,
+          "row_count": 20,
+          "pitch_mm": 2.54,
+          "center_xy_mm": [
+            5.2578,
+            42.5069
+          ]
+        },
+        "J15": {
+          "columns_x_mm": [
+            93.472,
+            96.012
+          ],
+          "first_row_y_mm": 18.3769,
+          "last_row_y_mm": 66.6369,
+          "row_count": 20,
+          "pitch_mm": 2.54,
+          "center_xy_mm": [
+            94.742,
+            42.5069
+          ]
+        }
+      }
     }
   },
   "phase1_work_that_may_proceed_without_exact_carrier_xy": [
