@@ -349,49 +349,21 @@ def _check_ad3542_evidence():
     return data, transcript, fp
 
 
-def _check_binding_requirements(manifest, by_ref, allowed):
-    requirements = manifest.get("binding_requirements")
-    if not isinstance(requirements, dict):
-        raise ValueError("binding_requirements must be an object")
-    if set(requirements) != allowed:
-        raise ValueError(
-            "binding requirement set changed: missing=%s unexpected=%s"
-            % (sorted(allowed - set(requirements)), sorted(set(requirements) - allowed))
-        )
-    if set(AD3542_REFS) & allowed:
-        raise ValueError("resolved AD3542R package bindings must not remain open blockers")
-
-    resolved = {ref: _resolve_requirement(requirements, ref) for ref in sorted(allowed)}
-    for ref in MECHANICAL_REFS:
-        req = resolved.get(ref)
-        row = by_ref.get(ref)
-        if req is None or not row:
-            raise ValueError("missing mechanical blocker " + ref)
-        if req.get("kind") != "mechanical_selection":
-            raise ValueError(ref + " must remain a mechanical_selection blocker")
-        if req.get("status") != "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED":
-            raise ValueError(ref + " must remain explicitly OPEN")
-        if row["footprint"]:
-            raise ValueError(ref + " must remain blank until real mechanical contract is bound")
-        if not isinstance(req.get("interface"), str) or not req["interface"].strip():
-            raise ValueError(ref + " must identify its physical interface")
-        _nonempty_string_list(
-            req.get("required_contract_fields"), ref + ".required_contract_fields", minimum=5
-        )
-        _nonempty_string_list(req.get("required_evidence"), ref + ".required_evidence", minimum=2)
-
-    j701 = resolved["J701"]
-    required_terms = " ".join(j701["required_contract_fields"]).lower()
-    for term in ("dut", "leakage", "isolation", "cable"):
-        if term not in required_terms:
-            raise ValueError("J701 physical contract must retain " + term + " requirement")
-    return resolved
+LAYOUT_REFS = ("J101", "SW101", "C105", "J5", "J501", "J701")
+LAYOUT_FOOTPRINTS = {
+    "J101": "Connector_Phoenix_MSTB:PhoenixContact_MSTBA_2,5_2-G-5,08_1x02_P5.08mm_Horizontal",
+    "SW101": "Button_Switch_SMD:SW_Push_PTS645SM43SMTR92",
+    "C105": "Capacitor_SMD:TDK_C5750X7R1V476M230KC",
+    "J5": "Connector_Phoenix_MC:PhoenixContact_MC_1,5_10-G-3.5_1x10_P3.50mm_Horizontal",
+    "J501": "Connector_Phoenix_MC:PhoenixContact_MC_1,5_2-G-3.5_1x02_P3.50mm_Horizontal",
+    "J701": "Connector_Molex:Molex_Micro-Fit_3.0_43045-0212_2x01_P3.00mm_Vertical",
+}
 
 
 def _check_resolved_ad3542(manifest, by_ref):
     bindings = manifest.get("resolved_bindings")
-    if not isinstance(bindings, dict) or set(bindings) != set(AD3542_REFS):
-        raise ValueError("resolved_bindings must contain exactly U20..U23")
+    if not isinstance(bindings, dict) or not set(AD3542_REFS).issubset(bindings):
+        raise ValueError("resolved_bindings must retain U20..U23")
     resolved = {ref: _resolve_requirement(bindings, ref) for ref in AD3542_REFS}
 
     for ref in AD3542_REFS:
@@ -427,15 +399,58 @@ def _check_resolved_ad3542(manifest, by_ref):
     return resolved, evidence, transcript, fp
 
 
+def _check_layout_bindings(manifest, by_ref):
+    bindings = manifest.get("resolved_bindings")
+    if not isinstance(bindings, dict):
+        raise ValueError("resolved_bindings must be an object")
+    if set(manifest.get("layout_entry_resolved_refs", [])) != set(LAYOUT_REFS):
+        raise ValueError("layout-entry resolved reference set drift")
+    if manifest.get("open_footprints") != {} or manifest.get("binding_requirements") != {}:
+        raise ValueError("layout entry requires zero open footprint/binding contracts")
+
+    resolved = {}
+    for ref in LAYOUT_REFS:
+        req = bindings.get(ref)
+        if not isinstance(req, dict):
+            raise ValueError(ref + ": missing resolved layout binding")
+        row = by_ref.get(ref)
+        if not row:
+            raise ValueError(ref + ": missing native schematic instance")
+        expected_fp = LAYOUT_FOOTPRINTS[ref]
+        if row["footprint"] != expected_fp:
+            raise ValueError(f"{ref}: native footprint drift: {row['footprint']} != {expected_fp}")
+        if manifest.get("bound_packages", {}).get(ref) != expected_fp:
+            raise ValueError(ref + ": bound_packages drift")
+        if req.get("footprint") != expected_fp:
+            raise ValueError(ref + ": resolved binding footprint drift")
+        if not str(req.get("status", "")).startswith("RESOLVED_"):
+            raise ValueError(ref + ": resolved binding status drift")
+        evidence = req.get("evidence_manifest")
+        if not isinstance(evidence, str) or not (ROOT / evidence).is_file():
+            raise ValueError(ref + ": source-bound layout evidence missing")
+        resolved[ref] = req
+
+    if resolved["C105"].get("mpn") != "C5750X7R1V476M230KC":
+        raise ValueError("C105 exact MPN drift")
+    if resolved["J101"].get("order_number") != "1757242":
+        raise ValueError("J101 exact order-number drift")
+    if resolved["J5"].get("order_number") != "1844294":
+        raise ValueError("J5 exact order-number drift")
+    if resolved["J501"].get("order_number") != "1844210":
+        raise ValueError("J501 exact order-number drift")
+    if resolved["J701"].get("order_number") != "430450212":
+        raise ValueError("J701 exact order-number drift")
+    return resolved
+
+
 def check():
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("schema_version") != 3:
+    if manifest.get("schema_version") != 4:
         raise ValueError("unsupported schematic-open-items schema")
-    if manifest.get("layout_allowed") is not False:
-        raise ValueError("schematic closure manifest must not authorize Layout")
-    close_policy = manifest.get("close_policy", "")
-    if not isinstance(close_policy, str) or "insufficient" not in close_policy or "source-bound" not in close_policy:
-        raise ValueError("close_policy must prevent evidence-free closure and retain source binding")
+    if manifest.get("layout_allowed") is not True:
+        raise ValueError("schematic closure manifest must authorize source-bound PCB Layout entry")
+    if manifest.get("status") != "SCHEMATIC_LAYOUT_ENTRY_READY_NO_OPEN_FOOTPRINTS":
+        raise ValueError("schematic layout-entry status drift")
 
     rows = placed_symbols()
     by_ref = {r["reference"]: r for r in rows}
@@ -444,23 +459,12 @@ def check():
         raise ValueError("duplicate physical references: " + str(dup))
 
     physical = [
-        r
-        for r in rows
+        r for r in rows
         if r["in_bom"] and r["on_board"] and not r["reference"].startswith("#")
     ]
     missing = {r["reference"] for r in physical if not r["footprint"]}
-    allowed = set(manifest.get("open_footprints", {}))
-    if missing != allowed:
-        raise ValueError(
-            "blank footprint set changed: unexpected=%s resolved_not_removed=%s"
-            % (sorted(missing - allowed), sorted(allowed - missing))
-        )
-
-    expected_status = f"SCHEMATIC_FUNCTION_COMPLETE_{len(allowed)}_PHYSICAL_BINDINGS_OPEN"
-    if manifest.get("status") != expected_status:
-        raise ValueError(
-            "manifest status/count drift: %r != %r" % (manifest.get("status"), expected_status)
-        )
+    if missing:
+        raise ValueError("layout entry requires zero blank physical footprints: " + str(sorted(missing)))
 
     for ref in manifest.get("excluded_host_boundaries", []):
         row = by_ref.get(ref)
@@ -480,23 +484,25 @@ def check():
         if not local.is_file():
             raise ValueError("missing locally vendored footprint for %s: %s" % (ref, local))
 
-    mechanical = _check_binding_requirements(manifest, by_ref, allowed)
+    layout_bindings = _check_layout_bindings(manifest, by_ref)
     ad_bindings, ad_evidence, transcript, fp = _check_resolved_ad3542(manifest, by_ref)
 
     return {
-        "status": "PASS_SOURCE_CLOSURE_CONTRACT",
+        "status": "PASS_LAYOUT_ENTRY_SOURCE_CLOSURE",
         "physical_components": len(physical),
-        "blank_footprints": sorted(missing),
-        "blank_footprint_count": len(missing),
-        "binding_requirement_count": len(mechanical),
+        "blank_footprints": [],
+        "blank_footprint_count": 0,
+        "binding_requirement_count": 0,
         "land_pattern_blockers": [],
         "resolved_land_patterns": sorted(ad_bindings),
-        "mechanical_blockers": sorted(mechanical),
+        "resolved_layout_refs": sorted(layout_bindings),
+        "mechanical_blockers": [],
         "ad3542r_footprint_evidence_status": ad_evidence["status"],
         "ad3542r_geometry_conclusion": transcript["conclusion"],
         "ad3542r_electrical_pad_count": fp["electrical_pad_count"],
         "ad3542r_mask_aperture_count": fp["mask_aperture_count"],
-        "layout_allowed": False,
+        "layout_allowed": True,
+        "fabrication_allowed": False,
     }
 
 
