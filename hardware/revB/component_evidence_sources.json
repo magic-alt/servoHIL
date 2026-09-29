@@ -3,8 +3,8 @@
   "revision": "Rev.B",
   "checked_on": "2026-09-29",
   "status": "MANUFACTURER_SOURCES_LOCATED_EVIDENCE_NOT_IMPORTED",
-  "layout_allowed": true,
-  "policy": "This registry records exact manufacturer source locations and catalog facts. Exact footprint/placement geometry may close the PCB Layout-entry subcheck; curve-based electrical qualification still requires archived/hash-bound source data and board-level physical evidence.",
+  "layout_allowed": false,
+  "policy": "This manufacturer/source registry is non-authorizing by itself: it records exact part identity, source locations and screened geometry only. Exact footprint/placement facts are consumed by hardware/revB/layout_entry_contract.json for PCB Layout entry; curve-based electrical qualification still requires archived/hash-bound source data and board-level physical evidence before fabrication/release.",
   "magnetics": {
     "manufacturer": "Coilcraft",
     "family": "XAL50xx",
