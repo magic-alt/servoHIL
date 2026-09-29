@@ -368,16 +368,31 @@ def _active_vivado_inputs(root: Path, harness_xdc: set[str]) -> dict[str, list[s
 def check(root: str | Path = ROOT) -> dict[str, Any]:
     root = Path(root)
     contract = _load(root / "hardware/revB/prelayout_qualification_contract.json", "prelayout contract")
-    if contract.get("schema_version") != 1:
+    if contract.get("schema_version") != 2:
         raise ValueError("unsupported prelayout contract schema")
-    if contract.get("layout_allowed") is not False or contract.get("status") != "BLOCKED_PRE_LAYOUT_EVIDENCE_REQUIRED":
-        raise ValueError("prelayout contract must remain fail-closed")
+    if (
+        contract.get("layout_allowed") is not True
+        or contract.get("fabrication_allowed") is not False
+        or contract.get("status") != "LAYOUT_ENTRY_COMPLETE_FABRICATION_QUALIFICATION_OPEN"
+    ):
+        raise ValueError("prelayout contract layout/fabrication state drift")
+
+    layout_entry = _load(root / "hardware/revB/layout_entry_contract.json", "layout entry contract")
+    if (
+        layout_entry.get("status") != "READY_FOR_PCB_LAYOUT"
+        or layout_entry.get("layout_allowed") is not True
+        or layout_entry.get("fabrication_allowed") is not False
+    ):
+        raise ValueError("layout-entry contract must remain ready-for-layout and fabrication-blocked")
 
     requirements = _load(root / "hardware/revB/qualification_requirements.json", "qualification requirements")
-    if requirements.get("schema_version") != 3:
-        raise ValueError("qualification requirements must use schema 3")
-    if requirements.get("release_policy", {}).get("layout_allowed") is not False:
-        raise ValueError("qualification requirements must preserve layout_allowed=false")
+    if requirements.get("schema_version") != 4:
+        raise ValueError("qualification requirements must use schema 4")
+    policy = requirements.get("release_policy", {})
+    if policy.get("layout_allowed") is not True or policy.get("fabrication_allowed") is not False:
+        raise ValueError("qualification release policy layout/fabrication drift")
+    if requirements.get("layout_entry_contract", {}).get("path") != "hardware/revB/layout_entry_contract.json":
+        raise ValueError("qualification layout-entry path drift")
 
     prelayout_ref = requirements.get("prelayout_contract", {}).get("path")
     if prelayout_ref != "hardware/revB/prelayout_qualification_contract.json":
@@ -385,7 +400,12 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
     mech_req = requirements.get("mechanical_bindings")
     if not isinstance(mech_req, dict) or set(mech_req.get("required_refs", [])) != EXPECTED_MECHANICAL:
         raise ValueError("qualification mechanical requirement set drift")
-    if mech_req.get("manifest") != contract["mechanical_bindings"]["manifest"] or mech_req.get("plan") != contract["mechanical_bindings"]["plan"]:
+    if mech_req.get("layout_resolved") is not True:
+        raise ValueError("qualification mechanical bindings must be resolved for Layout")
+    if (
+        mech_req.get("manifest") != contract["mechanical_bindings"]["manifest"]
+        or mech_req.get("plan") != contract["mechanical_bindings"]["plan"]
+    ):
         raise ValueError("qualification mechanical paths drift")
     registry_path = requirements.get("component_source_registry", {}).get("path")
     if registry_path != contract["component_evidence"]["source_registry"]:
@@ -393,7 +413,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
 
     manifest = _load(_repo_file(root, mech_req["manifest"], "mechanical manifest"), "mechanical manifest")
     plan = _load(_repo_file(root, mech_req["plan"], "mechanical plan"), "mechanical plan")
-    mechanical_open = _validate_mechanical(root, contract, manifest, plan)
+    mechanical_resolved = _validate_mechanical(root, contract, manifest, plan)
     cable_fault_state = _validate_cable_fault_architecture(root, contract["mechanical_bindings"])
 
     registry = _load(_repo_file(root, registry_path, "component source registry"), "component source registry")
@@ -430,8 +450,10 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
         raise ValueError("DUT evidence paths cannot be predeclared")
 
     gates = _load(root / "hardware/revB/gates.json", "Rev.B gates")
-    if gates.get("layout_allowed") is not False:
-        raise ValueError("Rev.B gates must preserve layout_allowed=false")
+    if gates.get("layout_allowed") is not True or gates.get("fabrication_allowed") is not False:
+        raise ValueError("Rev.B gates layout/fabrication policy drift")
+    if gates.get("layout_entry", {}).get("status") != "READY_FOR_PCB_LAYOUT":
+        raise ValueError("Rev.B layout-entry gate status drift")
 
     work = contract.get("workstreams", {}).get("VIVADO_IO_DRC_TIMING", {})
     vivado_contract = _validate_vivado_contract(root, work)
@@ -440,19 +462,23 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
     if vivado["harness_xdc"] != ["fpga/revb/io_drc/axu2cgb_io_drc.xdc"]:
         raise ValueError("expected exactly the reviewed I/O DRC harness XDC")
     if not vivado["functional_xdc"] and not vivado["project"]:
-        if work.get("status") != "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED":
-            raise ValueError("Vivado workstream must reflect bound I/O DRC harness and blocked timing")
-        vivado_status = "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED"
+        expected_work_status = "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED_FOR_FABRICATION"
+        if work.get("status") != expected_work_status:
+            raise ValueError("Vivado workstream must reflect layout-ready/fabrication-blocked state")
+        vivado_status = expected_work_status
     else:
         vivado_status = "FUNCTIONAL_INPUTS_PRESENT_REQUIRE_EXACT_BINDING_REVIEW"
 
     return {
-        "schema_version": 1,
-        "status": "PASS_CONTRACT_BLOCKED_EVIDENCE",
-        "layout_allowed": False,
-        "mechanical_open_refs": mechanical_open,
-        "mechanical_open_count": len(mechanical_open),
-        "mechanical_fault_semantic_blockers": {
+        "schema_version": 2,
+        "status": "PASS_LAYOUT_ENTRY_CONTRACT_FABRICATION_BLOCKED",
+        "layout_allowed": True,
+        "fabrication_allowed": False,
+        "mechanical_open_refs": [],
+        "mechanical_open_count": 0,
+        "mechanical_resolved_refs": mechanical_resolved,
+        "mechanical_fault_semantic_blockers": {},
+        "mechanical_residual_risks": {
             "J501": plan["interfaces"]["J501"]["cable_short_behavior"],
             "J701": plan["interfaces"]["J701"]["cable_short_behavior"],
         },
@@ -466,7 +492,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
         "vivado_input_contract": vivado_contract,
         "active_vivado_inputs": vivado,
         "workstreams": {k: v.get("status") for k, v in sorted(contract.get("workstreams", {}).items())},
-        "note": "Contract integrity passes; physical/tool/manufacturer evidence remains blocked and no Layout authorization is implied."
+        "note": "Source-level PCB Layout entry is closed. Physical/tool/manufacturer evidence remains fail-closed for fabrication/release."
     }
 
 
