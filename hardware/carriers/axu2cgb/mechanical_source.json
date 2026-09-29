@@ -2,13 +2,16 @@
   "schema_version": 1,
   "carrier_id": "axu2cgb",
   "board_variant": "AXU2CGB-original",
-  "status": "OFFICIAL_MECHANICAL_CAD_LOCATED_COORDINATE_EXTRACTION_PENDING",
+  "status": "OFFICIAL_CAD_BOUND_OUTLINE_AND_MOUNTING_HOLES_EXTRACTED_CONNECTORS_PENDING",
   "source_repository": "alinxalinx/AXU2CGA_AXU2CGB",
   "source_commit": "43effb3dacf1f9c7e76ac801d21f14a66f14d24e",
   "official_product_page": "https://www.en.alinx.com/Product/SoC-Development-Boards/Zynq-UltraScale-plus-MPSoC/AXU2CGB.html",
   "official_user_manual": "https://www.alinx.com/public/upload/file/AXU2CGAB_User_Manual.pdf",
   "documented_host_facts": {
-    "form_factor_mm": [100, 85],
+    "form_factor_mm": [
+      100,
+      85
+    ],
     "expansion_port_count": 2,
     "expansion_port_pin_count": 40,
     "expansion_port_pitch_mm": 2.54,
@@ -36,5 +39,37 @@
     }
   },
   "usage_policy": "Use the pinned official DXF/STEP as the primary mechanical datum. Product photographs are not dimensional evidence. Extract and review J12/J15, hole and height coordinates before freezing the Rev.B PCB outline.",
-  "fabrication_allowed": false
+  "fabrication_allowed": false,
+  "extracted_geometry": {
+    "coordinate_system": "ALINX_DXF_NATIVE_MM",
+    "board_outline_mm": {
+      "width": 100,
+      "height": 85
+    },
+    "primary_mounting_holes": [
+      {
+        "x_mm": 4.445,
+        "y_mm": 4.445,
+        "drill_diameter_mm": 3.175
+      },
+      {
+        "x_mm": 95.5548,
+        "y_mm": 4.445,
+        "drill_diameter_mm": 3.175
+      },
+      {
+        "x_mm": 4.445,
+        "y_mm": 80.5688,
+        "drill_diameter_mm": 3.175
+      },
+      {
+        "x_mm": 95.5548,
+        "y_mm": 80.5688,
+        "drill_diameter_mm": 3.175
+      }
+    ],
+    "evidence": "CI-parsed pinned DXF entity inventory",
+    "source_blob_sha": "3d3e2af818db5514c503d16d592db3629b0ff00f",
+    "extraction_note": "Exactly four radius-1.5875 mm circles occur at the symmetric board-corner mounting locations; diameter is 3.175 mm. Connector geometry remains separately review-bound."
+  }
 }
