@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "source_commit": "193d8bc61edc690c2f8518b8da784f56a821d872",
+  "price_snapshot_date": "2026-09-29",
+  "planning_fx": {
+    "USD_CNY": 6.71,
+    "note": "Engineering planning rate only; not an accounting or settlement rate."
+  },
+  "coverage": {
+    "physical_instances": 439,
+    "populated_instances": 431,
+    "dnp_instances": 8,
+    "grouped_bom_lines": 139
+  },
+  "costs_cny": {
+    "one_fully_stuffed_board_components": 4085.41,
+    "five_fully_stuffed_boards_components": 17153.21
+  },
+  "exclusions": [
+    "PCB fabrication",
+    "SMT/THT assembly",
+    "stencil",
+    "freight",
+    "VAT/duties",
+    "AXU2CGB host board",
+    "J12/J15 physical mating connector pair because exact host/mating MPN and stack height remain unbound",
+    "rework/scrap/yield reserve"
+  ],
+  "interpretation": "EXACT_QUOTE and CANDIDATE_QUOTE use a dated small-quantity source price where available. BUDGET_GENERIC is an engineering allowance, not an approved manufacturer MPN. Fabrication/release gates remain unchanged."
+}
