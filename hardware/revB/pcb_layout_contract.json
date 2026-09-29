@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "checked_on": "2026-09-29",
+  "status": "PHASE1_LAYOUT_ACTIVE_EXACT_CARRIER_MECHANICS_OPEN",
+  "layout_allowed": true,
+  "fabrication_allowed": false,
+  "release_allowed": false,
+  "layout_branch": "feat/revb-pcb-layout-phase1",
+  "layout_sequence": [
+    "mechanical_reference_and_board_outline",
+    "stackup_and_design_rules",
+    "power_and_precision_analog_placement",
+    "grounding_and_return_path",
+    "routing",
+    "pcb_drc"
+  ],
+  "source_schematic": "hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_sch",
+  "pcb_source": {
+    "path": "hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_pcb",
+    "status": "NOT_CREATED_UNTIL_EXACT_CARRIER_MECHANICAL_REFERENCE_IS_BOUND",
+    "reason": "Do not manufacture a guessed J12/J15 or mounting-hole geometry."
+  },
+  "carrier_mechanical_reference": {
+    "carrier_id": "axu2cgb",
+    "board_variant": "AXU2CGB-original",
+    "official_manual": "https://www.alinx.com/public/upload/file/AXU2CGAB_User_Manual.pdf",
+    "official_product_page": "https://www.en.alinx.com/Product/SoC-Development-Boards/Zynq-UltraScale-plus-MPSoC/AXU2CGB.html",
+    "documented_facts": {
+      "J12": {
+        "pins": 40,
+        "rows": 2,
+        "columns": 20,
+        "pitch_mm": 2.54,
+        "io_voltage_v": 1.8,
+        "logical_boundary": "hardware/carriers/axu2cgb/physical_pinout.csv"
+      },
+      "J15": {
+        "pins": 40,
+        "rows": 2,
+        "columns": 20,
+        "pitch_mm": 2.54,
+        "io_voltage_v": 3.3,
+        "logical_boundary": "hardware/carriers/axu2cgb/physical_pinout.csv"
+      }
+    },
+    "exact_mechanical_inputs_required_before_edge_cuts_freeze": {
+      "J12_center_xy_mm": null,
+      "J15_center_xy_mm": null,
+      "J12_pin1_orientation": null,
+      "J15_pin1_orientation": null,
+      "host_connector_manufacturer_and_mpn": null,
+      "mating_connector_manufacturer_and_mpn": null,
+      "mated_stack_height_mm": null,
+      "carrier_mounting_hole_xy_and_drill_mm": null,
+      "carrier_component_height_keepouts": null
+    },
+    "resolution_policy": "Use manufacturer CAD/drawing or direct caliper/CMM measurement of the actual AXU2CGB. Product photographs are review aids only and must not be converted into manufacturing coordinates.",
+    "schematic_boundary_note": "J12/J15 are intentionally modelled as purchased-host logical boundaries with on_board=no. If direct mezzanine mating is selected, add only the minimum reviewed expansion-board mating connector representation needed for PCB connectivity; do not reopen unrelated schematic topology."
+  },
+  "phase1_work_that_may_proceed_without_exact_carrier_xy": [
+    "six_layer_stackup_role_definition",
+    "net_class_and_clearance_policy",
+    "critical_power_and_analog_placement_constraints",
+    "ground_and_return_path_policy",
+    "connector_edge_and_esd_ordering_constraints",
+    "routing_priority_and_via_policy",
+    "pcb_drc_acceptance_contract"
+  ],
+  "deferred_fabrication_or_release_gates": [
+    "manufacturer DC-bias / temperature / ESR and magnetics curves hash-bound review",
+    "real DUT adapter thresholds, leakage and shutdown-time measurements",
+    "partial-power/backfeed and power-off measurements",
+    "assembled-board thermal evidence",
+    "low-energy fixture acceptance and cable-fault injection",
+    "Vivado I/O DRC raw evidence and functional STA/CDC closure",
+    "EMC, power-down, fault injection and FOC closed-loop acceptance"
+  ],
+  "note": "Exact carrier mechanical coordinates are a PCB-geometry input, not a reason to return to broad schematic redesign. Fabrication/release evidence remains fail-closed and does not block the independent Layout work listed above."
+}
