@@ -157,6 +157,30 @@ def inspect(text: str, *, source_encoding: str = "unknown") -> dict[str, Any]:
         if any(key in str(row["text"]).upper() for key in ("J12", "J15", "100", "85", "MM", "HOLE", "MOUNT"))
     ]
 
+    # The two 2x20 expansion sockets are located near opposite board edges in
+    # the manufacturer drawing. Report likely plated-hole circle centers
+    # without assigning connector identity automatically. The repeated
+    # 0.8636-mm radius geometry is especially useful for spotting the
+    # 2.54-mm pin grids, but the output remains review evidence rather than an
+    # inferred manufacturing binding.
+    edge_circle_candidates = [
+        row for row in circles
+        if 0.40 <= row["radius"] <= 1.00
+        and (
+            -2.0 <= row["x"] <= 18.0
+            or 82.0 <= row["x"] <= 102.0
+        )
+        and -2.0 <= row["y"] <= 87.0
+    ]
+    edge_circle_candidates.sort(key=lambda row: (row["x"], row["y"], row["radius"]))
+
+    repeated_grid_radius = 0.8636
+    repeated_grid_circles = [
+        row for row in circles
+        if abs(row["radius"] - repeated_grid_radius) <= 1e-4
+    ]
+    repeated_grid_circles.sort(key=lambda row: (row["x"], row["y"]))
+
     return {
         "format": "ASCII_DXF",
         "source_encoding": source_encoding,
@@ -169,6 +193,8 @@ def inspect(text: str, *, source_encoding: str = "unknown") -> dict[str, Any]:
         "circle_count": len(circles),
         "circle_radius_histogram": {str(k): v for k, v in sorted(radius_hist.items())},
         "likely_mounting_hole_circles": likely_mounting,
+        "edge_circle_candidates": edge_circle_candidates,
+        "repeated_0_8636mm_radius_circles": repeated_grid_circles,
         "text_entity_count": len(text_items),
         "relevant_text": relevant_text,
         "insert_count": len(inserts),
