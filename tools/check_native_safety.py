@@ -89,10 +89,12 @@ REVIEWED_COMPONENT_DELTAS = {
     }
     for ref in ('U20', 'U21', 'U22', 'U23')
 }
-# C105's X7R text is a reviewed value refinement for the exact screening
-# candidate; connectivity and the still-unqualified generic 2220 footprint do not change.
+# C105 is a reviewed exact-part Layout closure delta. Connectivity remains frozen;
+# only this exact machine-parseable value and the TDK source-bound land pattern may differ.
+# Electrical DC-bias/RMS/ESR/thermal qualification remains blocked independently.
 REVIEWED_COMPONENT_DELTAS['C105'] = {
-    'value': '47uF / 35V X7R effective >=22uF',
+    'value': '47uF / 35V X7R / TDK C5750X7R1V476M230KC',
+    'footprint': 'Capacitor_SMD:TDK_C5750X7R1V476M230KC',
 }
 
 REVIEWED_FOOTPRINT_DELTAS = {
