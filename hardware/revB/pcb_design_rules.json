@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "revision": "Rev.B",
+  "checked_on": "2026-09-29",
+  "status": "LAYOUT_RULES_ACTIVE_FAB_STACK_NOT_YET_BOUND",
+  "layout_allowed": true,
+  "fabrication_allowed": false,
+  "release_allowed": false,
+  "stackup": {
+    "layer_count": 6,
+    "target_total_thickness_mm": 1.6,
+    "manufacturer_stackup_bound": false,
+    "layers": [
+      {"name": "F.Cu", "role": "components_and_signal"},
+      {"name": "In1.Cu", "role": "continuous_ground_reference"},
+      {"name": "In2.Cu", "role": "power_distribution_and_slow_signal"},
+      {"name": "In3.Cu", "role": "signal"},
+      {"name": "In4.Cu", "role": "continuous_ground_reference"},
+      {"name": "B.Cu", "role": "components_and_signal"}
+    ],
+    "policy": "L2 and L5 stay continuous GND references. Do not cut a reference plane merely to create an AGND/DGND visual partition. Final dielectric/copper thickness and impedance geometry must come from the selected PCB fabricator before fabrication release."
+  },
+  "baseline_geometry_mm": {
+    "minimum_clearance": 0.20,
+    "default_signal_width": 0.20,
+    "default_via_diameter": 0.60,
+    "default_via_drill": 0.30,
+    "copper_to_board_edge": 0.30,
+    "silkscreen_to_pad": 0.15
+  },
+  "net_classes": {
+    "DEFAULT": {
+      "trace_width_mm": 0.20,
+      "clearance_mm": 0.20,
+      "via_diameter_mm": 0.60,
+      "via_drill_mm": 0.30
+    },
+    "POWER_INPUT": {
+      "nets": ["VIN_RAW", "VIN_PROT"],
+      "preferred_implementation": "short_wide_polygon_or_trace",
+      "minimum_trace_width_mm_when_not_poured": 1.00,
+      "clearance_mm": 0.25
+    },
+    "POWER_MEDIUM": {
+      "nets": ["6V2_PRE", "3V3_D", "1V8_D", "+5V0_DAC", "+5V2_PVDD", "-5V2_PVSS"],
+      "preferred_implementation": "polygon_or_short_wide_trace",
+      "minimum_trace_width_mm_when_not_poured": 0.50,
+      "clearance_mm": 0.20
+    },
+    "PRECISION_ANALOG": {
+      "patterns": ["AO*", "DUT_AO*", "AI*", "ADC_REF*", "VREF*", "REF*"],
+      "trace_width_mm": 0.20,
+      "clearance_mm": 0.25,
+      "reference_plane": "continuous_GND",
+      "routing_policy": "No switch-node adjacency; minimize layer changes; keep return path continuous."
+    },
+    "FAST_SINGLE_ENDED": {
+      "patterns": ["DAC_*", "ADC_DOUT*", "ADC_SCLK", "ADC_CS_N", "ADC_SDI", "ADC_CONVST", "ADC_BUSY", "ADC_RESET"],
+      "trace_width_mm": 0.20,
+      "clearance_mm": 0.20,
+      "reference_plane": "continuous_GND",
+      "hard_length_match_required": false,
+      "routing_policy": "Route as compact groups over an uninterrupted GND reference, avoid stubs, and minimize vias. Numeric skew limits remain a timing-analysis item rather than an invented fabrication rule."
+    },
+    "EXTERNAL_DIFFERENTIAL": {
+      "patterns": ["ENC*_P*_A", "ENC*_P*_B", "RS485_A", "RS485_B"],
+      "impedance_target_ohm": 120,
+      "impedance_tolerance_percent": 10,
+      "geometry_status": "TARGET_ONLY_PENDING_FABRICATOR_STACKUP",
+      "routing_policy": "Pair-coupled routing from transceiver to protection/connector, no long stubs, no plane split crossing."
+    }
+  },
+  "critical_placement": [
+    {
+      "domain": "input_power",
+      "ordered_refs": ["J101", "F101", "D101", "D102", "U101", "C105"],
+      "rule": "Place at a board edge and preserve the physical current-flow order. TVS and input bulk return must be compact."
+    },
+    {
+      "domain": "positive_switchers",
+      "refs": ["U201", "L201", "U202", "L202", "U203", "L203"],
+      "rule": "Each regulator forms a compact local hot loop with its input/output capacitors. Keep SW copper small and away from ADC/DAC/reference nodes."
+    },
+    {
+      "domain": "negative_switcher",
+      "refs": ["U301", "L301", "L302", "D301", "C410", "C411"],
+      "rule": "Keep the LT8330 switching/transfer loop compact and physically separated from precision analog."
+    },
+    {
+      "domain": "low_noise_rails",
+      "refs": ["U211", "U212", "U302"],
+      "rule": "Place downstream of switching stages and close to the precision loads they serve; do not route switching nodes beneath them."
+    },
+    {
+      "domain": "dac",
+      "refs": ["U20", "U21", "U22", "U23"],
+      "rule": "Cluster each DAC with its local decoupling and analog output network. Keep digital ingress on the host-facing side and analog egress toward J5."
+    },
+    {
+      "domain": "adc",
+      "refs": ["U801"],
+      "rule": "Keep AD7606C-16, its reference/decoupling and RC network compact. Connector-side ESD precedes the RC/ADC victim in the physical path."
+    },
+    {
+      "domain": "encoder_phy",
+      "refs": ["U901", "U902", "U903", "U904", "J901", "J902"],
+      "rule": "Place SM712 protection adjacent to the external connector, then termination/transceiver. Keep differential loops compact."
+    },
+    {
+      "domain": "permit_and_interlock",
+      "refs": ["J501", "J701"],
+      "rule": "Place at accessible board edges and preserve their documented non-safety residual-risk semantics; placement must not imply STO."
+    }
+  ],
+  "grounding_and_return_path": {
+    "primary_policy": "continuous_ground_planes_with_functional_zoning",
+    "split_ground_planes": false,
+    "rules": [
+      "Use placement to separate switchers, digital PHY, ADC and DAC domains instead of cutting GND.",
+      "Do not route a fast or precision signal across a void in its reference plane.",
+      "Add nearby GND stitching vias at every high-speed layer transition.",
+      "Keep switching-current return loops local and away from precision analog return paths.",
+      "Place connector ESD return vias immediately adjacent to the protection device.",
+      "Treat J5 pins 9/10 as signal GND, not chassis or protective earth."
+    ]
+  },
+  "routing_priority": [
+    "switching_hot_loops_and_power_current_paths",
+    "precision_reference_and_dac_adc_analog",
+    "external_differential_pairs",
+    "fast_dac_adc_digital_groups",
+    "safety_handshake_and_control",
+    "remaining_low_speed_signals"
+  ],
+  "drc_acceptance": {
+    "kicad_drc_required": true,
+    "unconnected_items_allowed": 0,
+    "clearance_violations_allowed": 0,
+    "track_width_violations_allowed": 0,
+    "via_violations_allowed": 0,
+    "courtyard_overlap_policy": "review_and_zero_unwaived_at_layout_close",
+    "edge_clearance_violations_allowed": 0,
+    "impedance_geometry_can_close_before_fab_stack": false,
+    "fabrication_output_allowed": false
+  },
+  "note": "These are Layout design rules, not a released PCB-fabricator stackup. Controlled-impedance trace widths/gaps must be recalculated from the selected fabricator stack before Gerber/fabrication authorization."
+}

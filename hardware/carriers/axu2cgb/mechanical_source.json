@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "carrier_id": "axu2cgb",
+  "board_variant": "AXU2CGB-original",
+  "status": "OFFICIAL_CAD_BOUND_OUTLINE_HOLES_HEADER_GRIDS_AND_PIN1_STACK_HEIGHT_PENDING",
+  "source_repository": "alinxalinx/AXU2CGA_AXU2CGB",
+  "source_commit": "43effb3dacf1f9c7e76ac801d21f14a66f14d24e",
+  "official_product_page": "https://www.en.alinx.com/Product/SoC-Development-Boards/Zynq-UltraScale-plus-MPSoC/AXU2CGB.html",
+  "official_user_manual": "https://www.alinx.com/public/upload/file/AXU2CGAB_User_Manual.pdf",
+  "documented_host_facts": {
+    "form_factor_mm": [
+      100,
+      85
+    ],
+    "expansion_port_count": 2,
+    "expansion_port_pin_count": 40,
+    "expansion_port_pitch_mm": 2.54,
+    "J12_io_voltage_v": 1.8,
+    "J15_io_voltage_v": 3.3
+  },
+  "cad_sources": {
+    "step": {
+      "path": "hardware/STEP_Models/AXU2CG.stp",
+      "github_blob_sha": "d3a131d2c2db3096ff5bcc0679a5a0558b7f3a82",
+      "size_bytes": 26022403,
+      "url": "https://github.com/alinxalinx/AXU2CGA_AXU2CGB/blob/43effb3dacf1f9c7e76ac801d21f14a66f14d24e/hardware/STEP_Models/AXU2CG.stp"
+    },
+    "dxf": {
+      "path": "hardware/STEP_Models/AXU2CG_size_structure.dxf",
+      "github_blob_sha": "3d3e2af818db5514c503d16d592db3629b0ff00f",
+      "size_bytes": 1145671,
+      "url": "https://github.com/alinxalinx/AXU2CGA_AXU2CGB/blob/43effb3dacf1f9c7e76ac801d21f14a66f14d24e/hardware/STEP_Models/AXU2CG_size_structure.dxf"
+    },
+    "mechanical_pdf": {
+      "path": "hardware/STEP_Models/AXU2CG_size_structure.pdf",
+      "github_blob_sha": "da3eed9fdcbd906074f8e95cfd007165283e8020",
+      "size_bytes": 42523,
+      "url": "https://github.com/alinxalinx/AXU2CGA_AXU2CGB/blob/43effb3dacf1f9c7e76ac801d21f14a66f14d24e/hardware/STEP_Models/AXU2CG_size_structure.pdf"
+    }
+  },
+  "usage_policy": "Use the pinned official DXF/STEP as the primary mechanical datum. Product photographs are not dimensional evidence. Extract and review J12/J15, hole and height coordinates before freezing the Rev.B PCB outline.",
+  "fabrication_allowed": false,
+  "extracted_geometry": {
+    "coordinate_system": "ALINX_DXF_NATIVE_MM",
+    "board_outline_mm": {
+      "width": 100,
+      "height": 85
+    },
+    "primary_mounting_holes": [
+      {
+        "x_mm": 4.445,
+        "y_mm": 4.445,
+        "drill_diameter_mm": 3.175
+      },
+      {
+        "x_mm": 95.5548,
+        "y_mm": 4.445,
+        "drill_diameter_mm": 3.175
+      },
+      {
+        "x_mm": 4.445,
+        "y_mm": 80.5688,
+        "drill_diameter_mm": 3.175
+      },
+      {
+        "x_mm": 95.5548,
+        "y_mm": 80.5688,
+        "drill_diameter_mm": 3.175
+      }
+    ],
+    "evidence": "CI-parsed pinned DXF entity inventory",
+    "source_blob_sha": "3d3e2af818db5514c503d16d592db3629b0ff00f",
+    "extraction_note": "Exactly four radius-1.5875 mm circles occur at the symmetric board-corner mounting locations; diameter is 3.175 mm. Connector geometry remains separately review-bound.",
+    "expansion_header_pin_grids": {
+      "J12": {
+        "columns_x_mm": [
+          3.9878,
+          6.5278
+        ],
+        "rows_y_mm": {
+          "first": 18.3769,
+          "last": 66.6369,
+          "count": 20,
+          "pitch": 2.54
+        },
+        "geometric_center_xy_mm": [
+          5.2578,
+          42.5069
+        ],
+        "grid_span_mm": [
+          2.54,
+          48.26
+        ],
+        "pin1_orientation_status": "BOUND_FROM_DXF_SQUARE_PAD",
+        "pin1_center_xy_mm": [
+          6.5278,
+          18.3769
+        ],
+        "pin1_grid_position": "right_column_low_y",
+        "pin1_evidence": "Top-level ENTITIES contains a closed square LWPOLYLINE on PIN_TOP centered at this grid position while the other 39 positions are radius-0.8636 mm circles."
+      },
+      "J15": {
+        "columns_x_mm": [
+          93.472,
+          96.012
+        ],
+        "rows_y_mm": {
+          "first": 18.3769,
+          "last": 66.6369,
+          "count": 20,
+          "pitch": 2.54
+        },
+        "geometric_center_xy_mm": [
+          94.742,
+          42.5069
+        ],
+        "grid_span_mm": [
+          2.54,
+          48.26
+        ],
+        "pin1_orientation_status": "BOUND_FROM_DXF_SQUARE_PAD",
+        "pin1_center_xy_mm": [
+          93.472,
+          66.6369
+        ],
+        "pin1_grid_position": "left_column_high_y",
+        "pin1_evidence": "Top-level ENTITIES contains a closed square LWPOLYLINE on PIN_TOP centered at this grid position while the other 39 positions are radius-0.8636 mm circles."
+      }
+    },
+    "expansion_header_evidence": "DXF contains two 2x20 repeated radius-0.8636 mm circle grids at the left/right expansion positions, exactly 2.54 mm pitch and 48.26 mm row span."
+  }
+}

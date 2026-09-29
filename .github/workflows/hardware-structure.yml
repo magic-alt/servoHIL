@@ -17,6 +17,19 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Archived baseline and active architecture
         run: python tools/check_revb_repository.py
+      - name: PCB Layout phase contract
+        run: python tools/check_revb_pcb_layout_contract.py
+      - name: Inspect pinned AXU2CGB mechanical DXF
+        shell: bash
+        run: |
+          mkdir -p build/revB
+          curl --fail --location --retry 3 \
+            https://raw.githubusercontent.com/alinxalinx/AXU2CGA_AXU2CGB/43effb3dacf1f9c7e76ac801d21f14a66f14d24e/hardware/STEP_Models/AXU2CG_size_structure.dxf \
+            -o build/revB/AXU2CG_size_structure.dxf
+          test "$(git hash-object build/revB/AXU2CG_size_structure.dxf)" = "3d3e2af818db5514c503d16d592db3629b0ff00f"
+          python tools/inspect_axu2cgb_dxf.py \
+            build/revB/AXU2CG_size_structure.dxf \
+            --output build/revB/axu2cgb-mechanical-inventory.json
       - name: Validate both carrier contracts
         run: |
           python tools/revb.py validate --carrier axu2cgb

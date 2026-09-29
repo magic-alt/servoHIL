@@ -49,6 +49,8 @@ ADC 输入前端和双编码器 PHY。`70_adc_frontend`、`80_encoder_phy` 是�
 
 ## Layout entry 与 fabrication qualification 状态
 
+当前 Layout Phase 1 已建立 `hardware/revB/pcb_layout_contract.json` 与 `hardware/revB/pcb_design_rules.json`：目标为 6 层板（L2/L5 连续 GND 参考面），先闭合机械基准/板框/keepout，再进入 power/precision-analog placement、return path、routing 与 PCB DRC。AXU2CGB 官方仓库已固定到 commit `43effb3dacf1f9c7e76ac801d21f14a66f14d24e` 的 STEP/DXF/机械 PDF；官方 DXF 已闭合 100×85 mm 轮廓、四个主安装孔、J12/J15 2×20 pin-grid/中心以及方形 pin-1 方向。仍未闭合的是主板连接器与配对连接器的精确 MPN、mated stack height 和元件高度 keepout，因此当前不会用通用 2×20 footprint 猜测生成可制造 PCB。
+
 `hardware/revB/layout_entry_contract.json` 当前状态为 `READY_FOR_PCB_LAYOUT`；`hardware/revB/prelayout_qualification_contract.json` 则转为 `LAYOUT_ENTRY_COMPLETE_FABRICATION_QUALIFICATION_OPEN`。也就是说 source-level 设计已经允许进入 placement/routing，但 fabrication/release 仍 fail-closed。
 机械、电气与实测工作分别由以下文件约束：
 
