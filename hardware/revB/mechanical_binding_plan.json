@@ -79,7 +79,18 @@
         "2": "GND"
       },
       "native_value": "PTS645SM43SMTR92 LFS / POWER RESET / SPST-NO",
-      "electrical_role": "Low-energy UVLO/reset control contact; not the 12 V main-current path"
+      "electrical_role": "Low-energy UVLO/reset control contact; not the 12 V main-current path",
+      "manufacturer_datasheet": "https://www.littelfuse.com/assetdocs/littelfuse-c-k-tactile-pts645-series-datasheet?assetguid=d58fc8a8-f6e1-4527-ab68-27635e632e39",
+      "recommended_pcb_layout_mm": {
+        "outer_x_span": 9.5,
+        "inner_x_gap": 6.4,
+        "pad_width": 1.55,
+        "center_x_abs": 3.975,
+        "outer_y_span": 5.8,
+        "inner_y_gap": 3.2,
+        "pad_height": 1.3,
+        "center_y_abs": 2.25
+      }
     },
     "J5": {
       "interface": "eight-channel analog output",
