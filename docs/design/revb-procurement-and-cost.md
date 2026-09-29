@@ -73,6 +73,10 @@ Used when the schematic/mechanical contract binds the MPN and a current
 authorized source was available. Examples include AD3542RBCPZ16,
 AD7606C-16BSTZ, LT3045EMSE#PBF, TPS259474LRPWR, J5/J101/J501/J701 and C105.
 
+### EXACT_MPN_NO_LIVE_QUOTE
+
+Used when the exact manufacturer MPN is bound but the authorized source has no executable small-quantity quote at the snapshot. The BOM may carry a conservative engineering allowance, but the row must be re-quoted before PO. PESD15VL1BA,115 is the current example.
+
 ### CANDIDATE_QUOTE
 
 Used for exact candidates already present in qualification evidence, for example

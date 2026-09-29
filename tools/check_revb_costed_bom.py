@@ -20,7 +20,7 @@ def main():
   refs=row["refs"].split(); assert int(row["qty_per_board"])==len(refs)
   for ref in refs: assert ref not in seen; seen[ref]=row
   if row["populate"]=="DNP": dnp+=len(refs); assert float(row["extended_cny_one_board"])==0; assert row["pricing_status"]=="DNP"
-  else: assert row["pricing_status"] in {"EXACT_QUOTE","CANDIDATE_QUOTE","ORDERABLE_MPN_MISMATCH","BUDGET_GENERIC"}; total+=float(row["extended_cny_one_board"])
+  else: assert row["pricing_status"] in {"EXACT_QUOTE","EXACT_MPN_NO_LIVE_QUOTE","CANDIDATE_QUOTE","ORDERABLE_MPN_MISMATCH","BUDGET_GENERIC"}; total+=float(row["extended_cny_one_board"])
  assert set(seen)==set(sch),f"coverage mismatch missing={sorted(set(sch)-set(seen))} extra={sorted(set(seen)-set(sch))}"
  assert len(sch)==439 and len(rows)==139 and dnp==8 and sum(not x["dnp"] for x in sch.values())==431
  assert seen["U501"]["pricing_status"]=="ORDERABLE_MPN_MISMATCH" and seen["U501"]["procurement_mpn"]=="TPS3430WDRCR"
