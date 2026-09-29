@@ -1,9 +1,14 @@
 ref,qty,part,role,status
-U20-U23,4,AD3542RBCPZ16,8-channel DAC,schematic candidate; footprint and analog review OPEN
+U20-U23,4,AD3542RBCPZ16,8-channel DAC,exact CP-28-15 land pattern RESOLVED; analog/fabrication qualification OPEN
 R300/R301/R320/R321/R340/R341/R360/R361,8,52.3ohm,AO source isolation,starting value; cable and ADC load review OPEN
 R1,1,10kohm,DAC RESET default pull-down,not a standalone safety solution
 J1,1,regulated bench rail interface,I/O power boundary,onboard regulator design NOT COMPLETE
 J2,1,independent safety interface,external hardware safety boundary,implementation and validation NOT COMPLETE
 J3,1,ADC integration interface,8-AI digital reservation,ADC AFE/physical implementation NOT COMPLETE
 J4,1,digital PHY integration interface,PWM dual encoder RS485 management,PHY/protection NOT COMPLETE
-J5,1,8-AO DUT interface,scaled and clamped by DUT adapter,mechanical/adapter review OPEN
+J5,1,Phoenix Contact 1844294 MC 1.5/10-G-3.5,8-AO DUT interface,exact board connector RESOLVED for Layout; DUT adapter qualification OPEN
+J101,1,Phoenix Contact 1757242 MSTBA 2.5/2-G-5.08,9-15V field input,exact board connector RESOLVED for Layout
+SW101,1,C&K PTS645SM43SMTR92 LFS,power-reset control,exact switch/footprint RESOLVED for Layout
+C105,1,TDK C5750X7R1V476M230KC,47uF 35V X7R input bulk,exact land pattern RESOLVED for Layout; DC-bias/RMS/thermal qualification OPEN
+J501,1,Phoenix Contact 1844210 MC 1.5/2-G-3.5,3.3V dry-contact service interlock,exact connector RESOLVED for Layout; non-safety cable-short residual risk
+J701,1,Molex 43045-0212 / 430450212,floating DUT permit contact,exact connector RESOLVED for Layout; non-safety cable-short residual risk
