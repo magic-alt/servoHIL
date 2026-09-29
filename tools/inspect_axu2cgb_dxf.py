@@ -174,6 +174,17 @@ def inspect(text: str, *, source_encoding: str = "unknown") -> dict[str, Any]:
     ]
     edge_circle_candidates.sort(key=lambda row: (row["x"], row["y"], row["radius"]))
 
+    edge_text_candidates = [
+        row for row in text_items
+        if row.get("x") is not None and row.get("y") is not None
+        and (
+            -2.0 <= float(row["x"]) <= 18.0
+            or 82.0 <= float(row["x"]) <= 102.0
+        )
+        and 12.0 <= float(row["y"]) <= 72.0
+    ]
+    edge_text_candidates.sort(key=lambda row: (float(row["x"]), float(row["y"]), str(row["text"])))
+
     repeated_grid_radius = 0.8636
     repeated_grid_circles = [
         row for row in circles
@@ -194,6 +205,7 @@ def inspect(text: str, *, source_encoding: str = "unknown") -> dict[str, Any]:
         "circle_radius_histogram": {str(k): v for k, v in sorted(radius_hist.items())},
         "likely_mounting_hole_circles": likely_mounting,
         "edge_circle_candidates": edge_circle_candidates,
+        "edge_text_candidates": edge_text_candidates,
         "repeated_0_8636mm_radius_circles": repeated_grid_circles,
         "text_entity_count": len(text_items),
         "relevant_text": relevant_text,
