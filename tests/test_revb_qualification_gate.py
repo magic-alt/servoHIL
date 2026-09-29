@@ -85,21 +85,27 @@ class DutProfileQualificationTests(unittest.TestCase):
         self.assertEqual(result["status"], "BLOCKED")
         self.assertIn("DUT_PHYSICAL_EVIDENCE_MISSING", result["blockers"])
 
-    def test_board_report_never_authorizes_layout_from_analytical_inputs(self):
+    def test_board_report_authorizes_layout_but_not_fabrication_from_source_closure(self):
         report = build_qualification_report(ROOT)
-        self.assertFalse(report["layout_allowed"])
-        self.assertEqual(report["qualification"], "BLOCKED")
+        self.assertTrue(report["layout_allowed"])
+        self.assertFalse(report["fabrication_allowed"])
+        self.assertEqual(report["layout_entry"], "READY_FOR_PCB_LAYOUT")
+        self.assertEqual(report["qualification"], "BLOCKED_FOR_FABRICATION")
         self.assertIn("DUT_PROFILE_UNBOUND", report["blockers"])
 
-    def test_component_and_fixture_requirements_cannot_disappear_from_aggregate(self):
+    def test_component_and_fixture_requirements_remain_fabrication_blockers(self):
         report = build_qualification_report(ROOT)
-        self.assertEqual(report["schema_version"], 3)
-        self.assertFalse(report["layout_allowed"])
+        self.assertEqual(report["schema_version"], 4)
+        self.assertTrue(report["layout_allowed"])
+        self.assertFalse(report["fabrication_allowed"])
         self.assertEqual(set(report["mechanical_required"]), {"J101", "SW101", "J5", "J501", "J701"})
-        self.assertIn("MECHANICAL_J701_REQUIRED", report["blockers"])
-        self.assertEqual(report["prelayout_contract"]["status"], "PASS_CONTRACT_BLOCKED_EVIDENCE")
-        self.assertEqual(report["prelayout_evidence_status"]["mechanical"]["J701"], "NOT_RUN")
-        self.assertEqual(report["verified_requirement_evidence"], {})
+        self.assertNotIn("MECHANICAL_J701_REQUIRED", report["blockers"])
+        self.assertEqual(
+            report["prelayout_contract"]["status"],
+            "PASS_LAYOUT_ENTRY_CONTRACT_FABRICATION_BLOCKED",
+        )
+        self.assertEqual(report["prelayout_evidence_status"]["mechanical"]["J701"], "BOUND_FOR_LAYOUT")
+        self.assertIn("mechanical.J701", report["verified_requirement_evidence"])
         self.assertIn("MAGNETICS_L_I_T_CURVES", report["component_evidence_required"])
         self.assertIn("MAGNETICS_AC_CORE_AND_WINDING_LOSS", report["component_evidence_required"])
         self.assertIn("MLCC_EXACT_MPN_DC_BIAS_CURVES", report["component_evidence_required"])
@@ -110,18 +116,9 @@ class DutProfileQualificationTests(unittest.TestCase):
         self.assertIn("VIVADO_TIMING", report["vivado_required"])
         self.assertIn("EMC", report["post_layout_release_required"])
         self.assertIn("FOC_CLOSED_LOOP", report["post_layout_release_required"])
-        self.assertIn(
-            "COMPONENT_MAGNETICS_L_I_T_CURVES_REQUIRED",
-            report["blockers"],
-        )
-        self.assertIn(
-            "COMPONENT_MLCC_EXACT_MPN_DC_BIAS_CURVES_REQUIRED",
-            report["blockers"],
-        )
-        self.assertIn(
-            "PHYSICAL_LOW_ENERGY_FIXTURE_ACCEPTANCE_REQUIRED",
-            report["blockers"],
-        )
+        self.assertIn("COMPONENT_MAGNETICS_L_I_T_CURVES_REQUIRED", report["blockers"])
+        self.assertIn("COMPONENT_MLCC_EXACT_MPN_DC_BIAS_CURVES_REQUIRED", report["blockers"])
+        self.assertIn("PHYSICAL_LOW_ENERGY_FIXTURE_ACCEPTANCE_REQUIRED", report["blockers"])
 
     def test_prelayout_evidence_registry_has_exact_required_coverage(self):
         status = json.loads((ROOT / "hardware/revB/prelayout_evidence_status.json").read_text())
@@ -135,8 +132,14 @@ class DutProfileQualificationTests(unittest.TestCase):
             requirements["vivado_required"],
         )
         self.assertEqual(result["carrier"], "axu2cgb")
-        self.assertEqual(result["verified"], {})
-        self.assertTrue(all(v == "NOT_RUN" for section in result["states"].values() for v in section.values()))
+        self.assertTrue(all(v == "BOUND_FOR_LAYOUT" for v in result["states"]["mechanical"].values()))
+        self.assertTrue(all(v == "NOT_RUN" for v in result["states"]["component"].values()))
+        self.assertTrue(all(v == "NOT_RUN" for v in result["states"]["physical"].values()))
+        self.assertTrue(all(v == "NOT_RUN" for v in result["states"]["vivado"].values()))
+        self.assertEqual(
+            set(result["verified"]),
+            {"mechanical.J101", "mechanical.SW101", "mechanical.J5", "mechanical.J501", "mechanical.J701"},
+        )
 
     def test_prelayout_evidence_registry_does_not_change_design_source_digest(self):
         with tempfile.TemporaryDirectory() as td:
