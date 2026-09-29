@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "revision": "Rev.B",
-  "status": "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS",
-  "layout_allowed": false,
+  "status": "NON_SAFETY_RESIDUAL_RISK_PATH_SELECTED_FOR_LAYOUT",
+  "layout_allowed": true,
   "safety_boundary": "These interfaces are lab inhibit/permit mechanisms, not certified functional safety. Selecting an option below does not create an STO claim.",
   "interfaces": {
     "J501": {
@@ -13,7 +13,7 @@
       "cable_open_detectability": "DETECTABLE_AS_OPEN_CONTACT_BY_CURRENT_DESIGN",
       "cable_short_detectability": "NOT_DETECTABLE_BY_CURRENT_TWO_WIRE_TOPOLOGY",
       "short_failure_semantics": "A short across J501 pins 1-2 is electrically indistinguishable from a closed/healthy remote contact.",
-      "selected_resolution": null,
+      "selected_resolution": "ACCEPT_NON_SAFETY_RESIDUAL_RISK",
       "allowed_resolutions": {
         "EOL_SUPERVISED_INPUT": {
           "description": "Place a reviewed end-of-line resistance/network at the remote contact and measure a window rather than only binary closure.",
@@ -53,7 +53,8 @@
           ]
         }
       },
-      "close_rule": "selected_resolution and its design/evidence contract must be reviewed before the cable-short semantic blocker can leave pre-layout review"
+      "close_rule": "The PCB may enter Layout with the explicitly non-safety residual-risk option selected. Before fabrication/release, the fixture/DUT test plan must retain the short-to-healthy/short-to-permit limitation and verify end-to-end inhibit behavior.",
+      "resolution_status": "SELECTED_FOR_LAYOUT_REAL_DUT_FIXTURE_SIGNOFF_STILL_REQUIRED"
     },
     "J701": {
       "role": "floating normally-open DUT permit contact",
@@ -63,7 +64,7 @@
       "cable_open_detectability": "DUT_DEPENDENT",
       "cable_short_detectability": "NOT_DETECTABLE_BY_HIL_CURRENT_TWO_WIRE_CONTACT",
       "short_failure_semantics": "A short across DUT_PERMIT_A/B can bypass the HIL open-contact inhibit; whether the DUT detects that short is entirely DUT-interface dependent.",
-      "selected_resolution": null,
+      "selected_resolution": "ACCEPT_NON_SAFETY_RESIDUAL_RISK",
       "allowed_resolutions": {
         "DUT_SIDE_LINE_MONITORING": {
           "description": "Bind a real DUT input that independently diagnoses line short/open or uses a coded/test-pulse permit input.",
@@ -105,7 +106,10 @@
         "redundant safety output",
         "cable-short fail-safe without external monitoring"
       ],
-      "close_rule": "selected_resolution must be consistent with the real DUT adapter and measured cable-fault behavior before the cable-short semantic blocker can leave pre-layout review"
+      "close_rule": "The PCB may enter Layout with the explicitly non-safety residual-risk option selected. Before fabrication/release, the fixture/DUT test plan must retain the short-to-healthy/short-to-permit limitation and verify end-to-end inhibit behavior.",
+      "resolution_status": "SELECTED_FOR_LAYOUT_REAL_DUT_FIXTURE_SIGNOFF_STILL_REQUIRED"
     }
-  }
+  },
+  "fabrication_allowed": false,
+  "checked_on": "2026-09-29"
 }
