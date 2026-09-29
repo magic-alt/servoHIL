@@ -21,16 +21,21 @@ class RevBPrelayoutContractTests(unittest.TestCase):
     def load(self, rel):
         return json.loads((ROOT / rel).read_text(encoding="utf-8"))
 
-    def test_checked_in_contract_is_fail_closed_and_machine_auditable(self):
+    def test_checked_in_contract_allows_layout_but_blocks_fabrication(self):
         report = check(ROOT)
-        self.assertEqual(report["status"], "PASS_CONTRACT_BLOCKED_EVIDENCE")
-        self.assertFalse(report["layout_allowed"])
-        self.assertEqual(set(report["mechanical_open_refs"]), EXPECTED_MECHANICAL)
-        self.assertEqual(report["mechanical_open_count"], 5)
-        self.assertIn("BLOCKER", report["mechanical_fault_semantic_blockers"]["J501"])
-        self.assertIn("BLOCKER", report["mechanical_fault_semantic_blockers"]["J701"])
+        self.assertEqual(report["status"], "PASS_LAYOUT_ENTRY_CONTRACT_FABRICATION_BLOCKED")
+        self.assertTrue(report["layout_allowed"])
+        self.assertFalse(report["fabrication_allowed"])
+        self.assertEqual(report["mechanical_open_refs"], [])
+        self.assertEqual(report["mechanical_open_count"], 0)
+        self.assertEqual(set(report["mechanical_resolved_refs"]), EXPECTED_MECHANICAL)
+        self.assertIn("NON_SAFETY_RESIDUAL_RISK", report["mechanical_residual_risks"]["J501"])
+        self.assertIn("NON_SAFETY_RESIDUAL_RISK", report["mechanical_residual_risks"]["J701"])
         self.assertEqual(report["dut_adapter_status"], "UNBOUND")
-        self.assertEqual(report["vivado_status"], "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED")
+        self.assertEqual(
+            report["vivado_status"],
+            "IO_DRC_HARNESS_BOUND_NOT_RUN_TIMING_BLOCKED_FOR_FABRICATION",
+        )
         self.assertEqual(report["vivado_input_contract"]["target_part"], "xczu2cg-sfvc784-1-e")
         self.assertEqual(report["vivado_input_contract"]["marketing_part"], "XCZU2CG-1SFVC784E")
         self.assertEqual(
@@ -60,7 +65,7 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "selected_part"):
             _validate_mechanical(ROOT, contract, manifest, plan)
 
-    def test_native_mechanical_pinouts_are_bound_without_fake_part_selection(self):
+    def test_native_mechanical_pinouts_and_exact_parts_are_bound(self):
         plan = self.load("hardware/revB/mechanical_binding_plan.json")
         self.assertEqual(plan["interfaces"]["J101"]["pinout"], {"1": "VIN_RAW", "2": "GND"})
         self.assertEqual(plan["interfaces"]["J5"]["pin_count"], 10)
@@ -68,7 +73,12 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         self.assertEqual(plan["interfaces"]["J5"]["pinout"]["10"], "GND")
         self.assertEqual(plan["interfaces"]["J501"]["pinout"], {"1": "INTERLOCK_FEED", "2": "INTERLOCK_RAW"})
         self.assertEqual(plan["interfaces"]["J701"]["pinout"], {"1": "DUT_PERMIT_A", "2": "DUT_PERMIT_B"})
-        self.assertTrue(all(plan["interfaces"][ref]["selected_part"] is None for ref in EXPECTED_MECHANICAL))
+        self.assertTrue(
+            all(isinstance(plan["interfaces"][ref]["selected_part"], dict) for ref in EXPECTED_MECHANICAL)
+        )
+        self.assertTrue(
+            all(plan["interfaces"][ref]["selection_status"] == "RESOLVED_FOR_LAYOUT" for ref in EXPECTED_MECHANICAL)
+        )
 
     def test_j5_stale_eight_pin_metadata_is_rejected(self):
         contract = self.load("hardware/revB/prelayout_qualification_contract.json")
@@ -89,13 +99,19 @@ class RevBPrelayoutContractTests(unittest.TestCase):
                     _validate_mechanical(ROOT, contract, manifest, plan)
 
 
-    def test_two_wire_cable_short_architecture_remains_decision_required(self):
+    def test_two_wire_cable_short_architecture_is_explicitly_non_safety(self):
         report = check(ROOT)
         state = report["cable_fault_architecture"]
-        self.assertEqual(state["status"], "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS")
+        self.assertEqual(state["status"], "NON_SAFETY_RESIDUAL_RISK_PATH_SELECTED_FOR_LAYOUT")
         self.assertIn("NOT_DETECTABLE", state["J501"])
         self.assertIn("NOT_DETECTABLE", state["J701"])
-        self.assertEqual(state["selected_resolutions"], {"J501": None, "J701": None})
+        self.assertEqual(
+            state["selected_resolutions"],
+            {
+                "J501": "ACCEPT_NON_SAFETY_RESIDUAL_RISK",
+                "J701": "ACCEPT_NON_SAFETY_RESIDUAL_RISK",
+            },
+        )
 
     def test_j701_cable_fault_contract_cannot_claim_sto(self):
         from check_revb_prelayout_contract import _validate_cable_fault_architecture
@@ -103,10 +119,10 @@ class RevBPrelayoutContractTests(unittest.TestCase):
         data = self.load("hardware/revB/cable_fault_architecture.json")
         self.assertIn("STO", data["interfaces"]["J701"]["forbidden_claims"])
         self.assertIn("redundant safety output", data["interfaces"]["J701"]["forbidden_claims"])
-        self.assertIsNone(data["interfaces"]["J701"]["selected_resolution"])
+        self.assertEqual(data["interfaces"]["J701"]["selected_resolution"], "ACCEPT_NON_SAFETY_RESIDUAL_RISK")
         self.assertEqual(
             _validate_cable_fault_architecture(ROOT, contract["mechanical_bindings"])["status"],
-            "DECISION_REQUIRED_CABLE_SHORT_SEMANTICS",
+            "NON_SAFETY_RESIDUAL_RISK_PATH_SELECTED_FOR_LAYOUT",
         )
 
     def test_template_can_never_be_promoted_to_pass(self):
