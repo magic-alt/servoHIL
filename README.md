@@ -23,6 +23,25 @@ ServoHIL 面向伺服驱动器和关节模组的实时 Hardware-in-the-Loop 验�
 PR #22 完成原生 ADC/PHY 电路；PR #23 完成资格门禁、AD7606C-16 初始化/采样 RTL、completion-only health 集成和 Vivado 证据导入框架。PR #27 已用 ADI Rev.C、CP-28-15 package drawing 与官方 EVAL Gerber/IPC-356/BOM 关闭 U20~U23 四个 exact land-pattern blocker，使 source-level physical blocker 从 9 降为 5。
 PR #28 建立了 fail-closed qualification contract；PR #29 增加了 AXU2CGB Vivado package-pin/IOSTANDARD DRC harness。当前 Layout-entry 收尾分支进一步关闭五个机械接口与 C105 exact land pattern，并把 Layout entry 与 fabrication/release qualification 分层，避免用“必须先有实板证据”反向阻塞 PCB Layout。PR #21 的 13 页 / 144 项测试仅保留为历史检查点。
 
+## 统一设计说明书与完整 BOM
+
+Rev.B 现在提供一个单一工程入口：
+[Rev.B Hardware Design Guide](docs/design/revb-hardware-design-guide.md)，集中说明
+15 页原理图设计意图、电源计算、J12/J15 引脚、电源/安全状态机、ADC/DAC/PHY、
+PCB Layout 规则、不可静默替换器件和首板 bring-up 顺序。
+
+采购与成本由 [Rev.B Procurement and Cost Snapshot](docs/design/revb-procurement-and-cost.md)
+以及 `bom/revb-costed.csv` 管理。当前 costed BOM 从原生 KiCad 反向核对，
+覆盖 439 个 on-board 物理实例（431 populated + 8 DNP），139 个归并采购行。
+2026-09-29 规划快照约为 **¥4,085.41/块全装元器件**，
+5 块全装元器件约 **¥17,153.21**；不含 PCB/SMT/THT、税运、AXU2CGB 和仍未绑定的
+J12/J15 mating connector stack。价格状态明确区分 exact quote、qualification
+candidate、generic budget 与 orderable-MPN mismatch，不能把预算价当 production release。
+
+特别地，U501 当前原理图值 `TPS3430DRCR` 与 TI 当前 active orderable
+`TPS3430WDRCR` 不一致，costed BOM 会 fail-closed 标记为
+`ORDERABLE_MPN_MISMATCH`，fabrication 前必须审查并统一。
+
 ## 打开工程与查阅证据
 
 ```text
@@ -68,6 +87,8 @@ ADC 输入前端和双编码器 PHY。`70_adc_frontend`、`80_encoder_phy` 是�
 ```sh
 python tools/check_revb_schematic_closure.py
 python tools/check_revb_prelayout_contract.py
+python tools/check_revb_pcb_layout_contract.py
+python tools/check_revb_costed_bom.py
 python tools/revb_qualification.py
 ```
 

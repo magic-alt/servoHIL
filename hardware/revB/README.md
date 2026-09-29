@@ -6,153 +6,80 @@ Rev.B is a **single-ZU2CG** HIL architecture. The active editable native KiCad s
 hardware/kicad/revB/axu2cgb_expansion/servohil_io_revB.kicad_pro
 ```
 
-The current functional schematic topology is closed at **15 pages**. It includes the
-AXU2CGB carrier boundary, power/protection, DAC and physical AO disconnect, hardware
-watchdog/interlock, floating DUT permit, ADC frontend, PWM/AUX/RS-485 boundaries and
-SSI/BiSS PHY. This is not equivalent to a production-qualified PCB.
+For the consolidated design rationale, calculations, pin definitions, Layout
+rules, procurement policy and first-board bring-up procedure, use:
 
-## Source and generated review kits
+- `docs/design/revb-hardware-design-guide.md`
+- `docs/design/revb-procurement-and-cost.md`
+- `bom/revb-costed.csv`
 
-The checked-in native KiCad files under
-`hardware/kicad/revB/axu2cgb_expansion/` are the active schematic design source.
-`tools/revb.py generate` remains useful for carrier-contract review fixtures and
-compatibility regressions; generated build directories are not the manufacturing
-source of truth.
+## Current gate state
 
-Example non-release review generation:
+The 15-page source-level schematic and Layout-entry contract are closed sufficiently
+to start PCB placement/routing:
 
-```sh
-python tools/revb.py validate --carrier axu2cgb
-python tools/revb.py generate --carrier axu2cgb --output build/revB
-```
+- `layout_allowed=true`
+- `fabrication_allowed=false`
+- `release_allowed=false`
+- layout-entry status: `READY_FOR_PCB_LAYOUT`
 
-The alternative ZU2CG SoM profile remains vendor/model **UNBOUND**. Synthetic SoM
-fixtures only test tooling compatibility and do not establish product compatibility.
+This means **Layout may proceed, but Gerber/fabrication/production release may not**.
 
-## Physical binding state
+The five previously open board-side mechanical parts are now source-bound for
+Layout: J101=Phoenix 1757242, SW101=PTS645SM43SMTR92 LFS,
+J5=Phoenix 1844294, J501=Phoenix 1844210 and J701=Molex 43045-0212.
+C105 is bound to TDK C5750X7R1V476M230KC and U20..U23 retain the reviewed exact
+AD3542R CP-28-15 land pattern. The current native source audit has **zero on-board
+blank footprints**.
 
-`hardware/revB/schematic_open_items.json` is the fail-closed source for unresolved
-blank footprints. It currently contains **5** blockers, all mechanical/interface
-contracts:
+AXU2CGB official CAD now binds the 100 x 85 mm host outline, four mounting holes,
+J12/J15 pin grids/centers and pin-1 orientation. Exact host/mating connector MPN,
+mated stack height and carrier component-height keepouts remain open, so a guessed
+generic 2x20 mating footprint must not be released.
 
-- J101: 12 V field connector mechanical/cable contract;
-- SW101: reset switch actuator/mechanical contract;
-- J5: AO connector and DUT cable contract;
-- J501: dry-contact service/interlock connector contract;
-- J701: floating DUT-permit connector, actual DUT voltage/current/leakage/isolation and cable contract.
+## Qualification boundary
 
-U20..U23 are source-bound to the reviewed
-`Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R` footprint. That footprint is
-traceable to the official EVAL-AD3542RFMCZ BOM, IPC-356 and top copper/mask/paste
-Gerber geometry through `hardware/revB/ad3542r_footprint_evidence.json` and
-`hardware/revB/evidence/ad3542r/u1_geometry_review.json`. The reviewed land pattern
-has 28 perimeter pads at 0.40 mm pitch and no center/exposed pad.
+The following remain fabrication/release gates:
 
-U101 and L201/L202/L301/L302/L203 also have source-level package/footprint
-bindings. None of these bindings constitutes electrical, thermal, magnetic,
-mechanical or production qualification.
+- exact J12/J15 host/mating connector stack definition;
+- manufacturer MLCC and magnetic characterization;
+- power margin and DAC analog stability;
+- real DUT adapter neutral/permit thresholds, leakage, cable-fault behavior and
+  maximum shutdown time;
+- partial-power/backfeed and powered-off interface behavior;
+- assembled-board thermal;
+- low-energy fault-injection fixture;
+- Vivado raw I/O DRC and functional STA/CDC bound to the exact part/top/XDC/source;
+- EMC, power-down, physical fault injection and FOC closed-loop acceptance.
 
-Run:
+J501/J701 remain laboratory non-safety dry-contact/permit interfaces. A cross-line
+cable short can mimic a closed contact; neither interface is STO or redundant
+functional safety.
 
-```sh
-python tools/check_revb_schematic_closure.py
-```
+## Costed BOM contract
 
-A passing source-closure report only proves that the checked-in schematic matches the
-explicit binding contract. It does not authorize Layout.
+`bom/revb-costed.csv` covers all **439** on-board physical refs:
+**431 populated + 8 DNP**, grouped into **139 purchasing lines**.
+`tools/check_revb_costed_bom.py` fails if coverage drifts.
 
-## Pre-layout qualification workstreams
+The 2026-09-29 planning snapshot is approximately **CNY 4,085.41** components for
+one fully stuffed board and **CNY 17,153.21** components for five fully stuffed
+boards after applicable small-quantity breaks. These figures exclude PCB,
+assembly, freight/tax, AXU2CGB and the still-unbound J12/J15 mating connector stack.
 
-The remaining pre-layout work is coordinated by
-`hardware/revB/prelayout_qualification_contract.json`. Its checked-in state is
-deliberately **BLOCKED_PRE_LAYOUT_EVIDENCE_REQUIRED** and cannot authorize Layout.
+The BOM also records U501 as an explicit `ORDERABLE_MPN_MISMATCH`: schematic
+`TPS3430DRCR` versus TI's current active orderable `TPS3430WDRCR`. It must be
+resolved by design review before fabrication, not silently substituted.
 
-Run both source/evidence contract audits:
+## Checks
 
 ```sh
 python tools/check_revb_schematic_closure.py
 python tools/check_revb_prelayout_contract.py
+python tools/check_revb_pcb_layout_contract.py
+python tools/check_revb_costed_bom.py
 python tools/revb_qualification.py
 ```
 
-The five mechanical interfaces have a machine-readable selection plan in
-`hardware/revB/mechanical_binding_plan.json`. Known native electrical facts are
-already bound there, but no connector or switch is claimed as selected: each exact
-part and evidence pack remains null until the real enclosure, mating cable and DUT
-contract are known.
-
-The native contract currently resolves J101 as a 2-pin 9–15 V input, SW101 as a
-2-pin normally-open reset/control contact, and J5 as **10 pins**: eight DUT_AO
-signals plus two ground contacts. J501 and J701 are both two-wire dry-contact
-interfaces. Their cable-short behavior is deliberately an architecture blocker:
-shorting the two wires can mimic/force a closed contact, so connector selection
-alone cannot prove fail-safe short detection.
-
-Manufacturer-source discovery is tracked separately in
-`hardware/revB/component_evidence_sources.json`:
-
-- Coilcraft XAL5050-103MEC / XAL5050-682MEC / XAL5030-472MEC source pages and the
-  current XAL50xx datasheet are located, but the characteristic bytes/curves are
-  not yet hash-archived and independently digitized;
-- TDK exact characterization sheets are located for the assigned 22 uF / 16 V,
-  10 uF / 25 V and automotive 1 uF / 50 V candidates, but no reviewed,
-  hash-bound DC-bias curve pack has yet been imported;
-- the protected-input MLCC bank still has no exact production MPN.
-
-Located source URLs are provenance discovery, not qualification evidence.
-
-The executable bench/tool plans live under
-`hardware/revB/verification_plans/`:
-
-- `dut_adapter_acceptance.json`;
-- `partial_power_backfeed.json`;
-- `board_thermal.json`;
-- `low_energy_fixture.json`;
-- `vivado_io_timing.json`.
-
-All checked-in results remain `NOT_RUN`. The Vivado input contract now binds the
-AXU2CGB-original target device to `xczu2cg-sfvc784-1-e`
-(`XCZU2CG-1SFVC784E`). The existing `carrier.xdc.preview` remains preview-only
-and cannot close a gate. A reviewed I/O-DRC top, active XDC, functional timing top,
-clock/generated-clock definitions, I/O delays and timing/CDC policy are still
-required before IO-DRC/STA evidence can be accepted.
-
-`hardware/revB/prelayout_evidence_status.json` is the machine state for future
-closure. Every mechanical/component/physical/Vivado item begins at `NOT_RUN`.
-A PASS must use the same source-digest-bound, raw-SHA256 evidence envelope as the
-existing Rev.B release path; the qualification aggregator rejects missing coverage,
-stale source identity, path escape, carrier mismatch and changed raw bytes.
-
-## Qualification state
-
-`hardware/revB/qualification_requirements.json`,
-`hardware/revB/dut_adapter_profile.json` and `hardware/revB/gates.json` are
-fail-closed. At this checkpoint `layout_allowed=false`.
-
-Before Layout, the project still requires:
-
-1. exact physical closure of the 5 remaining mechanical/interface items;
-2. power margin, thermal, MLCC and magnetic evidence, including XAL5050 L(I,T),
-   AC/core/winding losses, startup/short-circuit saturation and mounted-board
-   temperature rise;
-3. exact-MPN MLCC DC-bias curves plus temperature/aging and applicable ESR/RMS-current
-   evidence;
-4. a real DUT adapter profile binding AO neutral behavior, permit thresholds/leakage,
-   cable open/short response and maximum end-to-end disable time to raw measurements;
-5. partial-power/backfeed testing with relevant interfaces energized while other
-   domains are unpowered;
-6. Vivado IO DRC and STA reports bound to the exact part/top/XDC/source revision;
-7. low-energy fixture acceptance and engineering review.
-
-Post-layout/sample qualification still requires real EMC, board thermal,
-power-down, fault injection and FOC closed-loop evidence.
-
-## Safety semantics
-
-- AO disconnect is **high impedance**, not a guaranteed safe zero-voltage output.
-- The single floating DUT permit contact is **not redundant STO** and must not be
-  represented as certified functional safety.
-- Catalog ratings, exact footprints, ERC, SPICE and RTL simulation are design
-  evidence; none is a board-level safety or production certificate.
-- A gate must not be changed to PASS without raw evidence tied to the exact hardware,
-  DUT, tool inputs and revision that were actually tested.
+Passing these source/contract checks is not a physical qualification or production
+certificate.
