@@ -17,6 +17,8 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Archived baseline and active architecture
         run: python tools/check_revb_repository.py
+      - name: PCB Layout phase contract
+        run: python tools/check_revb_pcb_layout_contract.py
       - name: Validate both carrier contracts
         run: |
           python tools/revb.py validate --carrier axu2cgb
