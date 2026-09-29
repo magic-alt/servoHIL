@@ -1,35 +1,35 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "revision": "Rev.B",
   "carrier": "axu2cgb",
-  "status": "ALL_REQUIRED_EVIDENCE_NOT_RUN",
-  "layout_allowed": false,
-  "policy": "Every PASS uses the same source_digest + raw_report SHA-256 evidence envelope as the Rev.B release path. Templates, source URLs, screenshots, catalog rows and analytical PASSes do not change these entries.",
+  "status": "LAYOUT_SOURCE_BINDINGS_COMPLETE_FABRICATION_EVIDENCE_OPEN",
+  "layout_allowed": true,
+  "policy": "Mechanical/source bindings may be BOUND_FOR_LAYOUT without pretending that physical evidence is PASS. Component, physical and Vivado PASS still require source-digest/hash-bound evidence and gate fabrication/release.",
   "mechanical": {
     "J101": {
       "gate": "prelayout_mechanical_j101",
-      "status": "NOT_RUN",
-      "evidence": null
+      "status": "BOUND_FOR_LAYOUT",
+      "evidence": "hardware/revB/layout_entry_sources.json"
     },
     "SW101": {
       "gate": "prelayout_mechanical_sw101",
-      "status": "NOT_RUN",
-      "evidence": null
+      "status": "BOUND_FOR_LAYOUT",
+      "evidence": "hardware/revB/layout_entry_sources.json"
     },
     "J5": {
       "gate": "prelayout_mechanical_j5",
-      "status": "NOT_RUN",
-      "evidence": null
+      "status": "BOUND_FOR_LAYOUT",
+      "evidence": "hardware/revB/layout_entry_sources.json"
     },
     "J501": {
       "gate": "prelayout_mechanical_j501",
-      "status": "NOT_RUN",
-      "evidence": null
+      "status": "BOUND_FOR_LAYOUT",
+      "evidence": "hardware/revB/layout_entry_sources.json"
     },
     "J701": {
       "gate": "prelayout_mechanical_j701",
-      "status": "NOT_RUN",
-      "evidence": null
+      "status": "BOUND_FOR_LAYOUT",
+      "evidence": "hardware/revB/layout_entry_sources.json"
     }
   },
   "component": {
@@ -127,5 +127,7 @@
       "status": "NOT_RUN",
       "evidence": null
     }
-  }
+  },
+  "fabrication_allowed": false,
+  "release_allowed": false
 }
