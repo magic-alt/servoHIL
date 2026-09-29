@@ -19,7 +19,10 @@ class NativeSafetySourceTests(unittest.TestCase):
             }
             for ref in ('U20', 'U21', 'U22', 'U23')
         }
-        expected['C105'] = {'value': '47uF / 35V X7R effective >=22uF'}
+        expected['C105'] = {
+            'value': '47uF / 35V X7R / TDK C5750X7R1V476M230KC',
+            'footprint': 'Capacitor_SMD:TDK_C5750X7R1V476M230KC',
+        }
         self.assertEqual(REVIEWED_COMPONENT_DELTAS, expected)
 
     def test_real_watchdog_and_permit_sheets_exist(self):
@@ -63,6 +66,26 @@ class NativeSafetyNetlistTests(unittest.TestCase):
     def test_actual_native_safety_and_frozen_existing_wiring(self):
         from check_native_safety import check
         self.assertEqual(check(os.environ['NATIVE_NETLIST'])['new_components'],47)
+
+    @unittest.skipUnless(os.environ.get('NATIVE_NETLIST'), 'requires actual native KiCad export')
+    def test_c105_delta_rejects_generic_or_wrong_part(self):
+        import tempfile
+        import xml.etree.ElementTree as ET
+        from check_native_safety import check
+        source = os.environ['NATIVE_NETLIST']
+        for bad_value, bad_footprint in (
+            ('47uF / 35V X7R / TDK C5750X7R1V476M230KC', 'Capacitor_SMD:C_2220_5750Metric'),
+            ('47uF / 35V X7R', 'Capacitor_SMD:TDK_C5750X7R1V476M230KC'),
+        ):
+            with self.subTest(value=bad_value, footprint=bad_footprint), tempfile.TemporaryDirectory() as tmp:
+                tree = ET.parse(source)
+                comp = next(x for x in tree.findall('./components/comp') if x.get('ref') == 'C105')
+                comp.find('value').text = bad_value
+                comp.find('footprint').text = bad_footprint
+                path = Path(tmp) / 'bad-c105.xml'
+                tree.write(path)
+                with self.assertRaisesRegex(ValueError, 'component/value/footprint changed'):
+                    check(path)
 
     @unittest.skipUnless(os.environ.get('NATIVE_NETLIST'), 'requires actual native KiCad export')
     def test_ad3542r_delta_rejects_generic_or_wrong_footprint(self):
