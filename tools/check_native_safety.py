@@ -45,7 +45,8 @@ for ref,d,q in [('U506',AON,'HB_FIRST'),('U507','HB_FIRST','HB_VALID')]:
          'Package_SO:SSOP-8_2.95x2.8mm_P0.65mm')
 part('U508','SN74LVC1G11DBVR',{1:'RAILS_OK',3:'ARM_LATCH',6:'HIL_ARM',
                               2:GND,5:AON,4:'SAFE_ENABLE'},'Package_TO_SOT_SMD:SOT-23-6')
-part('J501','3.3V DRY CONTACT ONLY',{1:'INTERLOCK_FEED',2:'INTERLOCK_RAW'})
+part('J501','Phoenix MC 1,5/2-G-3,5 / 1844210 / 3.3V DRY CONTACT ONLY',{1:'INTERLOCK_FEED',2:'INTERLOCK_RAW'},
+     'Connector_Phoenix_MC:PhoenixContact_MC_1,5_2-G-3.5_1x02_P3.50mm_Horizontal')
 for ref,value,first,second in [
  ('R601','1k','HIL_WDI','WD_HOST'),('R602','10k','WD_HOST',GND),
  ('R603','10k','HB_VALID',GND),('R604','10k',AON,'WD_CWD'),
@@ -71,7 +72,8 @@ for n,rail in [(651,'+5V2_PVDD'),(652,'-5V2_PVSS'),(653,'+5V2_PVDD'),(654,'-5V2_
 part('U701','AQY212GS',{1:'PERMIT_LED_A',2:'PERMIT_LED_K',3:'DUT_PERMIT_A',4:'DUT_PERMIT_B'},
      'Package_SO:SO-4_4.4x4.3mm_P2.54mm')
 part('Q701','MMBT3904',{1:'PERMIT_BASE',2:GND,3:'PERMIT_LED_K'},'Package_TO_SOT_SMD:SOT-23')
-part('J701','DUT PERMIT - FLOATING NO',{1:'DUT_PERMIT_A',2:'DUT_PERMIT_B'})
+part('J701','Molex Micro-Fit 3.0 43045-0212 / DUT PERMIT FLOATING NO',{1:'DUT_PERMIT_A',2:'DUT_PERMIT_B'},
+     'Connector_Molex:Molex_Micro-Fit_3.0_43045-0212_2x01_P3.00mm_Vertical')
 passive('R701','220 1%',AON,'PERMIT_LED_A')
 passive('R702','680 1%','SAFE_ENABLE','PERMIT_BASE')
 passive('R703','10k','PERMIT_BASE',GND)
@@ -96,6 +98,23 @@ REVIEWED_COMPONENT_DELTAS['C105'] = {
     'value': '47uF / 35V X7R / TDK C5750X7R1V476M230KC',
     'footprint': 'Capacitor_SMD:TDK_C5750X7R1V476M230KC',
 }
+
+# Final source-level mechanical Layout bindings on retained historical parts.
+# These exceptions are exact value+footprint pairs, not generic connector waivers.
+REVIEWED_COMPONENT_DELTAS.update({
+    'J101': {
+        'value': 'Phoenix MSTBA 2,5/2-G-5,08 / 1757242 / 9-15V INPUT',
+        'footprint': 'Connector_Phoenix_MSTB:PhoenixContact_MSTBA_2,5_2-G-5,08_1x02_P5.08mm_Horizontal',
+    },
+    'SW101': {
+        'value': 'PTS645SM43SMTR92 LFS / POWER RESET / SPST-NO',
+        'footprint': 'Button_Switch_SMD:SW_Push_PTS645SM43SMTR92',
+    },
+    'J5': {
+        'value': 'Phoenix MC 1,5/10-G-3,5 / 1844294 / AO0..AO7+2GND',
+        'footprint': 'Connector_Phoenix_MC:PhoenixContact_MC_1,5_10-G-3.5_1x10_P3.50mm_Horizontal',
+    },
+})
 
 REVIEWED_FOOTPRINT_DELTAS = {
     'F101':'Fuse:Fuse_Littelfuse-NANO2-451_453',
