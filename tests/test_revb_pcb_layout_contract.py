@@ -22,8 +22,20 @@ class RevBPcbLayoutContractTests(unittest.TestCase):
         self.assertFalse(report["release_allowed"])
         self.assertFalse(report["pcb_exists"])
         self.assertEqual(report["layer_count"], 6)
-        self.assertIn("J12_center_xy_mm", report["mechanical_open_fields"])
-        self.assertIn("carrier_mounting_hole_xy_and_drill_mm", report["mechanical_open_fields"])
+        self.assertNotIn("J12_center_xy_mm", report["mechanical_open_fields"])
+        self.assertNotIn("J15_center_xy_mm", report["mechanical_open_fields"])
+        self.assertNotIn("J12_pin1_orientation", report["mechanical_open_fields"])
+        self.assertNotIn("J15_pin1_orientation", report["mechanical_open_fields"])
+        self.assertNotIn("carrier_mounting_hole_xy_and_drill_mm", report["mechanical_open_fields"])
+        self.assertEqual(
+            report["mechanical_open_fields"],
+            [
+                "carrier_component_height_keepouts",
+                "host_connector_manufacturer_and_mpn",
+                "mated_stack_height_mm",
+                "mating_connector_manufacturer_and_mpn",
+            ],
+        )
 
     def test_mechanical_photo_estimate_cannot_masquerade_as_bound_geometry(self):
         data = self.load("hardware/revB/pcb_layout_contract.json")
@@ -32,6 +44,15 @@ class RevBPcbLayoutContractTests(unittest.TestCase):
             "J12_center_xy_mm"
         )
         with self.assertRaisesRegex(ValueError, "mechanical input key set drift"):
+            _validate_layout_contract(ROOT, broken)
+
+    def test_pin1_orientation_is_locked_to_official_dxf_square_pad(self):
+        data = self.load("hardware/revB/pcb_layout_contract.json")
+        broken = copy.deepcopy(data)
+        broken["carrier_mechanical_reference"]["exact_mechanical_inputs_required_before_edge_cuts_freeze"][
+            "J12_pin1_orientation"
+        ]["pin1_center_xy_mm"] = [3.9878, 66.6369]
+        with self.assertRaisesRegex(ValueError, "J12: pin-1 orientation drift"):
             _validate_layout_contract(ROOT, broken)
 
     def test_j12_j15_voltage_domains_are_locked(self):

@@ -61,8 +61,22 @@
         94.742,
         42.5069
       ],
-      "J12_pin1_orientation": null,
-      "J15_pin1_orientation": null,
+      "J12_pin1_orientation": {
+        "pin1_center_xy_mm": [
+          6.5278,
+          18.3769
+        ],
+        "grid_position": "right_column_low_y",
+        "evidence": "official DXF top-level ENTITIES square PIN_TOP pad"
+      },
+      "J15_pin1_orientation": {
+        "pin1_center_xy_mm": [
+          93.472,
+          66.6369
+        ],
+        "grid_position": "left_column_high_y",
+        "evidence": "official DXF top-level ENTITIES square PIN_TOP pad"
+      },
       "host_connector_manufacturer_and_mpn": null,
       "mating_connector_manufacturer_and_mpn": null,
       "mated_stack_height_mm": null,
@@ -93,7 +107,7 @@
     "resolution_policy": "Use the pinned manufacturer DXF/STEP in hardware/carriers/axu2cgb/mechanical_source.json as the primary datum; direct caliper/CMM measurement of the actual board is an independent cross-check. Product photographs are review aids only and must not be converted into manufacturing coordinates.",
     "schematic_boundary_note": "J12/J15 are intentionally modelled as purchased-host logical boundaries with on_board=no. If direct mezzanine mating is selected, add only the minimum reviewed expansion-board mating connector representation needed for PCB connectivity; do not reopen unrelated schematic topology.",
     "mechanical_source_manifest": "hardware/carriers/axu2cgb/mechanical_source.json",
-    "source_status": "OFFICIAL_DXF_BOUND_OUTLINE_HOLES_AND_J12_J15_PIN_GRIDS_ORIENTATION_STACK_HEIGHT_PENDING",
+    "source_status": "OFFICIAL_DXF_BOUND_OUTLINE_HOLES_J12_J15_PIN_GRIDS_AND_PIN1_ORIENTATION_STACK_HEIGHT_PENDING",
     "extracted_geometry": {
       "mounting_holes": [
         {
@@ -167,5 +181,5 @@
     "Vivado I/O DRC raw evidence and functional STA/CDC closure",
     "EMC, power-down, fault injection and FOC closed-loop acceptance"
   ],
-  "note": "Exact carrier mechanical coordinates are a PCB-geometry input, not a reason to return to broad schematic redesign. Fabrication/release evidence remains fail-closed and does not block the independent Layout work listed above."
+  "note": "Official DXF now binds host outline, four primary mounting holes, both 2x20 pin grids, connector centers and pin-1 orientation. Exact host/mating connector MPN, mated stack height and component-height keepouts remain open; fabrication/release remain fail-closed."
 }

@@ -99,7 +99,7 @@ def _validate_layout_contract(root: Path, data: dict[str, Any]) -> dict[str, Any
     required = mech.get("exact_mechanical_inputs_required_before_edge_cuts_freeze")
     if not isinstance(required, dict):
         raise ValueError("exact carrier mechanical input set missing")
-    expected_open = {
+    expected_keys = {
         "J12_center_xy_mm",
         "J15_center_xy_mm",
         "J12_pin1_orientation",
@@ -110,8 +110,35 @@ def _validate_layout_contract(root: Path, data: dict[str, Any]) -> dict[str, Any
         "carrier_mounting_hole_xy_and_drill_mm",
         "carrier_component_height_keepouts",
     }
-    if set(required) != expected_open:
+    if set(required) != expected_keys:
         raise ValueError("exact carrier mechanical input key set drift")
+
+    expected_pin1 = {
+        "J12": {
+            "pin1_center_xy_mm": [6.5278, 18.3769],
+            "grid_position": "right_column_low_y",
+        },
+        "J15": {
+            "pin1_center_xy_mm": [93.472, 66.6369],
+            "grid_position": "left_column_high_y",
+        },
+    }
+    source_grids = source_manifest.get("extracted_geometry", {}).get("expansion_header_pin_grids", {})
+    for ref in ("J12", "J15"):
+        orientation = required.get(f"{ref}_pin1_orientation")
+        if not isinstance(orientation, dict):
+            raise ValueError(f"{ref}: pin-1 orientation must be bound from official DXF")
+        for key, value in expected_pin1[ref].items():
+            if orientation.get(key) != value:
+                raise ValueError(f"{ref}: pin-1 orientation drift")
+        source_row = source_grids.get(ref, {})
+        if source_row.get("pin1_orientation_status") != "BOUND_FROM_DXF_SQUARE_PAD":
+            raise ValueError(f"{ref}: mechanical source pin-1 evidence is not bound")
+        if source_row.get("pin1_center_xy_mm") != expected_pin1[ref]["pin1_center_xy_mm"]:
+            raise ValueError(f"{ref}: mechanical source pin-1 coordinate drift")
+        if source_row.get("pin1_grid_position") != expected_pin1[ref]["grid_position"]:
+            raise ValueError(f"{ref}: mechanical source pin-1 grid position drift")
+
     open_fields = sorted(key for key, value in required.items() if value is None)
     return {
         "pcb_path": str(pcb_path.relative_to(root.resolve())),
@@ -222,7 +249,7 @@ def check(root: str | Path = ROOT) -> dict[str, Any]:
         "mechanical_open_fields": phase["mechanical_open_fields"],
         "layer_count": rule_state["layer_count"],
         "net_classes": rule_state["net_classes"],
-        "note": "Layout work is active. Exact carrier geometry is still required before freezing Edge.Cuts/J12/J15/mounting-hole coordinates; fabrication/release remain blocked.",
+        "note": "Layout work is active. Official DXF binds outline, mounting holes, J12/J15 grids and pin-1 orientation; exact connector MPNs, mated stack height and component-height keepouts remain open. Fabrication/release remain blocked.",
     }
 
 

@@ -32,22 +32,26 @@ boundaries** with `on_board=no`. That was correct for schematic closure, but a
 directly mated PCB requires a physical expansion-board mating connector and exact
 mechanical registration.
 
-Before freezing Edge.Cuts, mounting holes or the J12/J15 footprint coordinates,
-bind all of the following from manufacturer CAD/drawing or direct measurement of
-the actual AXU2CGB:
+The pinned manufacturer DXF now binds the 100 x 85 mm host outline, four primary
+mounting holes, both 2x20 pin grids, J12/J15 geometric centers, and pin-1
+orientation. Pin 1 is the non-circular square `PIN_TOP` pad: J12 is at
+`(6.5278, 18.3769)` and J15 at `(93.4720, 66.6369)` in ALINX DXF native mm.
 
-- J12 and J15 center coordinates and pin-1 orientation;
+The remaining mechanical inputs that must be bound before a real mating
+connector footprint / stack is released are:
+
 - exact host connector manufacturer/MPN and expansion-board mating MPN;
 - mated stack height;
-- carrier mounting-hole coordinates and drill sizes;
 - tall-component / heatsink / connector keepouts.
 
 **Do not scale a product photograph into manufacturing coordinates.**
 
-This is a PCB mechanical input, not a reason to return to broad schematic
-redesign. If direct mezzanine mating is selected, the only schematic adjustment
-should be the minimum reviewed representation needed to give the physical mating
-connectors real nets/ratsnest connectivity.
+These remaining items are PCB mechanical inputs, not a reason to return to broad
+schematic redesign. Until connector MPN/stack height is bound, PR #31 keeps the
+native `.kicad_pcb` intentionally absent rather than committing a guessed generic
+2x20 footprint. If direct mezzanine mating is selected, the only schematic
+adjustment should be the minimum reviewed representation needed to give the
+physical mating connectors real nets/ratsnest connectivity.
 
 ## Stackup target
 

@@ -94,14 +94,16 @@ def _points(groups: dict[int, list[str]], xcode: int = 10, ycode: int = 20) -> l
 def inspect(text: str, *, source_encoding: str = "unknown") -> dict[str, Any]:
     pairs = _pairs(text)
     entities = _entities(pairs)
-    type_counts = Counter(e["type"] for e in entities)
+    physical_entities = [e for e in entities if e.get("section") == "ENTITIES"]
+    block_entities = [e for e in entities if e.get("section") == "BLOCKS"]
+    type_counts = Counter(e["type"] for e in physical_entities)
     circles: list[dict[str, float]] = []
     text_items: list[dict[str, Any]] = []
     inserts: list[dict[str, Any]] = []
     geometry_points: list[list[float]] = []
     per_type_bounds: dict[str, list[list[float]]] = defaultdict(list)
 
-    for ent in entities:
+    for ent in physical_entities:
         typ = ent["type"]
         g = ent["groups"]
         pts = _points(g)
@@ -192,10 +194,46 @@ def inspect(text: str, *, source_encoding: str = "unknown") -> dict[str, Any]:
     ]
     repeated_grid_circles.sort(key=lambda row: (row["x"], row["y"]))
 
+    # Pin 1 is conventionally marked by a non-circular pad. In the pinned
+    # AXU2CGB DXF, each 2x20 expansion grid has 39 circular pads and one closed
+    # square LWPOLYLINE on PIN_TOP. Report those square-pad centers explicitly.
+    square_pin1_candidates: list[dict[str, float | str]] = []
+    for ent in physical_entities:
+        if ent["type"] != "LWPOLYLINE":
+            continue
+        g = ent["groups"]
+        if (g.get(8) or [None])[0] != "PIN_TOP":
+            continue
+        pts = _points(g)
+        if len(pts) < 4:
+            continue
+        xs = [p[0] for p in pts]
+        ys = [p[1] for p in pts]
+        min_x, max_x = min(xs), max(xs)
+        min_y, max_y = min(ys), max(ys)
+        span_x, span_y = max_x - min_x, max_y - min_y
+        center_x, center_y = (min_x + max_x) / 2.0, (min_y + max_y) / 2.0
+        closed = bool(int((g.get(70) or ["0"])[0]) & 1)
+        if not closed or abs(span_x - span_y) > 1e-3:
+            continue
+        if not 1.70 <= span_x <= 1.75:
+            continue
+        if not ((2.0 <= center_x <= 8.0) or (92.0 <= center_x <= 98.0)):
+            continue
+        if not 16.0 <= center_y <= 69.0:
+            continue
+        square_pin1_candidates.append({
+            "x": round(center_x, 4),
+            "y": round(center_y, 4),
+            "side": "left" if center_x < 50.0 else "right",
+        })
+    square_pin1_candidates.sort(key=lambda row: (str(row["side"]), float(row["x"]), float(row["y"])))
+
     return {
         "format": "ASCII_DXF",
         "source_encoding": source_encoding,
-        "entity_count": len(entities),
+        "entity_count": len(physical_entities),
+        "block_entity_count": len(block_entities),
         "entity_type_counts": dict(sorted(type_counts.items())),
         "geometry_bounds": bounds(geometry_points),
         "bounds_by_entity_type": {
@@ -207,11 +245,12 @@ def inspect(text: str, *, source_encoding: str = "unknown") -> dict[str, Any]:
         "edge_circle_candidates": edge_circle_candidates,
         "edge_text_candidates": edge_text_candidates,
         "repeated_0_8636mm_radius_circles": repeated_grid_circles,
+        "square_pin1_candidates": square_pin1_candidates,
         "text_entity_count": len(text_items),
         "relevant_text": relevant_text,
         "insert_count": len(inserts),
         "inserts": inserts[:200],
-        "note": "Geometry inventory only. Connector/hole identity must be confirmed against the manufacturer drawing/STEP before freezing PCB coordinates.",
+        "note": "Physical-coordinate inventory uses only top-level DXF ENTITIES; BLOCKS are counted separately and never treated as placed geometry. Connector MPN/stack height still require independent binding before PCB mating geometry is released.",
     }
 
 

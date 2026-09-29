@@ -2,7 +2,7 @@
   "schema_version": 1,
   "carrier_id": "axu2cgb",
   "board_variant": "AXU2CGB-original",
-  "status": "OFFICIAL_CAD_BOUND_OUTLINE_HOLES_AND_HEADER_PIN_GRIDS_ORIENTATION_STACK_HEIGHT_PENDING",
+  "status": "OFFICIAL_CAD_BOUND_OUTLINE_HOLES_HEADER_GRIDS_AND_PIN1_STACK_HEIGHT_PENDING",
   "source_repository": "alinxalinx/AXU2CGA_AXU2CGB",
   "source_commit": "43effb3dacf1f9c7e76ac801d21f14a66f14d24e",
   "official_product_page": "https://www.en.alinx.com/Product/SoC-Development-Boards/Zynq-UltraScale-plus-MPSoC/AXU2CGB.html",
@@ -91,7 +91,13 @@
           2.54,
           48.26
         ],
-        "pin1_orientation_status": "OPEN"
+        "pin1_orientation_status": "BOUND_FROM_DXF_SQUARE_PAD",
+        "pin1_center_xy_mm": [
+          6.5278,
+          18.3769
+        ],
+        "pin1_grid_position": "right_column_low_y",
+        "pin1_evidence": "Top-level ENTITIES contains a closed square LWPOLYLINE on PIN_TOP centered at this grid position while the other 39 positions are radius-0.8636 mm circles."
       },
       "J15": {
         "columns_x_mm": [
@@ -112,7 +118,13 @@
           2.54,
           48.26
         ],
-        "pin1_orientation_status": "OPEN"
+        "pin1_orientation_status": "BOUND_FROM_DXF_SQUARE_PAD",
+        "pin1_center_xy_mm": [
+          93.472,
+          66.6369
+        ],
+        "pin1_grid_position": "left_column_high_y",
+        "pin1_evidence": "Top-level ENTITIES contains a closed square LWPOLYLINE on PIN_TOP centered at this grid position while the other 39 positions are radius-0.8636 mm circles."
       }
     },
     "expansion_header_evidence": "DXF contains two 2x20 repeated radius-0.8636 mm circle grids at the left/right expansion positions, exactly 2.54 mm pitch and 48.26 mm row span."
