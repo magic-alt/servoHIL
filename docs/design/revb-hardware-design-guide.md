@@ -349,6 +349,7 @@ Pricing states mean:
 
 - `EXACT_QUOTE`: source-bound MPN with a dated authorized-distributor/manufacturer
   small-quantity price.
+- `EXACT_MPN_NO_LIVE_QUOTE`: exact MPN is source-bound but no executable authorized small-quantity quote is available at the snapshot; keep only a planning allowance and re-quote before PO.
 - `CANDIDATE_QUOTE`: exact engineering candidate already present in qualification
   documents, but electrical/thermal qualification remains open.
 - `ORDERABLE_MPN_MISMATCH`: purchasing identity is inconsistent with the schematic;
