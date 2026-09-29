@@ -199,10 +199,16 @@ def check_release(root: Path, carrier: str):
     digest=source_digest(root)
     required={'carrier_pinout_review','carrier_schematic_xdc_crosscheck','io_power_design',
               'power_off_backfeed','safety_hardware','converter_pin_package_review','dac_analog_stability',
-              'adc_interface_timing','vivado_io_drc','vivado_timing','schematic_erc','foc_physical_loop'}
+              'adc_interface_timing','vivado_io_drc','vivado_timing','schematic_erc','foc_physical_loop',
+              'schematic_layout_entry'}
     if set(g.get('gates',{})) != required: blocked.append('gate coverage invalid')
     for name, gate in g.get('gates',{}).items():
         evidence=gate.get('evidence')
+        if name=='schematic_layout_entry' and gate.get('status')=='PASS_SOURCE_BOUND':
+            path=(root/evidence).resolve() if evidence else None
+            if not path or not path.is_relative_to(root.resolve()) or not path.is_file():
+                blocked.append(name+': missing source-bound evidence')
+            continue
         if gate.get('status')!='PASS' or not evidence:
             blocked.append(name); continue
         path=(root/evidence).resolve()

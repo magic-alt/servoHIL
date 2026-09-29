@@ -1,9 +1,11 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "revision": "Rev.B",
   "release_policy": {
-    "layout_allowed": false,
-    "note": "This manifest is fail-closed. Analysis may close analytical subchecks but cannot substitute for physical, manufacturer-curve, Vivado or DUT-bound evidence."
+    "layout_allowed": true,
+    "fabrication_allowed": false,
+    "release_allowed": false,
+    "note": "Exact schematic/footprint/mechanical source binding closes PCB Layout entry. Physical, manufacturer-curve, DUT-bound and Vivado evidence remain mandatory before fabrication/release and cannot be substituted by analysis."
   },
   "dut_profile": {
     "path": "hardware/revB/dut_adapter_profile.json",
@@ -65,12 +67,17 @@
       "J5",
       "J501",
       "J701"
-    ]
+    ],
+    "layout_resolved": true,
+    "layout_sources": "hardware/revB/layout_entry_sources.json"
   },
   "component_source_registry": {
     "path": "hardware/revB/component_evidence_sources.json"
   },
   "prelayout_evidence_status": {
     "path": "hardware/revB/prelayout_evidence_status.json"
+  },
+  "layout_entry_contract": {
+    "path": "hardware/revB/layout_entry_contract.json"
   }
 }

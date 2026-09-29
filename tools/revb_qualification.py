@@ -154,10 +154,10 @@ def _qualification_evidence_state(
     physical_required: list[str],
     vivado_required: list[str],
 ) -> dict[str, Any]:
-    if data.get("schema_version") != 1:
+    if data.get("schema_version") != 2:
         raise ValueError("unsupported prelayout evidence status schema")
-    if data.get("layout_allowed") is not False:
-        raise ValueError("prelayout evidence status must preserve layout_allowed=false")
+    if data.get("layout_allowed") is not True or data.get("fabrication_allowed") is not False:
+        raise ValueError("prelayout evidence status layout/fabrication policy drift")
     carrier = data.get("carrier")
     if not isinstance(carrier, str) or not carrier.strip():
         raise ValueError("prelayout evidence status carrier must be bound")
@@ -191,7 +191,10 @@ def _qualification_evidence_state(
             if not isinstance(entry, dict):
                 raise ValueError(f"{category}.{name}: evidence state must be an object")
             status = entry.get("status")
-            if status not in {"NOT_RUN", "BLOCKED", "FAIL", "PASS"}:
+            allowed_status = {"NOT_RUN", "BLOCKED", "FAIL", "PASS"}
+            if category == "mechanical":
+                allowed_status.add("BOUND_FOR_LAYOUT")
+            if status not in allowed_status:
                 raise ValueError(f"{category}.{name}: invalid evidence status")
             gate_name = entry.get("gate")
             if not isinstance(gate_name, str) or not gate_name.startswith("prelayout_"):
@@ -202,6 +205,16 @@ def _qualification_evidence_state(
                 verified[key] = _verified_gate_evidence(
                     entry, root, gate_name, expected_carrier=carrier
                 )
+            elif status == "BOUND_FOR_LAYOUT":
+                if category != "mechanical":
+                    raise ValueError(f"{category}.{name}: BOUND_FOR_LAYOUT is mechanical-only")
+                raw = entry.get("evidence")
+                if not isinstance(raw, str) or not raw.strip():
+                    raise ValueError(f"{category}.{name}: layout source evidence missing")
+                rel = Path(raw)
+                if rel.is_absolute() or ".." in rel.parts or not (root / rel).is_file():
+                    raise ValueError(f"{category}.{name}: layout source evidence file missing")
+                verified[key] = [raw]
             else:
                 if entry.get("evidence") not in (None, ""):
                     raise ValueError(f"{category}.{name}: non-PASS state cannot claim evidence")
@@ -339,10 +352,13 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
     requirements = json.loads(
         (root / "hardware/revB/qualification_requirements.json").read_text(encoding="utf-8")
     )
-    if requirements.get("schema_version") != 3:
+    if requirements.get("schema_version") != 4:
         raise ValueError("unsupported qualification requirements schema")
-    if requirements.get("release_policy", {}).get("layout_allowed") is not False:
-        raise ValueError("qualification requirements must preserve layout_allowed=false")
+    release_policy = requirements.get("release_policy", {})
+    if release_policy.get("layout_allowed") is not True:
+        raise ValueError("qualification requirements must authorize source-bound Layout entry")
+    if release_policy.get("fabrication_allowed") is not False:
+        raise ValueError("qualification requirements must keep fabrication blocked")
 
     component_required = _string_list(requirements, "component_evidence_required", minimum=1)
     physical_required = _string_list(requirements, "physical_required", minimum=1)
@@ -355,14 +371,9 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
         raise ValueError("qualification requirements must bind dut_profile.path")
     expected_dut_evidence = _string_list(dut_section, "required_evidence", minimum=5)
     if set(expected_dut_evidence) != {
-        "ao_disconnect",
-        "permit",
-        "cable_open",
-        "cable_short",
-        "shutdown_time",
+        "ao_disconnect", "permit", "cable_open", "cable_short", "shutdown_time"
     }:
         raise ValueError("DUT evidence contract drift")
-
     dut = evaluate_dut_profile(load_profile(root / dut_section["path"]), root=root)
 
     evidence_section = requirements.get("prelayout_evidence_status")
@@ -371,10 +382,12 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
 
     from check_revb_prelayout_contract import check as check_prelayout_contract
     prelayout = check_prelayout_contract(root)
-    mechanical_required = list(prelayout["mechanical_open_refs"])
+    mechanical_required = list(prelayout["mechanical_resolved_refs"])
 
-    if gates.get("layout_allowed") is not False:
-        raise ValueError("qualification branch must preserve layout_allowed=false")
+    if gates.get("layout_allowed") is not True or gates.get("fabrication_allowed") is not False:
+        raise ValueError("qualification branch layout/fabrication gate drift")
+    if gates.get("layout_entry", {}).get("status") != "READY_FOR_PCB_LAYOUT":
+        raise ValueError("qualification branch missing READY_FOR_PCB_LAYOUT gate")
 
     blockers = list(dut["blockers"])
     active_gates = gates.get("gates", {})
@@ -385,8 +398,14 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
         if not isinstance(entry, dict):
             blockers.append(f"GATE_{name.upper()}_NOT_PASS")
             continue
-        if entry.get("status") == "PASS":
+        status = entry.get("status")
+        if status == "PASS":
             verified_gate_evidence[name] = _verified_gate_evidence(entry, root, name)
+        elif status == "PASS_SOURCE_BOUND":
+            raw = entry.get("evidence")
+            if not isinstance(raw, str) or not (root / raw).is_file():
+                raise ValueError(f"{name}: source-bound gate evidence missing")
+            verified_gate_evidence[name] = [raw]
         else:
             blockers.append(f"GATE_{name.upper()}_NOT_PASS")
 
@@ -404,10 +423,13 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
     blockers.extend(requirement_evidence["blockers"])
 
     return {
-        "schema_version": 3,
+        "schema_version": 4,
         "revision": gates.get("revision", "Rev.B"),
-        "qualification": "BLOCKED" if blockers else "READY_FOR_ENGINEERING_REVIEW",
-        "layout_allowed": False,
+        "qualification": "BLOCKED_FOR_FABRICATION" if blockers else "READY_FOR_FABRICATION_REVIEW",
+        "layout_entry": "READY_FOR_PCB_LAYOUT",
+        "layout_allowed": True,
+        "fabrication_allowed": False if blockers else True,
+        "release_allowed": False,
         "dut_adapter": dut,
         "prelayout_contract": prelayout,
         "mechanical_required": mechanical_required,
@@ -420,8 +442,9 @@ def build_qualification_report(root: str | Path = ROOT) -> dict[str, Any]:
         "verified_requirement_evidence": requirement_evidence["verified"],
         "blockers": sorted(set(blockers)),
         "note": (
-            "Evidence aggregation only; analytical screens and catalog ratings cannot "
-            "authorize fabrication, safety or production release."
+            "PCB placement/routing is source-authorized. Remaining blockers are fabrication/release "
+            "qualification only; analytical screens and catalog ratings cannot replace physical, "
+            "manufacturer-curve, DUT-bound or Vivado evidence."
         ),
     }
 

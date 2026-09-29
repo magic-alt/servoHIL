@@ -122,7 +122,8 @@ class RevBTests(unittest.TestCase):
 
     def test_all_legacy_gates_are_superseded_not_pass(self):
         g=json.loads((ROOT/'hardware/revB/gates.json').read_text())
-        self.assertFalse(g['layout_allowed'])
+        self.assertTrue(g['layout_allowed'])
+        self.assertFalse(g['fabrication_allowed'])
         self.assertTrue(all(v['status']=='SUPERSEDED' for v in g['legacy'].values()))
         self.assertTrue(all(v['status']!='PASS' for v in g['gates'].values()))
 

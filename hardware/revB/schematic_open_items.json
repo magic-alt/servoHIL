@@ -1,113 +1,13 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "revision": "Rev.B",
-  "checked_on": "2026-09-28",
-  "status": "SCHEMATIC_FUNCTION_COMPLETE_5_PHYSICAL_BINDINGS_OPEN",
-  "layout_allowed": false,
-  "policy": "A blank physical footprint is allowed only when it is listed here with an unresolved exact land-pattern or mechanical contract. This manifest is a blocker list, not a fabrication waiver.",
-  "close_policy": "Removing an open item requires the exact footprint/mechanical contract plus the evidence named in binding_requirements. Resolved package bindings must remain source-bound through resolved_bindings. Catalog ratings, package-body dimensions, ERC, simulation or a visually similar land pattern are insufficient by themselves.",
-  "open_footprints": {
-    "J101": "12 V field connector mechanical/keying/current-rating selection not bound",
-    "SW101": "power-reset switch mechanical actuator/footprint not bound",
-    "J5": "AO connector mechanical/keying choice not bound",
-    "J501": "3.3 V dry-contact service connector mechanical choice not bound",
-    "J701": "floating DUT-permit connector mechanical/current/spacing choice not bound"
-  },
-  "binding_requirements": {
-    "J101": {
-      "kind": "mechanical_selection",
-      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
-      "interface": "12 V field input",
-      "required_contract_fields": [
-        "manufacturer and mating part number",
-        "contact voltage/current rating with derating basis",
-        "wire gauge and termination method",
-        "keying/polarization and retention",
-        "operating temperature and cycle life",
-        "creepage/clearance basis",
-        "enclosure/keepout dimensions"
-      ],
-      "required_evidence": [
-        "manufacturer drawing/datasheet",
-        "reviewed mating/cable assembly",
-        "mechanical fit/keepout review"
-      ]
-    },
-    "SW101": {
-      "kind": "mechanical_selection",
-      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
-      "interface": "power-reset switch",
-      "required_contract_fields": [
-        "manufacturer and exact part number",
-        "actuator style and accessible travel",
-        "contact voltage/current rating",
-        "switch function and terminal numbering",
-        "operating temperature and cycle life",
-        "board/enclosure keepout"
-      ],
-      "required_evidence": [
-        "manufacturer drawing/datasheet",
-        "mechanical access/fit review"
-      ]
-    },
-    "J5": {
-      "kind": "mechanical_selection",
-      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
-      "interface": "eight-channel analog output",
-      "required_contract_fields": [
-        "manufacturer and mating part number",
-        "pin count and pinout",
-        "AO working/common-mode voltage contract",
-        "contact current/contact resistance",
-        "keying/polarization and retention",
-        "cable/shield/grounding contract",
-        "creepage/clearance and enclosure keepout"
-      ],
-      "required_evidence": [
-        "manufacturer drawing/datasheet",
-        "reviewed DUT cable assembly",
-        "mechanical fit/keepout review"
-      ]
-    },
-    "J501": {
-      "kind": "mechanical_selection",
-      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
-      "interface": "3.3 V dry-contact service/interlock",
-      "required_contract_fields": [
-        "manufacturer and mating part number",
-        "pinout and contact rating",
-        "keying/polarization and retention",
-        "cable open/short fault contract",
-        "leakage/common-mode environment",
-        "creepage/clearance and enclosure keepout"
-      ],
-      "required_evidence": [
-        "manufacturer drawing/datasheet",
-        "reviewed service/interlock cable assembly",
-        "fault-response verification plan"
-      ]
-    },
-    "J701": {
-      "kind": "mechanical_selection",
-      "status": "OPEN_REAL_MECHANICAL_CONTRACT_REQUIRED",
-      "interface": "floating DUT permit contact",
-      "required_contract_fields": [
-        "manufacturer and mating part number",
-        "actual DUT open-circuit voltage and wetting/current contract",
-        "maximum allowed leakage in inhibited state",
-        "contact/cable voltage and current ratings",
-        "isolation/creepage/clearance basis",
-        "keying/polarization and retention",
-        "cable open/short fault behavior"
-      ],
-      "required_evidence": [
-        "manufacturer drawing/datasheet",
-        "reviewed real DUT permit input contract",
-        "reviewed permit cable assembly",
-        "measured leakage/threshold/fault-response evidence"
-      ]
-    }
-  },
+  "checked_on": "2026-09-29",
+  "status": "SCHEMATIC_LAYOUT_ENTRY_READY_NO_OPEN_FOOTPRINTS",
+  "layout_allowed": true,
+  "policy": "Rev.B native schematic may enter PCB Layout only with zero blank on-board footprints and source-bound exact layout parts. Fabrication, physical qualification, functional safety, EMC and release remain separate fail-closed gates.",
+  "close_policy": "All previous source-level footprint/mechanical blockers are resolved by exact selected parts, local reviewed footprints and the mechanical binding plan. Later evidence may invalidate a selection and force re-layout, but post-layout physical evidence is not a prerequisite to begin placement/routing.",
+  "open_footprints": {},
+  "binding_requirements": {},
   "excluded_host_boundaries": [
     "J12",
     "J15"
@@ -131,7 +31,13 @@
     "U20": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
     "U21": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
     "U22": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
-    "U23": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R"
+    "U23": "Package_DFN_QFN:AnalogDevices_CP-28-15_AD3542R",
+    "J101": "Connector_Phoenix_MSTB:PhoenixContact_MSTBA_2,5_2-G-5,08_1x02_P5.08mm_Horizontal",
+    "SW101": "Button_Switch_SMD:SW_Push_PTS645SM43SMTR92",
+    "C105": "Capacitor_SMD:TDK_C5750X7R1V476M230KC",
+    "J5": "Connector_Phoenix_MC:PhoenixContact_MC_1,5_10-G-3.5_1x10_P3.50mm_Horizontal",
+    "J501": "Connector_Phoenix_MC:PhoenixContact_MC_1,5_2-G-3.5_1x02_P3.50mm_Horizontal",
+    "J701": "Connector_Molex:Molex_Micro-Fit_3.0_43045-0212_2x01_P3.00mm_Vertical"
   },
   "resolved_bindings": {
     "U20": {
@@ -158,6 +64,84 @@
       "same_as": "U20",
       "kind": "exact_land_pattern",
       "status": "RESOLVED_REVIEWED_OFFICIAL_EVAL_LAND_PATTERN"
+    },
+    "J101": {
+      "kind": "mechanical_selection",
+      "status": "RESOLVED_EXACT_PART_AND_FOOTPRINT",
+      "manufacturer": "Phoenix Contact",
+      "mpn": "MSTBA 2,5/2-G-5,08",
+      "order_number": "1757242",
+      "mating_part": "MSTB 2,5/2-ST-5,08 / 1757019",
+      "footprint": "Connector_Phoenix_MSTB:PhoenixContact_MSTBA_2,5_2-G-5,08_1x02_P5.08mm_Horizontal",
+      "evidence_manifest": "hardware/revB/mechanical_binding_plan.json"
+    },
+    "SW101": {
+      "kind": "mechanical_selection",
+      "status": "RESOLVED_EXACT_PART_AND_FOOTPRINT",
+      "manufacturer": "C&K / Littelfuse",
+      "mpn": "PTS645SM43SMTR92 LFS",
+      "footprint": "Button_Switch_SMD:SW_Push_PTS645SM43SMTR92",
+      "evidence_manifest": "hardware/revB/mechanical_binding_plan.json"
+    },
+    "C105": {
+      "kind": "exact_land_pattern",
+      "status": "RESOLVED_TDK_RECOMMENDED_LAND_PATTERN",
+      "manufacturer": "TDK",
+      "mpn": "C5750X7R1V476M230KC",
+      "footprint": "Capacitor_SMD:TDK_C5750X7R1V476M230KC",
+      "land_pattern_mm": {
+        "PA": [
+          4.1,
+          4.8
+        ],
+        "PB": [
+          1.2,
+          1.4
+        ],
+        "PC": [
+          4,
+          5
+        ]
+      },
+      "evidence_manifest": "hardware/revB/layout_entry_sources.json"
+    },
+    "J5": {
+      "kind": "mechanical_selection",
+      "status": "RESOLVED_EXACT_PART_AND_FOOTPRINT",
+      "manufacturer": "Phoenix Contact",
+      "mpn": "MC 1,5/10-G-3,5",
+      "order_number": "1844294",
+      "mating_part": "FMC 1,5/10-ST-3,5 / 1952348",
+      "footprint": "Connector_Phoenix_MC:PhoenixContact_MC_1,5_10-G-3.5_1x10_P3.50mm_Horizontal",
+      "evidence_manifest": "hardware/revB/mechanical_binding_plan.json"
+    },
+    "J501": {
+      "kind": "mechanical_selection",
+      "status": "RESOLVED_EXACT_PART_AND_FOOTPRINT",
+      "manufacturer": "Phoenix Contact",
+      "mpn": "MC 1,5/2-G-3,5",
+      "order_number": "1844210",
+      "mating_part": "MC 1,5/2-ST-3,5 / 1840366",
+      "footprint": "Connector_Phoenix_MC:PhoenixContact_MC_1,5_2-G-3.5_1x02_P3.50mm_Horizontal",
+      "evidence_manifest": "hardware/revB/mechanical_binding_plan.json"
+    },
+    "J701": {
+      "kind": "mechanical_selection",
+      "status": "RESOLVED_EXACT_PART_AND_FOOTPRINT",
+      "manufacturer": "Molex",
+      "mpn": "43045-0212",
+      "order_number": "430450212",
+      "mating_part": "Micro-Fit 3.0 receptacle housing / 430250200",
+      "footprint": "Connector_Molex:Molex_Micro-Fit_3.0_43045-0212_2x01_P3.00mm_Vertical",
+      "evidence_manifest": "hardware/revB/mechanical_binding_plan.json"
     }
-  }
+  },
+  "layout_entry_resolved_refs": [
+    "J101",
+    "SW101",
+    "C105",
+    "J5",
+    "J501",
+    "J701"
+  ]
 }

@@ -19,14 +19,26 @@ def check_archive_tree(actual):
 def check(root=ROOT):
     for old in ['hardware/fpga/revA','hardware/kicad/revA','docs/icd/j12-hil-link.csv']:
         if (root/old).exists(): raise ValueError('legacy active path must be archived: '+old)
+
+    gates=json.loads((root/'hardware/revB/gates.json').read_text())
+    contract=json.loads((root/'hardware/revB/layout_entry_contract.json').read_text())
+    if gates.get('layout_allowed') is not True:
+        raise ValueError('Rev.B source closure must authorize PCB Layout entry')
+    if gates.get('fabrication_allowed') is not False or gates.get('release_allowed') is not False:
+        raise ValueError('Layout entry must not authorize fabrication/release')
+    if contract.get('status')!='READY_FOR_PCB_LAYOUT' or contract.get('layout_allowed') is not True:
+        raise ValueError('layout-entry contract is not READY_FOR_PCB_LAYOUT')
+    if contract.get('fabrication_allowed') is not False:
+        raise ValueError('layout-entry contract must keep fabrication blocked')
+
     for pcb in root.rglob('*.kicad_pcb'):
-        if 'archive' not in pcb.relative_to(root).parts:
-            raise ValueError('PCB layout is not authorized: '+str(pcb))
+        rel=pcb.relative_to(root)
+        if 'archive' not in rel.parts and not gates.get('layout_allowed'):
+            raise ValueError('active PCB layout exists without authorization: '+str(pcb))
+
     bom=(root/'bom/revb-common.csv').read_text()
     if re.search(r'XC7A|FGG484|W25Q128|ADP5054|ADM1186|1V0_FPGA',bom,re.I):
         raise ValueError('second-FPGA support component in active BOM')
-    gates=json.loads((root/'hardware/revB/gates.json').read_text())
-    if gates['layout_allowed'] is not False: raise ValueError('migration must keep layout disabled')
     if any(v['status']!='SUPERSEDED' for v in gates['legacy'].values()):
         raise ValueError('legacy gates must be SUPERSEDED, never PASS')
     if (root/'.git').exists():
@@ -34,6 +46,6 @@ def check(root=ROOT):
         check_archive_tree(result)
     else:
         print('Archive Git-tree verification not available outside a checkout')
-    print('Rev.B repository guard PASS; reviewed PR18 archive frozen; historical target is not active')
+    print('Rev.B repository guard PASS; Layout entry authorized, fabrication/release blocked; reviewed PR18 archive frozen')
 
 if __name__=='__main__': check()

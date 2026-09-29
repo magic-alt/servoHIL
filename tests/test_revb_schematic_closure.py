@@ -52,19 +52,22 @@ class RevBSchematicClosureTests(unittest.TestCase):
             with mock.patch.object(MOD, "AD3542_FOOTPRINT", path):
                 return MOD.check()
 
-    def test_checked_in_native_source_matches_five_open_mechanical_contracts(self):
+    def test_checked_in_native_source_is_ready_for_layout_entry(self):
         report = MOD.check()
-        self.assertEqual(report["status"], "PASS_SOURCE_CLOSURE_CONTRACT")
-        self.assertFalse(report["layout_allowed"])
-        self.assertEqual(report["blank_footprint_count"], 5)
-        self.assertEqual(report["binding_requirement_count"], 5)
+        self.assertEqual(report["status"], "PASS_LAYOUT_ENTRY_SOURCE_CLOSURE")
+        self.assertTrue(report["layout_allowed"])
+        self.assertFalse(report["fabrication_allowed"])
+        self.assertEqual(report["blank_footprint_count"], 0)
+        self.assertEqual(report["binding_requirement_count"], 0)
         self.assertEqual(report["land_pattern_blockers"], [])
         self.assertEqual(
             report["resolved_land_patterns"], ["U20", "U21", "U22", "U23"]
         )
         self.assertEqual(
-            report["mechanical_blockers"], ["J101", "J5", "J501", "J701", "SW101"]
+            set(report["resolved_layout_refs"]),
+            {"J101", "SW101", "C105", "J5", "J501", "J701"},
         )
+        self.assertEqual(report["mechanical_blockers"], [])
         self.assertEqual(
             report["ad3542r_footprint_evidence_status"],
             "REVIEWED_OFFICIAL_EVAL_GERBER_FOOTPRINT_VENDORED",
@@ -77,24 +80,24 @@ class RevBSchematicClosureTests(unittest.TestCase):
         self.assertEqual(report["ad3542r_mask_aperture_count"], 28)
         self.assertGreater(report["physical_components"], 350)
 
-    def test_manifest_open_contract_is_exactly_five_mechanical_interfaces(self):
+    def test_manifest_has_zero_open_layout_bindings(self):
         manifest = self.manifest()
-        self.assertEqual(manifest["schema_version"], 3)
+        self.assertEqual(manifest["schema_version"], 4)
+        self.assertEqual(manifest["open_footprints"], {})
+        self.assertEqual(manifest["binding_requirements"], {})
         self.assertEqual(
-            set(manifest["open_footprints"]), {"J101", "SW101", "J5", "J501", "J701"}
+            manifest["status"], "SCHEMATIC_LAYOUT_ENTRY_READY_NO_OPEN_FOOTPRINTS"
         )
+        self.assertTrue(manifest["layout_allowed"])
         self.assertEqual(
-            set(manifest["binding_requirements"]), set(manifest["open_footprints"])
+            set(manifest["layout_entry_resolved_refs"]),
+            {"J101", "SW101", "C105", "J5", "J501", "J701"},
         )
-        self.assertEqual(
-            manifest["status"], "SCHEMATIC_FUNCTION_COMPLETE_5_PHYSICAL_BINDINGS_OPEN"
-        )
-        self.assertFalse(manifest["layout_allowed"])
 
     def test_ad3542r_resolved_binding_is_exact_and_source_bound(self):
         manifest = self.manifest()
         bindings = manifest["resolved_bindings"]
-        self.assertEqual(set(bindings), {"U20", "U21", "U22", "U23"})
+        self.assertTrue({"U20", "U21", "U22", "U23"}.issubset(bindings))
         base = bindings["U20"]
         self.assertEqual(base["manufacturer"], "Analog Devices")
         self.assertEqual(base["mpn"], "AD3542RBCPZ16")
@@ -186,31 +189,34 @@ class RevBSchematicClosureTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing exact official solder-mask aperture"):
             self.check_with_footprint_text(text)
 
-    def test_stale_nine_open_count_is_rejected(self):
+    def test_stale_open_status_is_rejected(self):
         manifest = self.manifest()
-        manifest["status"] = "SCHEMATIC_FUNCTION_COMPLETE_9_PHYSICAL_BINDINGS_OPEN"
-        with self.assertRaisesRegex(ValueError, "status/count drift"):
+        manifest["status"] = "SCHEMATIC_FUNCTION_COMPLETE_5_PHYSICAL_BINDINGS_OPEN"
+        with self.assertRaisesRegex(ValueError, "layout-entry status drift"):
             self.check_with_manifest(manifest)
 
-    def test_missing_mechanical_binding_requirement_is_rejected(self):
+    def test_reopened_footprint_contract_is_rejected(self):
         manifest = self.manifest()
-        del manifest["binding_requirements"]["J5"]
-        with self.assertRaisesRegex(ValueError, "binding requirement set changed"):
+        manifest["open_footprints"]["J5"] = "stale blocker"
+        with self.assertRaisesRegex(ValueError, "zero open footprint"):
+            self.check_with_manifest(manifest)
+
+    def test_missing_layout_resolved_binding_is_rejected(self):
+        manifest = self.manifest()
+        del manifest["resolved_bindings"]["J5"]
+        with self.assertRaisesRegex(ValueError, "J5: missing resolved layout binding"):
+            self.check_with_manifest(manifest)
+
+    def test_layout_footprint_drift_is_rejected(self):
+        manifest = self.manifest()
+        manifest["resolved_bindings"]["J701"]["footprint"] = "Connector_Generic:Fake"
+        with self.assertRaisesRegex(ValueError, "J701: resolved binding footprint drift"):
             self.check_with_manifest(manifest)
 
     def test_ad3542r_resolved_binding_cannot_be_weakened_to_generic_pass(self):
         manifest = self.manifest()
         manifest["resolved_bindings"]["U20"]["status"] = "PASS"
         with self.assertRaisesRegex(ValueError, "U20 resolved binding drift"):
-            self.check_with_manifest(manifest)
-
-    def test_dut_permit_contract_cannot_drop_leakage_or_isolation(self):
-        manifest = self.manifest()
-        fields = manifest["binding_requirements"]["J701"]["required_contract_fields"]
-        manifest["binding_requirements"]["J701"]["required_contract_fields"] = [
-            x for x in fields if "leakage" not in x.lower() and "isolation" not in x.lower()
-        ]
-        with self.assertRaisesRegex(ValueError, "J701 physical contract"):
             self.check_with_manifest(manifest)
 
 
