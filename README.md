@@ -481,7 +481,29 @@ CI 的 skipped 项只有在明确缺少对应 native tool/evidence 时才可接�
 
 ---
 
-## 12. 下一阶段
+## 12. Pre-Layout 成本 / 架构决策
+
+在冻结 DAC、电源和 precision-analog placement 之前，项目增加一个个人版成本决策门：
+
+- 不再把 **8 路 AD3542R-16 全装**视为首板默认配置；
+- 当前推荐 baseline 为 **4 路 fast AO，可扩展到 8 路**；
+- 优先验证 AD3542R-12 是否已满足实际 DUT 分辨率；
+- AD7606C-16 可在首个闭环样机中作为可选 DNP；
+- 必须先实测 `PWM capture -> Plant -> AO settled -> DUT ADC sample` 的真实时序余量；
+- 如果余量 >10 us，才值得进一步切换 DAC80504 / DAC81404 一类低成本 DAC；
+- 如果余量 <2 us，则继续保留 AD3542R fast-precision 路线。
+
+完整决策、替代器件、成本和实施收益见：
+
+`docs/design/revb-prelayout-cost-feasibility-decision.md`
+
+该决策不改变机器 gate：`layout_allowed=true` 仍表示可以继续机械/板框/规则工作；
+但 **DAC / analog power / precision placement 不应冻结**，直到 fast-AO 数量、有效分辨率
+和 DUT ADC timing margin 三项实测闭合。
+
+---
+
+## 13. 下一阶段
 
 原理图已经不再是主要工作面。当前工程优先级是：
 
@@ -514,7 +536,7 @@ CI 的 skipped 项只有在明确缺少对应 native tool/evidence 时才可接�
 
 ---
 
-## 13. Release philosophy
+## 14. Release philosophy
 
 ServoHIL Rev.B 使用显式、fail-closed 的工程门禁：
 
